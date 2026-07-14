@@ -6,23 +6,23 @@ O **Arsenal** é um sistema desenvolvido em **Python** com **Django** para autom
 
 O objetivo é reduzir o trabalho manual realizado na análise de e-mails e anexos, organizando automaticamente as informações em planilhas já existentes. Futuramente, o sistema contará com funcionalidades como:
 
-* Leitura automática de e-mails;
-* Extração de informações dos anexos;
-* Organização e validação dos dados;
-* Preenchimento de planilhas modelo;
-* Histórico das execuções;
-* Dashboard para acompanhamento do processo.
+- Leitura automática de e-mails;
+- Extração de informações dos anexos;
+- Organização e validação dos dados;
+- Preenchimento de planilhas modelo;
+- Histórico das execuções;
+- Dashboard para acompanhamento do processo.
 
 ---
 
 # Tecnologias
 
-* Python 3
-* Django
-* Bootstrap (interface)
-* HTML
-* CSS
-* JavaScript
+- Python 3
+- Django
+- Bootstrap (interface)
+- HTML
+- CSS
+- JavaScript
 
 ---
 
@@ -44,8 +44,6 @@ O ambiente virtual isola as dependências do projeto, evitando conflitos com out
 Se já criado, pule para o passo 3.
 
 ## 3. Ativar o ambiente virtual
-
-Linux/macOS:
 
 ```bash
 source .venv/bin/activate
@@ -73,8 +71,8 @@ django-admin startproject config .
 
 Esse comando cria a estrutura inicial do projeto.
 
-* `config` é o nome da pasta que armazenará as configurações do projeto.
-* O `.` indica que o projeto será criado na pasta atual, evitando a criação de uma pasta adicional.
+- `config` é o nome da pasta que armazenará as configurações do projeto.
+- O `.` indica que o projeto será criado na pasta atual, evitando a criação de uma pasta adicional.
 
 Após esse comando, a estrutura será semelhante a:
 
@@ -101,6 +99,28 @@ db.sqlite3
 ```
 
 na raiz do projeto.
+
+## 7. Iniciar o servidor de desenvolvimento
+
+```bash
+python manage.py runserver
+```
+
+Esse comando inicia o **servidor de desenvolvimento** do Django. Ele é utilizado durante a criação e os testes da aplicação.
+
+Após executá-lo, o terminal exibirá uma mensagem semelhante a:
+
+```text
+Starting development server at http://127.0.0.1:8000/
+```
+
+Abra o navegador e acesse:
+
+```text
+http://127.0.0.1:8000/
+```
+
+Se tudo estiver configurado corretamente, será exibida a página padrão do Django, indicando que o projeto foi criado com sucesso.
 
 ---
 
