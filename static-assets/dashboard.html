@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depurador de Orçamentos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+				<aside class="col-12 col-md-4 col-lg-2 sidebar d-flex flex-column justify-content-between p-3 text-white" style="min-height: 100vh;">          
+					<div>
+            <div class="logo mb-4">
+              <h2 class="h4 mb-0 fw-bold">Arsenal</h2>
+              <span class="text-muted small">Depurador de Orçamentos</span>
+            </div>
+            <nav class="nav nav-pills flex-column gap-1">
+              <a class="nav-link" href="index.html">
+              	<i class="fa-solid fa-house me-2"></i> Início
+              </a>
+              <a class="nav-link active" href="dashboard.html">
+              	<i class="fa-solid fa-clipboard me-2"></i> Dashboard
+              </a>
+              <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuProcessos" role="button" aria-expanded="false" aria-controls="submenuProcessos">
+								<span>
+									<i class="fa-solid fa-folder-open me-2"></i> Processos
+								</span>
+								<i class="fa-solid fa-chevron-down ms-auto small seta-submenu"></i>
+							</a>
+							<div class="collapse" id="submenuProcessos">
+								<div class="nav flex-column ms-3 gap-1 ps-2 border-start border-secondary border-opacity-25">
+									<a class="nav-link py-2 text-white-50 small d-flex align-items-start" href="resumo.html">
+										<i class="fa-solid fa-folder-open me-2"></i> Ver Processos
+									</a>
+									<a class="nav-link py-2 text-white-50 small d-flex align-items-start" href="novoprocesso.html">
+										<i class="fa-solid fa-file-circle-plus me-2 pt-1"></i>
+										<span>Novo Processo</span>
+									</a>
+									<a class="nav-link py-2 text-white-50 small" href="emails.html">
+										<i class="fa-solid fa-envelope me-2"></i> E-mails
+									</a>
+									<a class="nav-link py-2 text-white-50 small" href="relatorios.html">
+										<i class="fa-solid fa-chart-pie me-2"></i> Relatórios
+									</a>
+									<a class="nav-link py-2 text-white-50 small" href="fornecedores.html">
+										<i class="fa-solid fa-building me-2"></i> Fornecedores
+									</a>
+									<a class="nav-link py-2 text-white-50 small" href="documentos.html">
+										<i class="fa-solid fa-file-lines me-2"></i> Documentos
+									</a>
+								</div>
+							</div>
+
+							<a class="nav-link d-flex align-items-center" href="mapa.html">
+								<i class="fa-solid fa-file-circle-plus me-2"></i>
+								<span>Mapa<br>Comparativo</span>
+							</a>
+              <a class="nav-link" href="relatorios.html">
+              	<i class="fa-solid fa-chart-column me-2"></i> Relatórios
+              </a>
+              <a class="nav-link" href="configuracoes.html">
+              	<i class="fa-solid fa-gear me-2"></i> Configurações
+              </a>
+            </nav>
+          </div>
+          <div class="perfil d-flex align-items-center gap-2 pt-3 border-top border-secondary mt-4">
+            <img src="https://placehold.co/40x40" class="rounded-circle" alt="Foto de perfil">
+            <div class="overflow-hidden">
+              <strong class="d-block text-truncate small">Administrador</strong>
+              <small class="text-muted d-block text-truncate" style="font-size: 0.75rem;">admin@teste.com</small>
+            </div>
+          </div>
+        </aside>
+        <main class="col-12 col-md-8 col-lg-10 p-4">
+  
+					<header class="d-flex justify-content-between align-items-center mb-4">
+						<h1 class="h3 mb-0 fw-bold">Dashboard</h1>
+						<button class="btn btn-primary rounded-3 d-flex align-items-center gap-2">
+							<i class="fa-solid fa-plus"></i> Novo Processo
+						</button>
+					</header>
+
+					<section class="row g-3 mb-4">
+						<div class="col-12 col-sm-6 col-lg-3">
+							<div class="card border-0 shadow-sm">
+								<div class="card-body">
+									<h3 class="card-title text-muted h6 mb-1">Processos</h3>
+									<span class="fs-2 fw-bold text-dark">18</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-lg-3">
+							<div class="card border-0 shadow-sm">
+								<div class="card-body">
+									<h3 class="card-title text-muted h6 mb-1">Em andamento</h3>
+									<span class="fs-2 fw-bold text-warning">7</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-lg-3">
+							<div class="card border-0 shadow-sm">
+								<div class="card-body">
+									<h3 class="card-title text-muted h6 mb-1">Concluídos</h3>
+									<span class="fs-2 fw-bold text-success">11</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-lg-3">
+							<div class="card border-0 shadow-sm">
+								<div class="card-body">
+									<h3 class="card-title text-muted h6 mb-1">Pendências</h3>
+									<span class="fs-2 fw-bold text-danger">4</span>
+								</div>
+							</div>
+						</div>
+					</section>
+
+					<section class="lista bg-white p-4 rounded shadow-sm">
+						
+						<div class="d-flex flex-wrap flex-md-nowrap gap-2 w-100 w-md-auto">
+							<input type="text" class="form-control form-control-sm" placeholder="Buscar processo..." style="max-width: 200px; flex-shrink: 1;">
+							
+							<select class="form-select form-select-sm" style="max-width: 150px; flex-shrink: 0;">
+								<option selected>Qualquer data</option>
+								<option>Hoje</option>
+								<option>Este mês</option>
+								<option>Ano corrente</option>
+							</select>
+
+							<select class="form-select form-select-sm" style="max-width: 150px; flex-shrink: 0;">
+								<option selected>Todos os status</option>
+								<option>Em andamento</option>
+								<option>Concluído</option>
+								<option>Pendente</option>
+							</select>
+						</div>
+
+						<div class="table-responsive pt-3">
+							<table class="table table-hover align-middle mb-0">
+								<thead class="table-light">
+									<tr>
+										<th class="border-0">Processo</th>
+										<th class="border-0">Descrição</th>
+										<th class="border-0">Data de Abertura</th>
+										<th class="border-0">Valor Estimado</th>
+										<th class="border-0">Status</th>
+										<th class="border-0 text-end">Ações</th>
+									</tr>
+								</thead>
+								<tbody>
+									
+									<tr>
+										<td><strong class="text-dark">00015/2026</strong></td>
+										<td>Aquisição de Notebooks</td>
+										<td class="text-muted small">15/05/2026</td>
+										<td class="fw-semibold">R$ 45.000,00</td>
+										<td>
+											<span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
+												Em andamento
+											</span>
+										</td>
+										<td class="text-end">
+											<a href="#" class="btn btn-sm btn-light border" title="Visualizar"><i class="fa-solid fa-eye text-secondary"></i></a>
+										</td>
+									</tr>
+
+									<tr>
+										<td><strong class="text-dark">00016/2026</strong></td>
+										<td>Material Elétrico</td>
+										<td class="text-muted small">12/05/2026</td>
+										<td class="fw-semibold">R$ 12.800,00</td>
+										<td>
+											<span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+												Concluído
+											</span>
+										</td>
+										<td class="text-end">
+											<a href="#" class="btn btn-sm btn-light border" title="Visualizar"><i class="fa-solid fa-eye text-secondary"></i></a>
+										</td>
+									</tr>
+
+									<tr>
+										<td><strong class="text-dark">00017/2026</strong></td>
+										<td>Serviços de Limpeza</td>
+										<td class="text-muted small">10/05/2026</td>
+										<td class="fw-semibold">R$ 8.500,00</td>
+										<td>
+											<span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">
+												Pendente
+											</span>
+										</td>
+										<td class="text-end">
+											<a href="#" class="btn btn-sm btn-light border" title="Visualizar"><i class="fa-solid fa-eye text-secondary"></i></a>
+										</td>
+									</tr>
+
+									<tr>
+										<td><strong class="text-dark">00018/2026</strong></td>
+										<td>Serviços de Carga</td>
+										<td class="text-muted small">10/06/2026</td>
+										<td class="fw-semibold">R$ 9.500,00</td>
+										<td>
+											<span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+												Concluído
+											</span>
+										</td>
+										<td class="text-end">
+											<a href="#" class="btn btn-sm btn-light border" title="Visualizar"><i class="fa-solid fa-eye text-secondary"></i></a>
+										</td>
+									</tr>
+
+								</tbody>
+							</table>
+						</div>
+
+						<div class="text-center mt-3">
+							<a href="#" class="text-decoration-none small fw-bold">Ver todos os processos <i class="fa-solid fa-arrow-right ms-1"></i></a>
+						</div>
+
+					</section>
+				</main>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
