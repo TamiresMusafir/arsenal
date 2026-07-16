@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Depurador de Orçamentos</title>
+    <title>Arsenal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="stylesheets/bootstrap.min.css">
     <link rel="stylesheet" href="stylesheets/style.css">
@@ -11,7 +11,8 @@
   <body>
     <div class="container-fluid">
       <div class="row">
-				<aside class="col-12 col-md-4 col-lg-2 sidebar d-flex flex-column justify-content-between p-3 text-white" style="min-height: 100vh;">          <div>
+				<aside class="col-12 col-md-4 col-lg-2 sidebar d-flex flex-column justify-content-between p-3 text-white" style="min-height: 100vh;">          
+					<div>
             <div class="logo mb-4">
               <h2 class="h4 mb-0 fw-bold">Arsenal</h2>
               <span class="text-muted small">Depurador de Orçamentos</span>
@@ -31,7 +32,7 @@
 							</a>
 							<div class="collapse" id="submenuProcessos">
 								<div class="nav flex-column ms-3 gap-1 ps-2 border-start border-secondary border-opacity-25">
-									<a class="nav-link py-2 text-white-50 small d-flex align-items-start" href="resumo.html">
+									<a class="nav-link py-2 text-white-50 small d-flex align-items-start" href="processos.html">
 										<i class="fa-solid fa-folder-open me-2"></i> Ver Processos
 									</a>
 									<a class="nav-link py-2 text-white-50 small d-flex align-items-start" href="novoprocesso.html">
@@ -52,9 +53,8 @@
 									</a>
 								</div>
 							</div>
-
 							<a class="nav-link d-flex align-items-center" href="mapa.html">
-								<i class="fa-solid fa-file-circle-plus me-2"></i>
+								<i class="fa-solid fa-scale-balanced me-2"></i>
 								<span>Mapa<br>Comparativo</span>
 							</a>
               <a class="nav-link" href="relatorios.html">
@@ -76,9 +76,9 @@
         <main class="col-12 col-md-8 col-lg-10 p-4">
   
 					<container>
-						<header class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-4">
+						<section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-4">
 							<div style="max-width: 700px;">
-								<span class="badge bg-primary-subtle text-primary mb-2 px-3 py-2 rounded-pill fw-bold">Guia de Introdução</span>
+								<h5 class="bg-primary-subtle text-primary mb-2 py-2 rounded-pill fw-bold">Guia de Introdução</h5>
 								<h1 class="display-5 fw-bold text-dark">Bem-vindo ao Arsenal!</h1>
 								<p class="col-md-11 fs-6 text-muted mt-3">
 									O Arsenal foi desenvolvido para automatizar e organizar o processo de <strong>depuração de orçamentos</strong>. Reunimos em um único ambiente todo o fluxo necessário para analisar processos licitatórios com agilidade, reduzindo tarefas manuais e minimizando erros.
@@ -87,10 +87,10 @@
 							<div class="d-none d-lg-block">
 								<i class="fa-solid fa-laptop-code text-primary opacity-25" style="font-size: 10rem;"></i>
 							</div>
-						</header>
+						</section>
 
 						<section class="mb-4">
-							<div class="d-flex align-items-center gap-2 mb-4">
+							<div class="d-flex align-items-center gap-2 mb-4 px-4">
 								<i class="fa-solid fa-book-open text-primary fs-4"></i>
 								<h2 class="h4 fw-bold text-dark mb-0">Apresentação dos Módulos</h2>
 							</div>
@@ -143,7 +143,7 @@
 									<div class="card h-100 border-0 shadow-sm p-4">
 										<div class="d-flex align-items-center gap-3 mb-3">
 											<div class="bg-secondary-subtle text-secondary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
-												<i class="fa-solid fa-chart-pie fs-5"></i>
+												<i class="fa-solid fa-chart-column fs-5"></i>
 											</div>
 											<h3 class="h5 fw-bold text-dark mb-0">Relatórios</h3>
 										</div>
