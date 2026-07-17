@@ -1,0 +1,178 @@
+/* Fontes */
+* {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+main{
+  text-align: justify;
+}
+
+/*Cores*/
+:root{
+  --main-dark: #374151;
+  --main-light: #9ca3af;;
+  --main-lighter: #f4f6f9;
+  --main-darker: #1f2937;
+}
+
+/* SIDEBAR */
+.sidebar {
+  background: var(--main-darker)!important;
+  color: white;
+}
+
+.logo {
+  padding: 20px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logo h2 {
+  font-size: 28px;
+}
+
+.sidebar nav {
+  margin-top: 20px;
+}
+
+.sidebar nav .nav-link {
+  color: white;
+  padding: 12px 15px;
+  transition: .3s;
+  border-radius: 8px;
+}
+
+.sidebar nav .nav-link i {
+  width: 25px;
+}
+
+.sidebar nav .nav-link:hover,
+.sidebar nav .nav-link.active {
+  background: var(--main-dark) !important;
+  color: white !important;
+}
+
+/* Perfil */
+.perfil {
+  padding: 15px 10px;
+  border-top: 1px var(--main-darker) !important;
+}
+
+.perfil img {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+}
+
+.perfil small {
+  color: #bdbdbd;
+}
+
+/* Main */
+main {
+  background: var(--main-lighter);
+}
+
+/* Cards */
+.card {
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
+  background: white;
+}
+
+/* Lista de Processos */
+.lista {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
+}
+
+.badge.bg-warning-subtle {
+  background-color: #fef3c7 !important;
+  color: #d97706 !important;
+}
+
+.badge.bg-success-subtle {
+  background-color: #dcfce7 !important;
+  color: #15803d !important;
+}
+
+.badge.bg-danger-subtle {
+  background-color: #fee2e2 !important;
+  color: #b91c1c !important;
+}
+
+.text-justify{
+  text-align: justify;
+}
+
+/*Wizard*/
+
+.wizard-card {
+  background: var(--main-light);
+  border-radius: 12px;
+}
+
+.wizard-header {
+  position: relative;
+}
+
+.wizard-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 18px;
+  height: 2px;
+  background: var(--main-dark);
+  z-index: 1;
+}
+
+.wizard-step {
+  position: relative;
+  z-index: 2;
+  background: white;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--main-darker);
+  font-size: .9rem;
+}
+
+.wizard-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--main-light);
+  border: 1px solid var(--main-light);
+  transition: .3s;
+}
+
+.wizard-step.active {
+  color: var(--main-darker);
+}
+
+.wizard-step.active .wizard-circle {
+  background: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.wizard-step.completed .wizard-circle {
+  background: #198754;
+  border-color: #198754;
+}
+
+.wizard-content {
+  display: none;
+}
+
+.wizard-content.active {
+  display: block;
+}
+
+.wizard-info-title{
+    color: #495057;
+    font-weight: 700;
+}
