@@ -11,204 +11,213 @@
   <body>
     <div class="container-fluid px-0">
       <div class="row g-0">
-        <!-- Header Mobile -->
-        <!--Sidebar-->
-        <header class="mobile-header d-lg-none d-flex align-items-center justify-content-between p-3">
-          <button id="mobileMenuBtn" class="btn btn-primary">
-          <i class="fa-solid fa-bars"></i>
-          </button>
-        </header>
-        <!-- Sidebar -->
-        <aside class="sidebar col-lg-2 d-flex flex-column justify-content-between p-3 text-white">
-          <!-- Botão fechar (somente mobile) -->
-          <button class="close-menu btn btn-link text-white d-lg-none align-self-end mb-3">
-          <i class="fa-solid fa-xmark fa-xl"></i>
-          </button>
-          <div>
-            <!-- Logo -->
-            <div class="logo mb-4">
-              <h2 class="h4 mb-0 fw-bold">Arsenal</h2>
-              <span class="text-muted small">
-              Depurador de Orçamentos
-              </span>
-            </div>
-            <!-- Navegação -->
-            <nav class="nav nav-pills flex-column gap-1">
-              <a class="nav-link active" href="index.html">
-              <i class="fa-solid fa-house fa-fw me-2"></i>
-              <span>Início</span>
-              </a>
-              <a class="nav-link" href="dashboard.html">
-              <i class="fa-solid fa-clipboard fa-fw me-2"></i>
-              <span>Dashboard</span>
-              </a>
-              <!-- Processos -->
-              <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuProcessos" role="button" aria-expanded="false" aria-controls="submenuProcessos">
-              <span>
-              <i class="fa-solid fa-folder-open fa-fw me-2"></i>
-              Processos
-              </span>
-              <i class="fa-solid fa-chevron-down small seta-submenu"></i>
-              </a>
-              <div class="collapse" id="submenuProcessos">
-                <div class="nav flex-column ms-3 ps-2 border-start border-secondary border-opacity-25">
-                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="processos.html">
-                  <i class="fa-solid fa-folder-open fa-fw me-2"></i>
-                  <span>Ver Processos</span>
-                  </a>
-                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="novoprocesso.html">
-                  <i class="fa-solid fa-file-circle-plus fa-fw me-2"></i>
-                  <span>Novo Processo</span>
-                  </a>
-                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="emails.html">
-                  <i class="fa-solid fa-envelope fa-fw me-2"></i>
-                  <span>E-mails</span>
-                  </a>
-                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="fornecedores.html">
-                  <i class="fa-solid fa-building fa-fw me-2"></i>
-                  <span>Fornecedores</span>
-                  </a>
-                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="documentos.html">
-                  <i class="fa-solid fa-file-lines fa-fw me-2"></i>
-                  <span>Documentos</span>
-                  </a>
-                </div>
-              </div>
-              <a class="nav-link d-flex align-items-center" href="mapa.html">
-              <i class="fa-solid fa-scale-balanced fa-fw me-2"></i>
-              <span>Mapa<br>Comparativo
-              </span>
-              </a>
-              <a class="nav-link" href="relatorios.html">
-              <i class="fa-solid fa-chart-column fa-fw me-2"></i>
-              <span>Relatórios</span>
-              </a>
-              <a class="nav-link" href="configuracoes.html">
-              <i class="fa-solid fa-gear fa-fw me-2"></i>
-              <span>Configurações</span>
-              </a>
-            </nav>
-          </div>
-          <!-- Perfil -->
-          <div class="perfil d-flex align-items-center gap-2 pt-3 mt-4 border-top border-secondary">
-            <img
-              src="https://placehold.co/40x40"
-              class="rounded-circle"
-              alt="Administrador">
-            <div class="overflow-hidden">
-              <strong class="d-block text-truncate small">
-              Administrador
-              </strong>
-              <small class="text-muted d-block text-truncate">
-              admin@teste.com
-              </small>
-            </div>
-          </div>
-        </aside>
-        <div class="sidebar-backdrop"></div>
+				<!-- Header Mobile -->
+				<!--Sidebar-->
+				<header class="mobile-header d-lg-none d-flex align-items-center justify-content-between p-3">
+					<button id="mobileMenuBtn" class="btn btn-primary">
+					<i class="fa-solid fa-bars"></i>
+					</button>
+				</header>
+				<!-- Sidebar -->
+				<aside class="sidebar col-lg-2 d-flex flex-column justify-content-between p-3 text-white">
+					<!-- Botão fechar (somente mobile) -->
+					<button class="close-menu btn btn-link text-white d-lg-none align-self-end mb-3">
+						<i class="fa-solid fa-xmark fa-xl"></i>
+					</button>
+					<div>
+						<!-- Logo -->
+						<div class="logo mb-4">
+							<h2 class="h4 mb-0 fw-bold">Arsenal</h2>
+							<span class="text-muted small">
+							Depurador de Orçamentos
+							</span>
+						</div>
+						<!-- Navegação -->
+						<nav class="nav nav-pills flex-column gap-1">
+							<a class="nav-link active" href="index.html">
+								<i class="fa-solid fa-house fa-fw me-2"></i>
+								<span>Início</span>
+							</a>
+							<a class="nav-link" href="dashboard.html">
+								<i class="fa-solid fa-clipboard fa-fw me-2"></i>
+								<span>Dashboard</span>
+							</a>
+							<!-- Processos -->
+							<a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuProcessos" role="button" aria-expanded="false" aria-controls="submenuProcessos">
+								<span>
+								<i class="fa-solid fa-folder-open fa-fw me-2"></i>
+								Processos
+								</span>
+								<i class="fa-solid fa-chevron-down small seta-submenu"></i>
+							</a>
+							<div class="collapse" id="submenuProcessos">
+								<div class="nav flex-column ms-3 ps-2 border-start border-secondary border-opacity-25">
+									<a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="processos.html">
+										<i class="fa-solid fa-folder-open fa-fw me-2"></i>
+										<span>Ver Processos</span>
+									</a>
+									<a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="novoprocesso.html">
+										<i class="fa-solid fa-file-circle-plus fa-fw me-2"></i>
+										<span>Novo Processo</span>
+									</a>
+									<a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="emails.html">
+										<i class="fa-solid fa-envelope fa-fw me-2"></i>
+										<span>E-mails</span>
+									</a>
+									<a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="fornecedores.html">
+										<i class="fa-solid fa-building fa-fw me-2"></i>
+										<span>Fornecedores</span>
+									</a>
+									<a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="documentos.html">
+										<i class="fa-solid fa-file-lines fa-fw me-2"></i>
+										<span>Documentos</span>
+									</a>
+								</div>
+							</div>
+							<a class="nav-link d-flex align-items-center" href="mapa.html">
+								<i class="fa-solid fa-scale-balanced fa-fw me-2"></i>
+								<span>Mapa<br>Comparativo
+								</span>
+							</a>
+							<a class="nav-link" href="relatorios.html">
+								<i class="fa-solid fa-chart-column fa-fw me-2"></i>
+								<span>Relatórios</span>
+							</a>
+							<a class="nav-link" href="configuracoes.html">
+								<i class="fa-solid fa-gear fa-fw me-2"></i>
+								<span>Configurações</span>
+							</a>
+						</nav>
+					</div>
+					<!-- Perfil -->
+					<div class="perfil d-flex align-items-center gap-2 pt-3 mt-4 border-top border-secondary">
+						<img
+							src="https://placehold.co/40x40"
+							class="rounded-circle"
+							alt="Administrador">
+						<div class="overflow-hidden">
+							<strong class="d-block text-truncate small">
+							Administrador
+							</strong>
+							<small class="text-muted d-block text-truncate">
+							admin@teste.com
+							</small>
+						</div>
+					</div>
+				</aside>
+				<div class="sidebar-backdrop"></div>
         <main class="col-12 col-lg-10 p-4">
-          <div class="container">
-            <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
-              <div class="row align-items-center">
-                <div class="col-lg-8 col-md-6">
-                  <span class="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill fw-bold">
-                  Guia de Introdução
-                  </span>
-                  <h1 class="display-5 fw-bold text-dark">
-                    Bem-vindo ao Arsenal!
-                  </h1>
-                  <p class="fs-6 text-muted mt-3 mb-0">
-                    O Arsenal foi desenvolvido para automatizar e organizar o processo de
-                    <strong>depuração de orçamentos</strong>. Reunimos em um único ambiente
-                    todo o fluxo necessário para analisar processos licitatórios com
-                    agilidade, reduzindo tarefas manuais e minimizando erros.
-                  </p>
-                </div>
-                <div class="col-lg-4 col-md-6 text-center">
-                  <i class="fa-solid fa-laptop-code text-primary opacity-25"
-                    style="font-size: 10rem;"></i>
-                </div>
-              </div>
-            </section>
-            <section class="mb-4">
-              <div class="d-flex align-items-center gap-2 mb-4 px-4">
-                <i class="fa-solid fa-book-open text-primary fs-4"></i>
-                <h2 class="h4 fw-bold text-dark mb-0">Apresentação dos Módulos</h2>
-              </div>
-              <div class="row g-4">
-                <div class="col-12 col-md-6">
-                  <div class="card h-100 border-0 shadow-sm p-4">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                      <div class="bg-primary-subtle text-primary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
-                        <i class="fa-solid fa-clipboard fs-5"></i>
-                      </div>
-                      <h3 class="h5 fw-bold text-dark mb-0">Dashboard</h3>
-                    </div>
-                    <p class="text-muted small mb-0">
-                      Apresenta uma visão geral do sistema, exibindo indicadores, estatísticas e os processos mais recentes. É a página inicial da aplicação e serve como ponto de acompanhamento das atividades em andamento.
-                    </p>
-                  </div>
-                </div>
-                <div class="col-12 col-md-6">
-                  <div class="card h-100 border-0 shadow-sm p-4">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                      <div class="bg-success-subtle text-success rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
-                        <i class="fa-solid fa-folder-open fs-5"></i>
-                      </div>
-                      <h3 class="h5 fw-bold text-dark mb-0">Processos</h3>
-                    </div>
-                    <p class="text-muted small mb-0">
-                      Concentra o gerenciamento dos processos cadastrados. Nele é possível visualizar informações gerais, acompanhar o andamento de cada processo e iniciar um novo fluxo de processamento.
-                    </p>
-                  </div>
-                </div>
-                <div class="col-12 col-md-6">
-                  <div class="card h-100 border-0 shadow-sm p-4">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                      <div class="bg-danger-subtle text-danger rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
-                        <i class="fa-solid fa-scale-balanced fs-5"></i>
-                      </div>
-                      <h3 class="h5 fw-bold text-dark mb-0">Mapa Comparativo</h3>
-                    </div>
-                    <p class="text-muted small mb-0">
-                      Apresenta o resultado da consolidação das propostas analisadas, facilitando a comparação entre fornecedores e apoiando a tomada de decisão financeira de maneira visual.
-                    </p>
-                  </div>
-                </div>
-                <div class="col-12 col-md-6">
-                  <div class="card h-100 border-0 shadow-sm p-4">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                      <div class="bg-secondary-subtle text-secondary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
-                        <i class="fa-solid fa-chart-column fs-5"></i>
-                      </div>
-                      <h3 class="h5 fw-bold text-dark mb-0">Relatórios</h3>
-                    </div>
-                    <p class="text-muted small mb-0">
-                      Disponibiliza os relatórios gerados pelo sistema, contendo informações consolidadas sobre os processos e suas respectivas etapas de execução e conferência.
-                    </p>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="card border-0 shadow-sm p-4">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                      <div class="bg-dark-subtle text-dark rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
-                        <i class="fa-solid fa-gear fs-5"></i>
-                      </div>
-                      <h3 class="h5 fw-bold text-dark mb-0">Configurações</h3>
-                    </div>
-                    <p class="text-muted small mb-0">
-                      Permite personalizar parâmetros da aplicação, ajustar preferências de e-mails, taxas, limites de importação e administrar recursos críticos necessários para o funcionamento correto do sistema.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </div>
-        </main>
+  
+					<div class="container">
+						<section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
+							<div class="row align-items-center">
+								<div class="col-lg-8 col-md-6">
+										<span class="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill fw-bold">
+												Guia de Introdução
+										</span>
+										<h1 class="display-5 fw-bold text-dark">
+												Bem-vindo ao Arsenal!
+										</h1>
+										<p class="fs-6 text-muted mt-3 mb-0">
+												O Arsenal foi desenvolvido para automatizar e organizar o processo de
+												<strong>depuração de orçamentos</strong>. Reunimos em um único ambiente
+												todo o fluxo necessário para analisar processos licitatórios com
+												agilidade, reduzindo tarefas manuais e minimizando erros.
+										</p>
+								</div>
+								<div class="col-lg-4 col-md-6 text-center">
+										<i class="fa-solid fa-laptop-code text-primary opacity-25"
+											style="font-size: 10rem;"></i>
+								</div>
+							</div>
+						</section>
+
+						<section class="mb-4">
+							<div class="d-flex align-items-center gap-2 mb-4 px-4">
+								<i class="fa-solid fa-book-open text-primary fs-4"></i>
+								<h2 class="h4 fw-bold text-dark mb-0">Apresentação dos Módulos</h2>
+							</div>
+
+							<div class="row g-4">
+								
+								<div class="col-12 col-md-6">
+									<div class="card h-100 border-0 shadow-sm p-4">
+										<div class="d-flex align-items-center gap-3 mb-3">
+											<div class="bg-primary-subtle text-primary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+												<i class="fa-solid fa-clipboard fs-5"></i>
+											</div>
+											<h3 class="h5 fw-bold text-dark mb-0">Dashboard</h3>
+										</div>
+										<p class="text-muted small mb-0">
+											Apresenta uma visão geral do sistema, exibindo indicadores, estatísticas e os processos mais recentes. É a página inicial da aplicação e serve como ponto de acompanhamento das atividades em andamento.
+										</p>
+									</div>
+								</div>
+
+								<div class="col-12 col-md-6">
+									<div class="card h-100 border-0 shadow-sm p-4">
+										<div class="d-flex align-items-center gap-3 mb-3">
+											<div class="bg-success-subtle text-success rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+												<i class="fa-solid fa-folder-open fs-5"></i>
+											</div>
+											<h3 class="h5 fw-bold text-dark mb-0">Processos</h3>
+										</div>
+										<p class="text-muted small mb-0">
+											Concentra o gerenciamento dos processos cadastrados. Nele é possível visualizar informações gerais, acompanhar o andamento de cada processo e iniciar um novo fluxo de processamento.
+										</p>
+									</div>
+								</div>
+
+								<div class="col-12 col-md-6">
+									<div class="card h-100 border-0 shadow-sm p-4">
+										<div class="d-flex align-items-center gap-3 mb-3">
+											<div class="bg-danger-subtle text-danger rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+												<i class="fa-solid fa-scale-balanced fs-5"></i>
+											</div>
+											<h3 class="h5 fw-bold text-dark mb-0">Mapa Comparativo</h3>
+										</div>
+										<p class="text-muted small mb-0">
+											Apresenta o resultado da consolidação das propostas analisadas, facilitando a comparação entre fornecedores e apoiando a tomada de decisão financeira de maneira visual.
+										</p>
+									</div>
+								</div>
+
+								<div class="col-12 col-md-6">
+									<div class="card h-100 border-0 shadow-sm p-4">
+										<div class="d-flex align-items-center gap-3 mb-3">
+											<div class="bg-secondary-subtle text-secondary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+												<i class="fa-solid fa-chart-column fs-5"></i>
+											</div>
+											<h3 class="h5 fw-bold text-dark mb-0">Relatórios</h3>
+										</div>
+										<p class="text-muted small mb-0">
+											Disponibiliza os relatórios gerados pelo sistema, contendo informações consolidadas sobre os processos e suas respectivas etapas de execução e conferência.
+										</p>
+									</div>
+								</div>
+
+								<div class="col-12">
+									<div class="card border-0 shadow-sm p-4">
+										<div class="d-flex align-items-center gap-3 mb-3">
+											<div class="bg-dark-subtle text-dark rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+												<i class="fa-solid fa-gear fs-5"></i>
+											</div>
+											<h3 class="h5 fw-bold text-dark mb-0">Configurações</h3>
+										</div>
+										<p class="text-muted small mb-0">
+											Permite personalizar parâmetros da aplicação, ajustar preferências de e-mails, taxas, limites de importação e administrar recursos críticos necessários para o funcionamento correto do sistema.
+										</p>
+									</div>
+								</div>
+
+							</div>
+						</section>
+					</div>
+				</main>
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/sidebar.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/sidebar.js"></script>
   </body>
 </html>
