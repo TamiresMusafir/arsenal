@@ -1,0 +1,390 @@
+﻿===========================
+CONFIGURAÇÃO DO PROJETO
+===========================
+
+1. Entrar na pasta do projeto
+
+cd arsenal
+
+===========================
+
+2. Criar o ambiente virtual
+
+python3 -m venv .venv
+
+O ambiente virtual isola as dependências do projeto, evitando conflitos com outros projetos Python instalados na máquina.
+
+Caso ele já exista, pule para o próximo passo.
+
+===========================
+
+3. Ativar o ambiente virtual
+
+source .venv/bin/activate
+
+Após a ativação, o terminal deverá exibir algo semelhante a:
+
+(.venv) usuario@maquina:~/arsenal$
+
+===========================
+
+4. Instalar o Django
+
+pip install django
+
+Esse comando instala o framework Django dentro do ambiente virtual.
+
+===========================
+
+5. Criar o projeto Django
+
+django-admin startproject config .
+
+config é a pasta que armazenará as configurações do projeto.
+
+O "." indica que o projeto será criado na pasta atual, sem criar uma pasta extra.
+
+Estrutura inicial:
+
+arsenal/
+
+├── .venv/
+├── config/
+└── manage.py
+
+===========================
+
+6. Executar as migrações
+
+python manage.py migrate
+
+Esse comando cria as tabelas internas utilizadas pelo Django.
+
+Será criado automaticamente:
+
+db.sqlite3
+
+===========================
+
+7. Iniciar o servidor
+
+python manage.py runserver
+
+Acesse:
+
+http://127.0.0.1:8000/
+
+===========================
+CRIANDO UM NOVO APP
+===========================
+
+Criar o app:
+
+python manage.py startapp home
+
+Estrutura criada:
+
+home/
+
+├── migrations/
+├── admin.py
+├── apps.py
+├── models.py
+├── tests.py
+└── views.py
+
+===========================
+
+Registrar o app
+
+Arquivo:
+
+config/settings.py
+
+Adicionar em INSTALLED_APPS:
+
+'home',
+
+===========================
+
+Criar urls.py
+
+O Django não cria esse arquivo.
+
+Criar:
+
+home/urls.py
+
+Exemplo:
+
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.index, name="home"),
+]
+
+===========================
+
+Criar a view
+
+Arquivo:
+
+home/views.py
+
+from django.shortcuts import render
+
+def index(request):
+    return render(request, "home/index.html")
+
+===========================
+
+Criar os templates
+
+Criar a estrutura:
+
+home/
+
+└── templates/
+    └── home/
+        └── index.html
+
+===========================
+
+Criar os arquivos estáticos (opcional)
+
+home/
+
+└── static/
+    └── home/
+        ├── css/
+        ├── js/
+        └── img/
+
+===========================
+CRIANDO MODELS
+===========================
+
+Criar as classes em:
+
+models.py
+
+Exemplo:
+
+class Processo(models.Model):
+    numero = models.CharField(max_length=20)
+
+===========================
+
+Criar as migrações
+
+python manage.py makemigrations
+
+===========================
+
+Aplicar as migrações
+
+python manage.py migrate
+
+===========================
+CRIAR USUÁRIO ADMIN
+===========================
+
+python manage.py createsuperuser
+
+Depois acessar:
+
+http://127.0.0.1:8000/admin
+
+===========================
+ORDEM DE DESENVOLVIMENTO
+===========================
+
+1. Criar o app
+2. Registrar no settings.py
+3. Criar urls.py
+4. Criar as views
+5. Criar templates
+6. Criar static
+7. Criar os models
+8. Executar makemigrations
+9. Executar migrate
+10. Testar no navegador
+11. Repetir o processo para os próximos apps
+
+===========================
+CRIANDO UM LAYOUT BASE
+===========================
+
+Quando várias páginas compartilham a mesma estrutura
+(cabeçalho, sidebar, rodapé, CSS e JavaScript),
+crie um template base para evitar repetição de código.
+
+1. Criar uma pasta global de templates na raiz do projeto
+
+arsenal/
+
+├── config/
+├── home/
+├── templates/
+│   ├── base.html
+│   └── partials/
+│       ├── header.html
+│       ├── sidebar.html
+│       └── footer.html
+└── manage.py
+
+===========================
+
+2. Configurar o Django para encontrar os templates globais
+
+Arquivo:
+
+config/settings.py
+
+Localizar:
+
+'DIRS': [],
+
+Alterar para:
+
+'DIRS': [BASE_DIR / 'templates'],
+
+===========================
+
+3. Configurar os arquivos estáticos globais 
+
+Ainda em: 
+
+config/settings.py 
+
+Adicionar abaixo de: 
+
+STATIC_URL = 'static/' 
+
+o seguinte: 
+
+STATICFILES_DIRS = [ BASE_DIR / 'static-assets', ] 
+
+Isso informa ao Django que os arquivos CSS, JavaScript e imagens estão armazenados na pasta: 
+
+arsenal/static-assets/ 
+
+===========================
+
+4. Criar o layout principal
+
+Arquivo:
+
+templates/base.html
+
+Estrutura básica:
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <link rel="stylesheet" href="{% static 'stylesheets/style.css' %}">
+</head>
+
+<body>
+
+    {% include "partials/header.html" %}
+    {% include "partials/sidebar.html" %}
+
+    <main>
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+    {% include "partials/footer.html" %}
+
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+</body>
+
+
+</html>
+
+===========================
+
+5. Herdar o layout nas páginas
+
+Exemplo:
+
+home/templates/home/index.html
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Home</h1>
+
+{% endblock %}
+
+===========================
+
+OBSERVAÇÃO
+
+===========================
+
+OBSERVAÇÕES
+
+• {% load static %}
+  Carrega a funcionalidade responsável por localizar
+  arquivos CSS, JavaScript e imagens.
+
+• {% static '...' %}
+  Gera automaticamente o caminho correto para os
+  arquivos estáticos do projeto.
+
+• {% include %}
+  Insere o conteúdo de outro template no local onde
+  foi chamado.
+
+• {% block content %}
+  Define a região que será substituída pelo conteúdo
+  específico de cada página.
+
+Esse bloco é o equivalente ao:
+
+<%= yield %>
+
+do Ruby on Rails.
+
+O equivalente ao <%= yield %> do Ruby on Rails é:
+
+{% block content %}
+{% endblock %}
+
+Todo o conteúdo específico de cada página ficará dentro desse bloco.
+
+Os elementos comuns (header, sidebar, footer, CSS e JavaScript)
+permanecem apenas no base.html.
+
+===========================
+
+Registrar as URLs do app
+
+Arquivo:
+
+config/urls.py
+
+from django.urls import include, path
+
+urlpatterns = [
+    path("", include("home.urls")),
+]
+
+
+Rails (ERB)	Django Templates
+<% ... %>	{% ... %}
+<%= ... %>	{{ ... }}
+application.html.erb	base.html
+yield	{% block content %}
+render partial:	{% include %}
+
