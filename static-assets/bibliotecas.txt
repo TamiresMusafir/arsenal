@@ -1,0 +1,612 @@
+=========================================================
+GUIA DE BIBLIOTECAS E FRAMEWORKS PYTHON
+=========================================================
+
+=========================================================
+1. ANÁLISE E MANIPULAÇÃO DE DADOS
+=========================================================
+
+Pandas
+-------
+Biblioteca para manipulação e análise de dados em tabelas (DataFrames).
+
+Principais usos:
+- Ler arquivos CSV e Excel.
+- Filtrar e organizar dados.
+- Limpar dados.
+- Agrupar informações.
+- Gerar relatórios.
+- Trabalhar com bancos de dados.
+
+---------------------------------------------------------
+
+NumPy
+------
+Biblioteca para computação numérica.
+
+Principais usos:
+- Matrizes e vetores.
+- Álgebra linear.
+- Estatística.
+- Operações matemáticas de alta performance.
+
+É a base de diversas bibliotecas como Pandas, Scikit-Learn e TensorFlow.
+
+---------------------------------------------------------
+
+Polars
+-------
+Biblioteca semelhante ao Pandas, porém muito mais rápida para grandes conjuntos de dados.
+
+Principais usos:
+- Processamento de grandes planilhas.
+- DataFrames de alta performance.
+- Manipulação de milhões de registros.
+
+---------------------------------------------------------
+
+PySpark
+--------
+Biblioteca que permite utilizar o Apache Spark com Python.
+
+Principais usos:
+- Big Data.
+- Processamento distribuído.
+- Grandes volumes de informações.
+- Computação em cluster.
+
+---------------------------------------------------------
+
+OpenPyXL
+---------
+Biblioteca para manipulação de arquivos Excel (.xlsx).
+
+Principais usos:
+- Criar planilhas.
+- Alterar células.
+- Inserir fórmulas.
+- Aplicar estilos.
+- Gerar relatórios.
+- Automatizar planilhas.
+
+=========================================================
+2. INTELIGÊNCIA ARTIFICIAL
+=========================================================
+
+Scikit-Learn
+------------
+Biblioteca de Machine Learning tradicional.
+
+Principais algoritmos:
+- Regressão.
+- Classificação.
+- Clusterização.
+- Árvores de decisão.
+- Random Forest.
+- SVM.
+- KNN.
+
+Muito utilizada para análise preditiva.
+
+---------------------------------------------------------
+
+TensorFlow
+----------
+Framework desenvolvido pelo Google para Deep Learning.
+
+Principais usos:
+- Redes neurais.
+- Visão computacional.
+- Processamento de linguagem natural (NLP).
+- Reconhecimento de imagens.
+- IA Generativa.
+
+---------------------------------------------------------
+
+PyTorch
+--------
+Framework desenvolvido pela Meta para Deep Learning.
+
+Principais usos:
+- Redes neurais.
+- LLMs.
+- IA Generativa.
+- Chatbots.
+- Visão computacional.
+
+Hoje é um dos frameworks mais utilizados em pesquisa.
+
+---------------------------------------------------------
+
+LangChain
+----------
+Framework para construção de aplicações com Grandes Modelos de Linguagem (LLMs).
+
+Principais recursos:
+- Chatbots.
+- Agentes inteligentes.
+- Memória.
+- Busca em documentos.
+- Integração com APIs.
+- Automação utilizando IA.
+
+Muito utilizado com OpenAI.
+
+---------------------------------------------------------
+
+Hugging Face
+------------
+Plataforma e biblioteca que disponibiliza milhares de modelos de Inteligência Artificial.
+
+Possui modelos para:
+- Tradução.
+- Resumo.
+- Classificação.
+- Chatbots.
+- Visão computacional.
+- Geração de texto.
+
+É considerado o "GitHub da Inteligência Artificial".
+
+=========================================================
+3. AUTOMAÇÃO E RPA
+=========================================================
+
+Requests
+--------
+Biblioteca para realizar requisições HTTP.
+
+Principais usos:
+- Consumir APIs.
+- Fazer downloads.
+- Enviar dados para servidores.
+- Comunicação entre sistemas.
+
+---------------------------------------------------------
+
+BeautifulSoup
+-------------
+Biblioteca para interpretar HTML e XML.
+
+Principais usos:
+- Web Scraping.
+- Extração de textos.
+- Tabelas.
+- Links.
+- Imagens.
+
+---------------------------------------------------------
+
+Playwright
+----------
+Framework moderno para automação de navegadores.
+
+Permite:
+- Abrir navegador.
+- Fazer login.
+- Preencher formulários.
+- Baixar arquivos.
+- Upload de documentos.
+- Capturar telas.
+- Automatizar sistemas web.
+
+Muito utilizado em RPA.
+
+---------------------------------------------------------
+
+Selenium
+---------
+Framework tradicional para automação de navegadores.
+
+Principais usos:
+- Testes automatizados.
+- Automação web.
+- Sistemas antigos.
+- RPA.
+
+---------------------------------------------------------
+
+Web Scraping
+------------
+Técnica para extrair informações automaticamente de páginas da internet.
+
+Ferramentas mais utilizadas:
+- Requests.
+- BeautifulSoup.
+- Playwright.
+- Selenium.
+
+---------------------------------------------------------
+
+PyAutoGUI
+----------
+Biblioteca para automação da interface gráfica do computador.
+
+Permite:
+- Mover o mouse.
+- Clicar.
+- Digitar.
+- Pressionar teclas.
+- Automatizar programas sem API.
+
+Muito utilizada quando não existe integração disponível.
+
+=========================================================
+4. DESENVOLVIMENTO WEB
+=========================================================
+
+Django
+------
+Framework Web Full Stack.
+
+Possui:
+- ORM.
+- Sistema de usuários.
+- Autenticação.
+- Templates.
+- Painel administrativo.
+- Segurança.
+- Migrations.
+- APIs.
+
+Ideal para sistemas empresariais.
+
+---------------------------------------------------------
+
+Flask
+-----
+Microframework para desenvolvimento web.
+
+Características:
+- Simples.
+- Leve.
+- Modular.
+- Fácil de aprender.
+
+Muito utilizado para APIs pequenas e projetos simples.
+
+---------------------------------------------------------
+
+FastAPI
+-------
+Framework moderno para construção de APIs REST.
+
+Características:
+- Muito rápido.
+- Assíncrono.
+- Documentação automática.
+- Validação automática.
+- Alto desempenho.
+
+Muito utilizado em microsserviços.
+
+---------------------------------------------------------
+
+Pydantic
+---------
+Biblioteca para validação de dados utilizando classes Python.
+
+Principais usos:
+- Validar entrada de dados.
+- Converter tipos automaticamente.
+- Garantir consistência das informações.
+
+Muito utilizada junto com FastAPI.
+
+=========================================================
+5. VISUALIZAÇÃO DE DADOS
+=========================================================
+
+Matplotlib
+-----------
+Biblioteca para criação de gráficos.
+
+Tipos:
+- Linha.
+- Barras.
+- Pizza.
+- Dispersão.
+- Histogramas.
+
+É a base para diversas bibliotecas de visualização.
+
+---------------------------------------------------------
+
+Seaborn
+--------
+Biblioteca construída sobre o Matplotlib.
+
+Características:
+- Gráficos mais bonitos.
+- Estatísticas prontas.
+- Menos código.
+- Excelente para análise exploratória.
+
+---------------------------------------------------------
+
+Plotly
+-------
+Biblioteca para gráficos interativos.
+
+Permite:
+- Zoom.
+- Hover.
+- Filtros.
+- Dashboards.
+- Gráficos 3D.
+
+Muito utilizada em aplicações web.
+
+---------------------------------------------------------
+
+Streamlit
+----------
+Framework para criação rápida de dashboards e aplicações web voltadas para Ciência de Dados e IA.
+
+Principais usos:
+- Dashboards.
+- Protótipos.
+- Ferramentas internas.
+- Demonstrações de modelos de IA.
+
+=========================================================
+LEITURA E PROCESSAMENTO DE DOCUMENTOS
+=========================================================
+
+PyMuPDF (fitz)
+--------------
+Biblioteca para leitura e manipulação de arquivos PDF.
+
+Principais usos:
+- Extrair texto de PDFs.
+- Ler PDFs página por página.
+- Extrair imagens.
+- Obter posição do texto na página.
+- Dividir e unir PDFs.
+
+Muito utilizada quando é necessário processar documentos automaticamente.
+
+---------------------------------------------------------
+
+pdfplumber
+----------
+Biblioteca especializada na extração de texto e tabelas de arquivos PDF.
+
+Principais usos:
+- Extrair tabelas.
+- Ler PDFs digitais.
+- Identificar linhas e colunas.
+- Converter tabelas em DataFrames.
+
+Muito utilizada em documentos administrativos e financeiros.
+
+---------------------------------------------------------
+
+python-docx
+-----------
+Biblioteca para manipulação de arquivos Microsoft Word (.docx).
+
+Principais usos:
+- Ler documentos Word.
+- Criar documentos.
+- Alterar textos.
+- Inserir tabelas.
+- Inserir imagens.
+- Preencher modelos automaticamente.
+
+Muito utilizada para geração automática de documentos.
+
+=========================================================
+OCR (RECONHECIMENTO DE TEXTO)
+=========================================================
+
+OCR (Optical Character Recognition)
+-----------------------------------
+Tecnologia utilizada para transformar imagens ou documentos escaneados em texto editável.
+
+É utilizada quando o documento não possui texto selecionável.
+
+---------------------------------------------------------
+
+EasyOCR
+--------
+Biblioteca de OCR baseada em Inteligência Artificial.
+
+Principais usos:
+- Ler imagens.
+- Ler PDFs escaneados.
+- Extrair textos automaticamente.
+- Reconhecer diferentes idiomas.
+
+Possui fácil utilização e boa precisão.
+
+---------------------------------------------------------
+
+PaddleOCR
+----------
+Biblioteca de OCR desenvolvida pela Baidu.
+
+Principais usos:
+- Leitura de documentos.
+- Extração de tabelas.
+- Leitura de formulários.
+- Reconhecimento de textos complexos.
+
+É considerada uma das melhores bibliotecas atuais para OCR.
+
+=========================================================
+PROCESSAMENTO ASSÍNCRONO
+=========================================================
+
+Celery
+------
+Framework para execução de tarefas em segundo plano.
+
+Principais usos:
+- Processar documentos.
+- Executar OCR.
+- Chamar modelos de IA.
+- Enviar e-mails.
+- Gerar planilhas.
+- Executar tarefas demoradas sem travar o sistema.
+
+Muito utilizado em aplicações Django.
+
+---------------------------------------------------------
+
+Redis
+-----
+Banco de dados em memória.
+
+Principais usos:
+- Fila de tarefas do Celery.
+- Cache da aplicação.
+- Armazenamento temporário de dados.
+- Sessões de usuários.
+
+Muito utilizado para aumentar o desempenho das aplicações.
+
+=========================================================
+MODELOS DE IA (LLMs)
+=========================================================
+
+OpenAI API
+----------
+Serviço que disponibiliza modelos de Linguagem (LLMs) através de API.
+
+Principais usos:
+- Leitura e interpretação de documentos.
+- Extração de informações.
+- Geração de textos.
+- Resumos.
+- Classificação de documentos.
+- Conversação.
+
+Muito utilizada para automatizar tarefas utilizando IA.
+
+---------------------------------------------------------
+
+JSON
+----
+Formato padrão para troca de informações entre sistemas.
+
+Muito utilizado para:
+
+- Retornar informações estruturadas da IA.
+- Comunicação entre APIs.
+- Armazenar dados temporários.
+
+Exemplo:
+
+{
+    "empresa": "...",
+    "cnpj": "...",
+    "item": "...",
+    "quantidade": "...",
+    "valor_unitario": "...",
+    "valor_total": "..."
+}
+
+=========================================================
+ARQUITETURA E PADRONIZAÇÃO
+=========================================================
+
+Pydantic
+---------
+Biblioteca para validação e organização de dados.
+
+Principais usos:
+- Validar respostas da IA.
+- Garantir tipos corretos.
+- Converter JSON em objetos Python.
+- Evitar erros de preenchimento.
+
+Muito utilizada com FastAPI, mas também extremamente útil em projetos Django.
+
+=========================================================
+OBSERVAÇÕES PARA ESTE PROJETO
+=========================================================
+
+Tecnologias consideradas essenciais:
+
+Backend
+-------
+- Python
+- Django
+- PostgreSQL
+
+Manipulação de Dados
+--------------------
+- Pandas
+- OpenPyXL
+
+Leitura de Documentos
+---------------------
+- PyMuPDF
+- pdfplumber
+- python-docx
+
+OCR
+---
+- EasyOCR
+ou
+- PaddleOCR
+
+Inteligência Artificial
+-----------------------
+- OpenAI API
+- LangChain (quando o fluxo de IA crescer)
+
+Automação
+----------
+- Requests
+- Playwright
+
+Processamento em Segundo Plano
+------------------------------
+- Celery
+- Redis
+
+Visualização
+------------
+- Plotly (caso deseje dashboards interativos)
+- Matplotlib (caso precise gerar gráficos simples)
+
+=========================================================
+RESUMO
+=========================================================
+
+Análise de Dados
+- Pandas
+- NumPy
+- Polars
+- PySpark
+- OpenPyXL
+
+Machine Learning
+- Scikit-Learn
+- TensorFlow
+- PyTorch
+
+LLMs e IA Generativa
+- LangChain
+- Hugging Face
+
+Automação e RPA
+- Requests
+- BeautifulSoup
+- Playwright
+- Selenium
+- PyAutoGUI
+
+Desenvolvimento Web
+- Django
+- Flask
+- FastAPI
+- Pydantic
+
+Visualização de Dados
+- Matplotlib
+- Seaborn
+- Plotly
+- Streamlit
