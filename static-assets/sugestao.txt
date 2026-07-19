@@ -1,0 +1,269 @@
+=========================================================
+TECNOLOGIAS SUGERIDAS PARA O PROJETO
+DEPURADOR DE ORÇAMENTOS
+=========================================================
+
+=========================================================
+BACKEND
+=========================================================
+
+Python
+------
+Linguagem principal do projeto.
+
+Será utilizada para desenvolver toda a lógica do sistema, processamento dos documentos, automações e integração com Inteligência Artificial.
+
+---------------------------------------------------------
+
+Django
+------
+Framework Web Full Stack.
+
+Responsável por:
+- Interface do sistema.
+- Login de usuários.
+- Controle de processos.
+- Comunicação com banco de dados.
+- APIs.
+- Sistema administrativo.
+
+=========================================================
+BANCO DE DADOS
+=========================================================
+
+PostgreSQL
+----------
+Banco de dados relacional.
+
+Responsável por armazenar:
+- Usuários.
+- Processos.
+- Fornecedores.
+- Documentos.
+- Histórico.
+- Informações extraídas pela IA.
+
+=========================================================
+PROCESSAMENTO DE DADOS
+=========================================================
+
+Pandas
+------
+Biblioteca para manipulação de dados em tabelas (DataFrames).
+
+Será utilizada para:
+- Organizar os dados extraídos.
+- Filtrar informações.
+- Comparar propostas.
+- Agrupar fornecedores.
+- Preparar os dados antes da geração da planilha.
+
+---------------------------------------------------------
+
+OpenPyXL
+---------
+Biblioteca para manipulação de arquivos Excel (.xlsx).
+
+Será utilizada para:
+- Abrir o modelo do Mapa Comparativo.
+- Preencher automaticamente as células.
+- Manter formatação, cores e fórmulas.
+- Gerar o Excel final.
+
+=========================================================
+LEITURA DE DOCUMENTOS
+=========================================================
+
+PyMuPDF (fitz)
+--------------
+Biblioteca para leitura de arquivos PDF.
+
+Será utilizada para:
+- Extrair texto de PDFs.
+- Ler documentos digitais.
+- Extrair imagens quando necessário.
+- Processar páginas individualmente.
+
+---------------------------------------------------------
+
+python-docx
+-----------
+Biblioteca para leitura e criação de documentos Word (.docx).
+
+Será utilizada para:
+- Ler documentos enviados pelos fornecedores.
+- Gerar documentos automaticamente.
+- Alterar modelos do Word.
+
+=========================================================
+OCR (LEITURA DE IMAGENS)
+=========================================================
+
+EasyOCR
+--------
+Biblioteca de OCR (Reconhecimento Óptico de Caracteres).
+
+Será utilizada para:
+- Ler PDFs escaneados.
+- Ler imagens.
+- Extrair texto de documentos digitalizados.
+- Converter imagens em texto.
+
+Caso futuramente seja necessário maior desempenho, pode ser substituída pelo PaddleOCR.
+
+=========================================================
+INTELIGÊNCIA ARTIFICIAL
+=========================================================
+
+OpenAI GPT (ou outro LLM)
+-------------------------
+Modelo de Inteligência Artificial.
+
+Será utilizado para:
+- Interpretar documentos.
+- Identificar informações importantes.
+- Organizar os dados em formato estruturado (JSON).
+- Auxiliar na criação de documentos como DOD, ETP e TR.
+
+---------------------------------------------------------
+
+LangChain
+----------
+Framework para integração com Grandes Modelos de Linguagem (LLMs).
+
+Será utilizado para:
+- Organizar o fluxo entre OCR, IA e banco de dados.
+- Criar agentes inteligentes.
+- Automatizar etapas da leitura dos documentos.
+- Integrar diferentes modelos de IA.
+
+=========================================================
+AUTOMAÇÃO
+=========================================================
+
+Requests
+--------
+Biblioteca para comunicação HTTP.
+
+Será utilizada para:
+- Consumir APIs.
+- Integrar sistemas externos.
+- Enviar e receber informações automaticamente.
+
+---------------------------------------------------------
+
+Playwright
+----------
+Framework para automação de navegadores.
+
+Será utilizado quando não existir API.
+
+Exemplos:
+- Fazer login em sistemas.
+- Preencher formulários.
+- Enviar documentos.
+- Baixar arquivos.
+- Automatizar processos internos.
+
+=========================================================
+PROCESSAMENTO EM SEGUNDO PLANO
+=========================================================
+
+Celery
+------
+Sistema de processamento assíncrono.
+
+Será utilizado para executar tarefas demoradas sem travar o sistema.
+
+Exemplos:
+- Processar documentos.
+- Executar OCR.
+- Chamar IA.
+- Gerar planilhas.
+- Enviar e-mails.
+
+---------------------------------------------------------
+
+Redis
+-----
+Banco de dados em memória.
+
+Será utilizado pelo Celery para controlar a fila de tarefas e acelerar o processamento.
+
+=========================================================
+ARQUITETURA DO PROJETO
+=========================================================
+
+Usuário
+
+↓
+
+Django
+
+↓
+
+PostgreSQL
+
+↓
+
+Upload do arquivo TGZ
+
+↓
+
+Extração dos e-mails
+
+↓
+
+Extração dos anexos
+
+↓
+
+Leitura dos documentos
+(PDF | Word | Excel | Imagens)
+
+↓
+
+OCR (EasyOCR)
+
+↓
+
+IA (OpenAI GPT)
+
+↓
+
+Estruturação dos dados (JSON)
+
+↓
+
+Pandas
+
+↓
+
+OpenPyXL
+
+↓
+
+Mapa Comparativo (Excel)
+
+↓
+
+Download pelo usuário
+
+=========================================================
+TECNOLOGIAS PRINCIPAIS
+=========================================================
+
+✓ Python
+✓ Django
+✓ PostgreSQL
+✓ Pandas
+✓ OpenPyXL
+✓ PyMuPDF
+✓ python-docx
+✓ EasyOCR
+✓ OpenAI GPT
+✓ LangChain
+✓ Requests
+✓ Playwright
+✓ Celery
+✓ Redis
