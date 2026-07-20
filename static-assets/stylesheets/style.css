@@ -3,21 +3,21 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
-main{
+main {
   text-align: justify;
 }
 
 /*Cores*/
-:root{
+:root {
   --main-dark: #374151;
-  --main-light: #9ca3af;;
+  --main-light: #9ca3af;
   --main-lighter: #f4f6f9;
   --main-darker: #1f2937;
 }
 
 /* SIDEBAR */
 .sidebar {
-  background: var(--main-darker)!important;
+  background: var(--main-darker) !important;
   color: white;
 }
 
@@ -37,7 +37,7 @@ main{
 .sidebar nav .nav-link {
   color: white;
   padding: 12px 15px;
-  transition: .3s;
+  transition: 0.3s;
   border-radius: 8px;
 }
 
@@ -67,6 +67,42 @@ main{
   color: #bdbdbd;
 }
 
+@media (max-width: 991px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    z-index: 1050;
+    transition: left 0.3s ease;
+    box-shadow: 8px 0 25px rgba(0, 0, 0, 0.25);
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 1040;
+}
+
+.sidebar-backdrop.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+body.menu-open {
+  overflow: hidden;
+}
+
 /* Main */
 main {
   background: var(--main-lighter);
@@ -75,7 +111,7 @@ main {
 /* Cards */
 .card {
   border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   background: white;
 }
 
@@ -83,7 +119,7 @@ main {
 .lista {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
 }
 
 .badge.bg-warning-subtle {
@@ -101,7 +137,7 @@ main {
   color: #b91c1c !important;
 }
 
-.text-justify{
+.text-justify {
   text-align: justify;
 }
 
@@ -135,7 +171,7 @@ main {
   align-items: center;
   gap: 10px;
   color: var(--main-darker);
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 
 .wizard-circle {
@@ -147,7 +183,7 @@ main {
   align-items: center;
   background: var(--main-light);
   border: 1px solid var(--main-light);
-  transition: .3s;
+  transition: 0.3s;
 }
 
 .wizard-step.active {
@@ -172,7 +208,7 @@ main {
   display: block;
 }
 
-.wizard-info-title{
-    color: #495057;
-    font-weight: 700;
+.wizard-info-title {
+  color: #495057;
+  font-weight: 700;
 }
