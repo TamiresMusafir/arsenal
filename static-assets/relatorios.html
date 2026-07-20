@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arsenal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
+  </head>
+  <body>
+    <div class="container-fluid px-0">
+      <div class="row g-0">
+        <!-- Header Mobile -->
+        <header class="mobile-header d-lg-none d-flex align-items-center justify-content-between p-3">
+          <button id="mobileMenuBtn" class="btn btn-primary">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </header>
+        <!-- Sidebar -->
+        <aside class="sidebar col-lg-2 d-flex flex-column justify-content-between p-3 text-white">
+          <!-- Botão fechar (somente mobile) -->
+          <button class="close-menu btn btn-link text-white d-lg-none align-self-end mb-3">
+            <i class="fa-solid fa-xmark fa-xl"></i>
+          </button>
+          <div>
+            <!-- Logo -->
+            <div class="logo mb-4">
+              <h2 class="h4 mb-0 fw-bold">Arsenal</h2>
+              <span class="text-muted small">Depurador de Orçamentos</span>
+            </div>
+            <!-- Navegação -->
+            <nav class="nav nav-pills flex-column gap-1">
+              <a class="nav-link" href="index.html">
+                <i class="fa-solid fa-house fa-fw me-2"></i>
+                <span>Início</span>
+              </a>
+              <a class="nav-link" href="dashboard.html">
+                <i class="fa-solid fa-clipboard fa-fw me-2"></i>
+                <span>Dashboard</span>
+              </a>
+              <!-- Processos -->
+              <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuProcessos" role="button" aria-expanded="true" aria-controls="submenuProcessos">
+                <span>
+                  <i class="fa-solid fa-folder-open fa-fw me-2"></i>
+                  Processos
+                </span>
+                <i class="fa-solid fa-chevron-down small seta-submenu"></i>
+              </a>
+              <div class="collapse show" id="submenuProcessos">
+                <div class="nav flex-column ms-3 ps-2 border-start border-secondary border-opacity-25">
+                  <a class="nav-link active py-2 text-white-50 small d-flex align-items-center" href="processos.html">
+                    <i class="fa-solid fa-folder-open fa-fw me-2"></i>
+                    <span>Ver Processos</span>
+                  </a>
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="novoprocesso.html">
+                    <i class="fa-solid fa-file-circle-plus fa-fw me-2"></i>
+                    <span>Novo Processo</span>
+                  </a>
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="documentos.html">
+                    <i class="fa-solid fa-file-lines fa-fw me-2"></i>
+                    <span>Documentos</span>
+                  </a>
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="mapasgerados.html">
+                    <i class="fa-solid fa-file-circle-check fa-fw me-2"></i>
+                    <span>Mapas Gerados</span>
+                  </a>
+                </div>
+              </div>
+              <a class="nav-link d-flex align-items-center" href="mapa.html">
+                <i class="fa-solid fa-scale-balanced fa-fw me-2"></i>
+                <span>Modelo de Mapa<br>Comparativo</span>
+              </a>
+              <a class="nav-link active d-flex align-items-center" href="relatorios.html">
+                <i class="fa-solid fa-chart-column fa-fw me-2"></i>
+                <span>Relatórios</span>
+              </a>
+              <a class="nav-link d-flex align-items-center" href="configuracoes.html">
+                <i class="fa-solid fa-gear fa-fw me-2"></i>
+                <span>Configurações</span>
+              </a>
+            </nav>
+          </div>
+          <!-- Perfil -->
+          <div class="perfil d-flex align-items-center gap-2 pt-3 mt-4 border-top border-secondary">
+            <img src="https://placehold.co/40x40" class="rounded-circle" alt="Administrador">
+            <div class="overflow-hidden">
+              <strong class="d-block text-truncate small">Administrador</strong>
+              <small class="text-muted d-block text-truncate">admin@teste.com</small>
+            </div>
+          </div>
+        </aside>
+            
+            <!-- Conteúdo Principal -->
+            <main class="col-12 col-lg-10 p-4">
+               <div class="container">
+                  <!-- Título da Página -->
+                  <section class="p-4 mb-4 bg-white rounded-3 shadow-sm border-0">
+                     <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h2 class="fw-bold text-dark mt-2">
+                            <i class="fa-solid fa-chart-column me-2"></i>
+                            Relatórios
+                          </h2>
+                           <p class="text-muted mt-2 mb-0">
+                              Gerencie e visualize relatórios de processos e orçamentos
+                           </p>
+                        </div>
+                        <button class="btn btn-primary" id="btnGerarRelatorio">
+                           <i class="fa-solid fa-plus me-2"></i>
+                           Novo Relatório
+                        </button>
+                     </div>
+                  </section>
+
+                  <!-- Filtros -->
+                  <section class="p-4 mb-4 bg-white rounded-3 shadow-sm border-0">
+                     <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                           <label class="form-label fw-bold small">Tipo de Relatório</label>
+                           <select class="form-select" id="tipoRelatorio">
+                              <option value="todos">Todos</option>
+                              <option value="processos">Processos</option>
+                              <option value="orçamentos">Orçamentos</option>
+                              <option value="fornecedores">Fornecedores</option>
+                              <option value="produtos">Produtos</option>
+                           </select>
+                        </div>
+                        <div class="col-md-3">
+                           <label class="form-label fw-bold small">Período</label>
+                           <select class="form-select" id="periodoRelatorio">
+                              <option value="hoje">Hoje</option>
+                              <option value="semana">Última Semana</option>
+                              <option value="mes">Último Mês</option>
+                              <option value="trimestre">Último Trimestre</option>
+                              <option value="ano">Último Ano</option>
+                              <option value="personalizado">Personalizado</option>
+                           </select>
+                        </div>
+                        <div class="col-md-2">
+                           <label class="form-label fw-bold small">Data Início</label>
+                           <input type="date" class="form-control" id="dataInicio">
+                        </div>
+                        <div class="col-md-2">
+                           <label class="form-label fw-bold small">Data Fim</label>
+                           <input type="date" class="form-control" id="dataFim">
+                        </div>
+                        <div class="col-md-2">
+                           <button class="btn btn-primary w-100" id="btnFiltrar">
+                              <i class="fa-solid fa-filter me-2"></i>
+                              Filtrar
+                           </button>
+                        </div>
+                     </div>
+                  </section>
+
+                  <!-- Cards de Estatísticas -->
+                  <section class="row g-3 mb-4">
+                     <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                           <div class="card-body">
+                              <div class="d-flex justify-content-between align-items-center">
+                                 <div>
+                                    <h6 class="text-muted small mb-1">Total Processos</h6>
+                                    <h3 class="fw-bold mb-0">1.247</h3>
+                                 </div>
+                                 <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                                    <i class="fa-solid fa-folder-open text-primary fs-4"></i>
+                                 </div>
+                              </div>
+                              <div class="mt-3">
+                                 <span class="badge bg-success">+12%</span>
+                                 <span class="text-muted small">em relação ao mês anterior</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     
+                     <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                           <div class="card-body">
+                              <div class="d-flex justify-content-between align-items-center">
+                                 <div>
+                                    <h6 class="text-muted small mb-1">Orçamentos</h6>
+                                    <h3 class="fw-bold mb-0">R$ 3.2M</h3>
+                                 </div>
+                                 <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                                    <i class="fa-solid fa-dollar-sign text-success fs-4"></i>
+                                 </div>
+                              </div>
+                              <div class="mt-3">
+                                 <span class="badge bg-success">+8.5%</span>
+                                 <span class="text-muted small">em relação ao mês anterior</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     
+                     <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                           <div class="card-body">
+                              <div class="d-flex justify-content-between align-items-center">
+                                 <div>
+                                    <h6 class="text-muted small mb-1">Fornecedores Ativos</h6>
+                                    <h3 class="fw-bold mb-0">86</h3>
+                                 </div>
+                                 <div class="bg-info bg-opacity-10 p-3 rounded-circle">
+                                    <i class="fa-solid fa-building text-info fs-4"></i>
+                                 </div>
+                              </div>
+                              <div class="mt-3">
+                                 <span class="badge bg-success">+5</span>
+                                 <span class="text-muted small">novos este mês</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     
+                     <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                           <div class="card-body">
+                              <div class="d-flex justify-content-between align-items-center">
+                                 <div>
+                                    <h6 class="text-muted small mb-1">Produtos Cadastrados</h6>
+                                    <h3 class="fw-bold mb-0">4.532</h3>
+                                 </div>
+                                 <div class="bg-warning bg-opacity-10 p-3 rounded-circle">
+                                    <i class="fa-solid fa-box text-warning fs-4"></i>
+                                 </div>
+                              </div>
+                              <div class="mt-3">
+                                 <span class="badge bg-success">+234</span>
+                                 <span class="text-muted small">este mês</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </section>
+
+                  <!-- Tabela de Relatórios -->
+                  <section class="p-4 bg-white rounded-3 shadow-sm border-0">
+                     <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0">
+                           <i class="fa-solid fa-list me-2"></i>
+                           Relatórios Recentes
+                        </h5>
+                        <div>
+                           <button class="btn btn-outline-secondary btn-sm me-2" id="btnExportarCSV">
+                              <i class="fa-solid fa-file-csv me-1"></i>
+                              Exportar CSV
+                           </button>
+                           <button class="btn btn-outline-secondary btn-sm" id="btnExportarPDF">
+                              <i class="fa-solid fa-file-pdf me-1"></i>
+                              Exportar PDF
+                           </button>
+                        </div>
+                     </div>
+                     
+                     <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="tabelaRelatorios">
+                           <thead class="table-light">
+                              <tr>
+                                 <th>ID</th>
+                                 <th>Nome do Relatório</th>
+                                 <th>Tipo</th>
+                                 <th>Data</th>
+                                 <th>Status</th>
+                                 <th>Ações</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              <tr>
+                                 <td>#001</td>
+                                 <td>Relatório de Orçamentos - Julho</td>
+                                 <td><span class="badge bg-primary">Orçamentos</span></td>
+                                 <td>20/07/2026</td>
+                                 <td><span class="badge bg-success">Concluído</span></td>
+                                 <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                       <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary">
+                                       <i class="fa-solid fa-download"></i>
+                                    </button>
+                                 </td>
+                              </tr>
+                              <tr>
+                                 <td>#002</td>
+                                 <td>Análise de Fornecedores</td>
+                                 <td><span class="badge bg-info">Fornecedores</span></td>
+                                 <td>18/07/2026</td>
+                                 <td><span class="badge bg-warning text-dark">Em Andamento</span></td>
+                                 <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                       <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary">
+                                       <i class="fa-solid fa-download"></i>
+                                    </button>
+                                 </td>
+                              </tr>
+                              <tr>
+                                 <td>#003</td>
+                                 <td>Relatório de Processos - Q2</td>
+                                 <td><span class="badge bg-success">Processos</span></td>
+                                 <td>15/07/2026</td>
+                                 <td><span class="badge bg-success">Concluído</span></td>
+                                 <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                       <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary">
+                                       <i class="fa-solid fa-download"></i>
+                                    </button>
+                                 </td>
+                              </tr>
+                              <tr>
+                                 <td>#004</td>
+                                 <td>Produtos Mais Comprados</td>
+                                 <td><span class="badge bg-warning text-dark">Produtos</span></td>
+                                 <td>10/07/2026</td>
+                                 <td><span class="badge bg-danger">Cancelado</span></td>
+                                 <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                       <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary">
+                                       <i class="fa-solid fa-download"></i>
+                                    </button>
+                                 </td>
+                              </tr>
+                              <tr>
+                                 <td>#005</td>
+                                 <td>Relatório Geral - Junho</td>
+                                 <td><span class="badge bg-secondary">Geral</span></td>
+                                 <td>05/07/2026</td>
+                                 <td><span class="badge bg-success">Concluído</span></td>
+                                 <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                       <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary">
+                                       <i class="fa-solid fa-download"></i>
+                                    </button>
+                                 </td>
+                              </tr>
+                           </tbody>
+                        </table>
+                     </div>
+                     
+                     <!-- Paginação -->
+                     <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="text-muted">Mostrando 5 de 25 relatórios</small>
+                        <nav>
+                           <ul class="pagination pagination-sm mb-0">
+                              <li class="page-item disabled">
+                                 <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                              </li>
+                              <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                              <li class="page-item"><a class="page-link" href="#">2</a></li>
+                              <li class="page-item"><a class="page-link" href="#">3</a></li>
+                              <li class="page-item"><a class="page-link" href="#">4</a></li>
+                              <li class="page-item"><a class="page-link" href="#">5</a></li>
+                              <li class="page-item">
+                                 <a class="page-link" href="#">Próximo</a>
+                              </li>
+                           </ul>
+                        </nav>
+                     </div>
+                  </section>
+               </div>
+            </main>
+         </div>
+      </div>
+      
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="js/sidebar.js"></script>
+      <script src="js/relatorios.js"></script>
+   </body>
+</html>
