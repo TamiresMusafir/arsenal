@@ -99,6 +99,16 @@ Será utilizada para:
 OCR (LEITURA DE IMAGENS)
 =========================================================
 
+DeepSeek OCR
+-------
+O DeepSeek OCR comprime documentos de alta resolução em tokens de visão compactos e, em seguida, os decodifica com um modelo de combinação de especialistas de 3 bilhões de parâmetros para fornecer uma compreensão de texto, layout e diagrama praticamente sem perdas em mais de 100 idiomas.
+
+Será utilizada para:
+- Ler PDFs escaneados.
+- Ler imagens.
+- Extrair texto de documentos digitalizados.
+- Converter imagens em texto.
+
 EasyOCR
 --------
 Biblioteca de OCR (Reconhecimento Óptico de Caracteres).
