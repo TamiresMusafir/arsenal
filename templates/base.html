@@ -6,14 +6,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Arsenal</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="{% static 'stylesheets/bootstrap.min.css' %}"
-    />
+    <!--Font-awesome-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+    <!--Estilos-->
+    <link rel="stylesheet" href="{% static 'stylesheets/bootstrap.min.css' %}" />
     <link rel="stylesheet" href="{% static 'stylesheets/style.css' %}" />
   </head>
   <body>
@@ -21,7 +17,7 @@
       <div class="row g-0">
         {% include 'partials/sidebar.html' %}
 
-        <main class="col-12 col-md-8 col-lg-10 p-4">
+        <main class="col-12 col-lg-10 p-4">
           {% block content %} {% endblock %}
         </main>
       </div>
