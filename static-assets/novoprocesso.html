@@ -9,202 +9,200 @@
     <link rel="stylesheet" href="stylesheets/style.css">
   </head>
   <body>
-    <div class="container-fluid">
-      <div class="row">
-				<!--Sidebar-->
-				<header class="mobile-header d-lg-none d-flex align-items-center justify-content-between p-3">
-					<button id="mobileMenuBtn" class="btn btn-primary">
-					<i class="fa-solid fa-bars"></i>
-					</button>
-				</header>
-				<!-- Sidebar -->
-				<aside class="sidebar col-lg-2 d-flex flex-column justify-content-between p-3 text-white">
-					<!-- Botão fechar (somente mobile) -->
-					<button class="close-menu btn btn-link text-white d-lg-none align-self-end mb-3">
-						<i class="fa-solid fa-xmark fa-xl"></i>
-					</button>
-					<div>
-						<!-- Logo -->
-						<div class="logo mb-4">
-							<h2 class="h4 mb-0 fw-bold">Arsenal</h2>
-							<span class="text-muted small">
-							Depurador de Orçamentos
-							</span>
-						</div>
-						<!-- Navegação -->
-						<nav class="nav nav-pills flex-column gap-1">
-							<a class="nav-link" href="index.html">
-								<i class="fa-solid fa-house fa-fw me-2"></i>
-								<span>Início</span>
-							</a>
-							<a class="nav-link" href="dashboard.html">
-								<i class="fa-solid fa-clipboard fa-fw me-2"></i>
-								<span>Dashboard</span>
-							</a>
-							<!-- Processos -->
-							<a class="nav-link active d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuProcessos" role="button" aria-expanded="false" aria-controls="submenuProcessos">
-								<span>
-									<i class="fa-solid fa-folder-open fa-fw me-2"></i>
-								Processos
-								</span>
-								<i class="fa-solid fa-chevron-down small seta-submenu"></i>
-							</a>
-							<div class="collapse" id="submenuProcessos">
-								<div class="nav flex-column ms-3 ps-2 border-start border-secondary border-opacity-25">
-									<a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="processos.html">
-										<i class="fa-solid fa-folder-open fa-fw me-2"></i>
-										<span>Ver Processos</span>
-									</a>
-									<a class="nav-link active py-2 text-white-50 small d-flex align-items-center" href="novoprocesso.html">
-										<i class="fa-solid fa-file-circle-plus fa-fw me-2"></i>
-										<span>Novo Processo</span>
-									</a>
-									<a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="documentos.html">
-										<i class="fa-solid fa-file-lines fa-fw me-2"></i>
-										<span>Documentos</span>
-									</a>
-									<a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="documentos.html">
-										<i class="fa-solid fa-table fa-fw me-2"></i>
-										<span>Mapas Gerados</span>
-									</a>
-								</div>
-							</div>
-							<a class="nav-link d-flex align-items-center" href="mapa.html">
-								<i class="fa-solid fa-scale-balanced fa-fw me-2"></i>
-								<span>Modelo de Mapa<br>Comparativo</span>
-							</a>
-							<a class="nav-link" href="relatorios.html">
-								<i class="fa-solid fa-chart-column fa-fw me-2"></i>
-								<span>Relatórios</span>
-							</a>
-							<a class="nav-link" href="configuracoes.html">
-								<i class="fa-solid fa-gear fa-fw me-2"></i>
-								<span>Configurações</span>
-							</a>
-						</nav>
-					</div>
-					<!-- Perfil -->
-					<div class="perfil d-flex align-items-center gap-2 pt-3 mt-4 border-top border-secondary">
-						<img
-							src="https://placehold.co/40x40"
-							class="rounded-circle"
-							alt="Administrador">
-						<div class="overflow-hidden">
-							<strong class="d-block text-truncate small">
-							Administrador
-							</strong>
-							<small class="text-muted d-block text-truncate">
-							admin@teste.com
-							</small>
-						</div>
-					</div>
-				</aside>
-				<div class="sidebar-backdrop"></div>
-        <main class="col-12 col-md-8 col-lg-10 p-4">
-  
-					<container>
-						<section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-4">
-							<div>
-								<a href="processos.html" class="text-decoration-none small fw-bold">
-									<i class="fa-solid fa-arrow-left"></i> Ver todos os processos</i>
-								</a>
-								<h2 class="fw-bold text-dark mt-2"><i class="fa-solid fa-file-circle-plus me-2 pt-1"></i> Criar Novo Processo</h2>
-								<p class="text-justify fs-6 text-muted mt-3">
-									Aqui é onde será feita depuração automatizada de uma licitação ou compra no Arsenal. Nesta etapa, você cria um ambiente exclusivo para o seu processo administrativo, centralizando o upload dos documentos necessários e configurando as informações essenciais. A partir disso, o motor de inteligência do sistema fará a leitura automática dos arquivos e preencherá a sua planilha final estruturada, utilizando o Mapa Comparativo como o gabarito central para organizar, validar e preencher cada coluna de dados.
-								</p>
-							</div>
-						</section>
-
-						<section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-4">
-							<div class="rounded-3 shadow-sm p-4 w-100">
-								<!-- Header -->
-								<div class="wizard-header d-flex justify-content-between align-items-center position-relative mb-5">
-									<div class="wizard-line"></div>
-									<div class="wizard-step active" data-step="0">
-										<div class="wizard-circle">1</div>
-										<span>Dados</span>
-									</div>
-									<div class="wizard-step" data-step="1">
-										<div class="wizard-circle">2</div>
-										<span>Importar Arquivos</span>
-									</div>
-									<div class="wizard-step" data-step="2">
-										<div class="wizard-circle">3</div>
-										<span>Validação</span>
-									</div>
-									<div class="wizard-step" data-step="3">
-										<div class="wizard-circle">4</div>
-										<span>Geração de Planilha</span>
-									</div>
-								</div>
-								<!-- PASSO 1 -->
-								<form id="wizardForm" novalidate>
-									<div class="wizard-content active">
-										<h2 class="fw-bold">Dados do Processo</h2>
-										<p>
-											<i class="fa-solid fa-circle-info"></i>
-											<strong class="wizard-info-title"> O que acontece aqui:</strong> 
-											Você define as informações básicas do processo administrativo. Essas informações servem para rotular, organizar e dar contexto  ao processo no seu banco de dados.
-										</p>
-										<div class="mb-3">
-											<label class="form-label fw-bold">Número do Processo</label>
-											<input type="text" class="form-control" required>
-											<div class="invalid-feedback">
-												<p>Informe o número do processo.</p>
-											</div>
-										</div>
-										<div class="mb-3">
-											<label class="form-label fw-bold">Título do Processo</label>
-											<input
-												class="form-control"
-												required>
-											<div class="invalid-feedback">
-												Informe o objeto.
-											</div>
-										</div>
-									</div>
-									<!-- PASSO 2 -->
-									<div class="wizard-content">
-										<h2 class="fw-bold">Importar Arquivos</h2>
-										<p>
-											<i class="fa-solid fa-circle-info"></i>
-											<strong class="wizard-info-title"> O que acontece aqui:</strong> 
-											O usuário realiza o envio do pacote de arquivos compactados (geralmente em formato .tgz ou PDFs das propostas e e-mails). O Arsenal recebe esses arquivos e inicia uma varredura interna em segundo plano para identificar a estrutura de cada documento enviado.
-										</p>
-										<input type="file" class="form-control" required>
-									</div>
-									<!-- PASSO 3 -->
-									<div class="wizard-content">
-										<h2 class="fw-bold">Validação</h2>
-										<p class="">
-											Validando...
-										</p>
-										<div class="progress">
-											<div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
-										</div>
-									</div>
-									<!-- PASSO 4 -->
-									<div class="wizard-content">
-										<h4>Geração de Planilhas</h4>
-										<p class="text-light">
-											Processando...
-										</p>
-									</div>
-									<div class="d-flex justify-content-between mt-5">
-										<button type="button" id="prevBtn" class="btn btn-outline-primary"> Anterior</button>
-										<button type="button" id="nextBtn" class="btn btn-primary  ms-auto">Próximo</button>
-									</div>
-								</form>
-							</div>
-
-						</section>
-					</container>
-				</main>
+    <div class="container-fluid px-0">
+      <div class="row g-0">
+        <!--Sidebar-->
+        <header class="mobile-header d-lg-none d-flex align-items-center justify-content-between p-3">
+          <button id="mobileMenuBtn" class="btn btn-primary">
+          <i class="fa-solid fa-bars"></i>
+          </button>
+        </header>
+        <!-- Sidebar -->
+        <aside class="sidebar col-lg-2 d-flex flex-column justify-content-between p-3 text-white">
+          <button class="close-menu btn btn-link text-white d-lg-none align-self-end mb-3">
+          <i class="fa-solid fa-xmark fa-xl"></i>
+          </button>
+          <div>
+            <!-- Logo -->
+            <div class="logo mb-4">
+              <h2 class="h4 mb-0 fw-bold">Arsenal</h2>
+              <span class="text-muted small">
+              Depurador de Orçamentos
+              </span>
+            </div>
+            <!-- Navegação -->
+            <nav class="nav nav-pills flex-column gap-1">
+              <a class="nav-link" href="index.html">
+              <i class="fa-solid fa-house fa-fw me-2"></i>
+              <span>Início</span>
+              </a>
+              <a class="nav-link" href="dashboard.html">
+              <i class="fa-solid fa-clipboard fa-fw me-2"></i>
+              <span>Dashboard</span>
+              </a>
+              <!-- Processos -->
+              <a class="nav-link active d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuProcessos" role="button" aria-expanded="false" aria-controls="submenuProcessos">
+              <span>
+              <i class="fa-solid fa-folder-open fa-fw me-2"></i>
+              Processos
+              </span>
+              <i class="fa-solid fa-chevron-down small seta-submenu"></i>
+              </a>
+              <div class="collapse" id="submenuProcessos">
+                <div class="nav flex-column ms-3 ps-2 border-start border-secondary border-opacity-25">
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="processos.html">
+                  <i class="fa-solid fa-folder-open fa-fw me-2"></i>
+                  <span>Ver Processos</span>
+                  </a>
+                  <a class="nav-link active py-2 text-white-50 small d-flex align-items-center" href="novoprocesso.html">
+                  <i class="fa-solid fa-file-circle-plus fa-fw me-2"></i>
+                  <span>Novo Processo</span>
+                  </a>
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="documentos.html">
+                  <i class="fa-solid fa-file-lines fa-fw me-2"></i>
+                  <span>Documentos</span>
+                  </a>
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="documentos.html">
+                  <i class="fa-solid fa-table fa-fw me-2"></i>
+                  <span>Mapas Gerados</span>
+                  </a>
+                </div>
+              </div>
+              <a class="nav-link d-flex align-items-center" href="mapa.html">
+              <i class="fa-solid fa-scale-balanced fa-fw me-2"></i>
+              <span>Modelo de Mapa<br>Comparativo</span>
+              </a>
+              <a class="nav-link" href="relatorios.html">
+              <i class="fa-solid fa-chart-column fa-fw me-2"></i>
+              <span>Relatórios</span>
+              </a>
+              <a class="nav-link" href="configuracoes.html">
+              <i class="fa-solid fa-gear fa-fw me-2"></i>
+              <span>Configurações</span>
+              </a>
+            </nav>
+          </div>
+          <!-- Perfil -->
+          <div class="perfil d-flex align-items-center gap-2 pt-3 mt-4 border-top border-secondary">
+            <img
+              src="https://placehold.co/40x40"
+              class="rounded-circle"
+              alt="Administrador">
+            <div class="overflow-hidden">
+              <strong class="d-block text-truncate small">
+              Administrador
+              </strong>
+              <small class="text-muted d-block text-truncate">
+              admin@teste.com
+              </small>
+            </div>
+          </div>
+        </aside>
+        <div class="sidebar-backdrop"></div>
+        <main class="col-12 col-lg-10 p-4">
+          <div class="container">
+            <!-- 1. Seção do Banner Superior -->
+            <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-4">
+              <div>
+                <a href="processos.html" class="text-decoration-none small fw-bold">
+                <i class="fa-solid fa-arrow-left"></i> Ver todos os processos</i>
+                </a>
+                <h2 class="fw-bold text-dark mt-2"><i class="fa-solid fa-file-circle-plus me-2 pt-1"></i> Criar Novo Processo</h2>
+                <p class="text-justify fs-6 text-muted mt-3">
+                  Aqui é onde será feita depuração automatizada de uma licitação ou compra no Arsenal. Nesta etapa, você cria um ambiente exclusivo para o seu processo administrativo, centralizando o upload dos documentos necessários e configurando as informações essenciais. A partir disso, o motor de inteligência do sistema fará a leitura automática dos arquivos e preencherá a sua planilha final estruturada, utilizando o Mapa Comparativo como o gabarito central para organizar, validar e preencher cada coluna de dados.
+                </p>
+              </div>
+            </section>
+            <!-- 1. Seção de Criação de Novo Processo -->
+            <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-4">
+              <div class="rounded-3 shadow-sm p-4 w-100">
+                <!-- Header -->
+                <div class="wizard-header d-flex justify-content-between align-items-center position-relative mb-5">
+                  <div class="wizard-line"></div>
+                  <div class="wizard-step active" data-step="0">
+                    <div class="wizard-circle">1</div>
+                    <span>Dados</span>
+                  </div>
+                  <div class="wizard-step" data-step="1">
+                    <div class="wizard-circle">2</div>
+                    <span>Importar Arquivos</span>
+                  </div>
+                  <div class="wizard-step" data-step="2">
+                    <div class="wizard-circle">3</div>
+                    <span>Validação</span>
+                  </div>
+                  <div class="wizard-step" data-step="3">
+                    <div class="wizard-circle">4</div>
+                    <span>Geração de Planilha</span>
+                  </div>
+                </div>
+                <!-- PASSO 1 -->
+                <form id="wizardForm" novalidate>
+                  <div class="wizard-content active">
+                    <h2 class="fw-bold">Dados do Processo</h2>
+                    <p>
+                      <i class="fa-solid fa-circle-info"></i>
+                      <strong class="wizard-info-title"> O que acontece aqui:</strong> 
+                      Você define as informações básicas do processo administrativo. Essas informações servem para rotular, organizar e dar contexto  ao processo no seu banco de dados.
+                    </p>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Número do Processo</label>
+                      <input type="text" class="form-control" required>
+                      <div class="invalid-feedback">
+                        <p>Informe o número do processo.</p>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Título do Processo</label>
+                      <input
+                        class="form-control"
+                        required>
+                      <div class="invalid-feedback">
+                        Informe o objeto.
+                      </div>
+                    </div>
+                  </div>
+                  <!-- PASSO 2 -->
+                  <div class="wizard-content">
+                    <h2 class="fw-bold">Importar Arquivos</h2>
+                    <p>
+                      <i class="fa-solid fa-circle-info"></i>
+                      <strong class="wizard-info-title"> O que acontece aqui:</strong> 
+                      O usuário realiza o envio do pacote de arquivos compactados (geralmente em formato .tgz ou PDFs das propostas e e-mails). O Arsenal recebe esses arquivos e inicia uma varredura interna em segundo plano para identificar a estrutura de cada documento enviado.
+                    </p>
+                    <input type="file" class="form-control" required>
+                  </div>
+                  <!-- PASSO 3 -->
+                  <div class="wizard-content">
+                    <h2 class="fw-bold">Validação</h2>
+                    <p class="">
+                      Validando...
+                    </p>
+                    <div class="progress">
+                      <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                    </div>
+                  </div>
+                  <!-- PASSO 4 -->
+                  <div class="wizard-content">
+                    <h4>Geração de Planilhas</h4>
+                    <p class="text-light">
+                      Processando...
+                    </p>
+                  </div>
+                  <div class="d-flex justify-content-between mt-5">
+                    <button type="button" id="prevBtn" class="btn btn-outline-primary"> Anterior</button>
+                    <button type="button" id="nextBtn" class="btn btn-primary  ms-auto">Próximo</button>
+                  </div>
+                </form>
+              </div>
+            </section>
+          </div>
+        </main>
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-		<script src="js/bootstrap.min.js"></script>
-		<script src="js/sidebar.js"></script>
-		<script src="js/wizard.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/wizard.js"></script>
   </body>
 </html>
