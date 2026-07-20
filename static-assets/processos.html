@@ -107,7 +107,6 @@
             
             <!-- 2. Seção da Lista -->
             <section class="lista bg-white p-4 rounded shadow-sm">
-              <!-- CORRIGIDO: Alinhamento e fluxo dos filtros sem tags fantasmas ou colunas soltas -->
               <div class="d-flex flex-wrap align-items-center gap-2 w-100">
                 <input type="text" class="form-control form-control-sm" placeholder="Buscar processo..." style="max-width: 200px; flex-shrink: 1;">
                 
@@ -131,144 +130,163 @@
                   <option>Número</option>
                 </select>
                 
-                <!-- CORRIGIDO: Botão integrado no flexbox de forma limpa -->
-                <button class="btn btn-sm btn-outline-primary ms-md-auto">
+                <button class="btn btn-sm btn-outline-primary ">
                   <i class="fa-solid fa-filter me-2"></i>Filtrar
                 </button>
               </div>
               
-              <div class="table-responsive pt-3">
-                <table class="table table-hover align-middle mb-0">
-                  <thead class="table-light">
-                    <tr>
-                      <th class="border-0">Processo</th>
-                      <th class="border-0">Descrição</th>
-                      <th class="border-0">Data de Abertura</th>
-                      <th class="border-0">Valor Estimado</th>
-                      <th class="border-0">Status</th>
-                      <th class="border-0 text-end">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong class="text-dark">00015/2026</strong></td>
-                      <td>Aquisição de Notebooks</td>
-                      <td class="text-muted small">15/05/2026</td>
-                      <td class="fw-semibold">R$ 45.000,00</td>
-                      <td>
-                        <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
-                          Em andamento
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a href="#" class="btn btn-sm btn-light border">
-                          <i class="fa-solid fa-eye text-secondary"></i>
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00016/2026</strong></td>
-                      <td>Material Elétrico</td>
-                      <td class="text-muted small">12/05/2026</td>
-                      <td class="fw-semibold">R$ 12.800,00</td>
-                      <td>
-                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
-                          Concluído
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a href="#" class="btn btn-sm btn-light border" title="Visualizar"><i class="fa-solid fa-eye text-secondary"></i></a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00017/2026</strong></td>
-                      <td>Serviços de Limpeza</td>
-                      <td class="text-muted small">10/05/2026</td>
-                      <td class="fw-semibold">R$ 8.500,00</td>
-                      <td>
-                        <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">
-                          Pendente
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a href="#" class="btn btn-sm btn-light border" title="Visualizar"><i class="fa-solid fa-eye text-secondary"></i></a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00018/2026</strong></td>
-                      <td>Serviços de Carga</td>
-                      <td class="text-muted small">10/06/2026</td>
-                      <td class="fw-semibold">R$ 9.500,00</td>
-                      <td>
-                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
-                          Concluído
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a href="#" class="btn btn-sm btn-light border" title="Visualizar"><i class="fa-solid fa-eye text-secondary"></i></a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00015/2026</strong></td>
-                      <td>Aquisição de Notebooks</td>
-                      <td class="text-muted small">15/05/2026</td>
-                      <td class="fw-semibold">R$ 45.000,00</td>
-                      <td>
-                        <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
-                          Em andamento
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a href="#" class="btn btn-sm btn-light border">
-                          <i class="fa-solid fa-eye text-secondary"></i>
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00016/2026</strong></td>
-                      <td>Material Elétrico</td>
-                      <td class="text-muted small">12/05/2026</td>
-                      <td class="fw-semibold">R$ 12.800,00</td>
-                      <td>
-                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
-                          Concluído
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a href="#" class="btn btn-sm btn-light border" title="Visualizar"><i class="fa-solid fa-eye text-secondary"></i></a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00017/2026</strong></td>
-                      <td>Serviços de Limpeza</td>
-                      <td class="text-muted small">10/05/2026</td>
-                      <td class="fw-semibold">R$ 8.500,00</td>
-                      <td>
-                        <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">
-                          Pendente
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a href="#" class="btn btn-sm btn-light border" title="Visualizar"><i class="fa-solid fa-eye text-secondary"></i></a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00018/2026</strong></td>
-                      <td>Serviços de Carga</td>
-                      <td class="text-muted small">10/06/2026</td>
-                      <td class="fw-semibold">R$ 9.500,00</td>
-                      <td>
-                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
-                          Concluído
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a href="#" class="btn btn-sm btn-light border" title="Visualizar"><i class="fa-solid fa-eye text-secondary"></i></a>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div class="d-lg-none mb-2 mt-2 text-muted small">
+                <i class="fa-solid fa-arrows-left-right me-1"></i>
+                Deslize a tabela para visualizar todas as colunas.
               </div>
+
+              <section class="lista bg-white p-4 rounded shadow-sm">
+                <div class="lista-tabela">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th class="border-0">Processo</th>
+                        <th class="border-0">Descrição</th>
+                        <th class="border-0">Data de Abertura</th>
+                        <th class="border-0">Valor Estimado</th>
+                        <th class="border-0">Status</th>
+                        <th class="border-0 text-end">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong class="text-dark">00015/2026</strong></td>
+                        <td>Aquisição de Notebooks</td>
+                        <td class="text-muted small">15/05/2026</td>
+                        <td class="fw-semibold">R$ 45.000,00</td>
+                        <td>
+                          <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
+                            Em andamento
+                          </span>
+                        </td>
+                        <td class="text-end">
+                          <a class="btn btn-sm btn-outline-primary" href="#">
+                              <i class="fa-solid fa-eye"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong class="text-dark">00016/2026</strong></td>
+                        <td>Material Elétrico</td>
+                        <td class="text-muted small">12/05/2026</td>
+                        <td class="fw-semibold">R$ 12.800,00</td>
+                        <td>
+                          <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                            Concluído
+                          </span>
+                        </td>
+                        <td class="text-end">
+                          <a class="btn btn-sm btn-outline-primary" href="#">
+                              <i class="fa-solid fa-eye"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong class="text-dark">00017/2026</strong></td>
+                        <td>Serviços de Limpeza</td>
+                        <td class="text-muted small">10/05/2026</td>
+                        <td class="fw-semibold">R$ 8.500,00</td>
+                        <td>
+                          <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">
+                            Pendente
+                          </span>
+                        </td>
+                        <td class="text-end">
+                          <a class="btn btn-sm btn-outline-primary" href="#">
+                            <i class="fa-solid fa-eye"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong class="text-dark">00018/2026</strong></td>
+                        <td>Serviços de Carga</td>
+                        <td class="text-muted small">10/06/2026</td>
+                        <td class="fw-semibold">R$ 9.500,00</td>
+                        <td>
+                          <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                            Concluído
+                          </span>
+                        </td>
+                        <td class="text-end">
+                          <a class="btn btn-sm btn-outline-primary" href="#">
+                            <i class="fa-solid fa-eye"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong class="text-dark">00015/2026</strong></td>
+                        <td>Aquisição de Notebooks</td>
+                        <td class="text-muted small">15/05/2026</td>
+                        <td class="fw-semibold">R$ 45.000,00</td>
+                        <td>
+                          <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
+                            Em andamento
+                          </span>
+                        </td>
+                        <td class="text-end">
+                          <a class="btn btn-sm btn-outline-primary" href="#">
+                            <i class="fa-solid fa-eye"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong class="text-dark">00016/2026</strong></td>
+                        <td>Material Elétrico</td>
+                        <td class="text-muted small">12/05/2026</td>
+                        <td class="fw-semibold">R$ 12.800,00</td>
+                        <td>
+                          <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                            Concluído
+                          </span>
+                        </td>
+                        <td class="text-end">
+                          <a class="btn btn-sm btn-outline-primary" href="#">
+                            <i class="fa-solid fa-eye"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong class="text-dark">00017/2026</strong></td>
+                        <td>Serviços de Limpeza</td>
+                        <td class="text-muted small">10/05/2026</td>
+                        <td class="fw-semibold">R$ 8.500,00</td>
+                        <td>
+                          <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">
+                            Pendente
+                          </span>
+                        </td>
+                        <td class="text-end">
+                          <a class="btn btn-sm btn-outline-primary" href="#">
+                            <i class="fa-solid fa-eye"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong class="text-dark">00018/2026</strong></td>
+                        <td>Serviços de Carga</td>
+                        <td class="text-muted small">10/06/2026</td>
+                        <td class="fw-semibold">R$ 9.500,00</td>
+                        <td>
+                          <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                            Concluído
+                          </span>
+                        </td>
+                        <td class="text-end">
+                          <a class="btn btn-sm btn-outline-primary" href="#">
+                            <i class="fa-solid fa-eye"></i>
+                          </a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
               <hr class="my-3">
               <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <small class="text-muted">
