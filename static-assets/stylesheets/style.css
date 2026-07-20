@@ -123,6 +123,34 @@ main {
   background: white;
   border-radius: 12px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.lista-tabela{
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lista-tabela table{
+  width: 100%;
+  min-width: 100%;
+}
+
+@media (max-width: 992px){
+  .lista-tabela table{
+    min-width: 850px;
+  }
+}
+
+.lista-tabela::-webkit-scrollbar{
+  height: 8px;
+}
+
+.lista-tabela::-webkit-scrollbar-thumb{
+  background:#bdbdbd;
+  border-radius:20px;
 }
 
 .badge.bg-warning-subtle {
