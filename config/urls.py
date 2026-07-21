@@ -24,4 +24,5 @@ urlpatterns = [
     path('processos/', include('processos.urls')),
     path('mapa/', include('mapa.urls')),
     path('relatorios/', include('relatorios.urls')),
+    path('configuracoes/', include('configuracoes.urls')),
 ]
