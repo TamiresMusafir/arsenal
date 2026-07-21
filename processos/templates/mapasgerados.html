@@ -1,0 +1,146 @@
+      {% extends "base.html" %}
+
+			{% block content %}
+
+      <div class="container">
+
+        <!-- 1. Seção do Banner Superior -->
+        <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
+          <div>
+            <h2 class="fw-bold text-dark mt-2">
+              <i class="fa-solid fa-file-circle-check me-2"></i>
+              Mapas Gerados
+            </h2>
+            <p class="text-justify fs-6 text-muted mt-3 mb-0">
+              Reúne todos os mapas comparativos gerados automaticamente pelos processos cadastrados no sistema. Nesta página, é possível localizar mapas por número do processo, data ou status, visualizar os resultados consolidados das propostas recebidas e realizar o download do mapa comparativo em formato PDF para consulta ou arquivamento.
+            </p>
+          </div>
+        </section>
+
+        <!-- 2. Seção dos Resultados -->
+        <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
+          <!-- Filtros -->
+          <div class="card border-0 shadow-sm p-4 mb-4">
+            <div class="row g-3">
+              <div class="col-lg-4">
+                <label class="form-label fw-semibold">
+                Número do Processo
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Ex.: 0015/2026">
+              </div>
+              <div class="col-lg-3">
+                <label class="form-label fw-semibold">
+                Situação
+                </label>
+                <select class="form-select">
+                  <option>Todos</option>
+                  <option>Finalizado</option>
+                  <option>Em andamento</option>
+                  <option>Pendente</option>
+                </select>
+              </div>
+              <div class="col-lg-3">
+                <label class="form-label fw-semibold">
+                Data de Geração
+                </label>
+                <input
+                  type="date"
+                  class="form-control">
+              </div>
+              <div class="col-lg-2 d-flex align-items-end">
+                <button class="btn btn-primary w-100">
+                <i class="fa-solid fa-magnifying-glass me-2"></i>
+                Buscar
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Resultado -->
+          <div class="card border-0 shadow-sm p-4 mb-3">
+            <div class="row align-items-center">
+              <div class="col-lg-8">
+                <h5 class="fw-bold mb-2">
+                  Processo 0015/2026
+                </h5>
+                <p class="text-muted mb-2">
+                  Aquisição de Notebooks
+                </p>
+                <div class="d-flex flex-wrap gap-3 small">
+                  <span>
+                  <i class="fa-solid fa-calendar me-1"></i>
+                  20/07/2026
+                  </span>
+                  <span>
+                  <i class="fa-solid fa-building me-1"></i>
+                  8 fornecedores
+                  </span>
+                  <span>
+                  <i class="fa-solid fa-envelope me-1"></i>
+                  6 respostas
+                  </span>
+                  <span>
+                  <i class="fa-solid fa-circle-check text-success me-1"></i>
+                  Finalizado
+                  </span>
+                </div>
+              </div>
+              <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <button class="btn btn-outline-primary me-2">
+                <i class="fa-solid fa-eye me-2"></i>
+                Visualizar
+                </button>
+                <button class="btn btn-primary">
+                <i class="fa-solid fa-download me-2"></i>
+                PDF
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card border-0 shadow-sm p-4 mb-3">
+            <div class="row align-items-center">
+              <div class="col-lg-8">
+                <h5 class="fw-bold mb-2">
+                  Processo 0018/2026
+                </h5>
+                <p class="text-muted mb-2">
+                  Aquisição de Impressoras
+                </p>
+                <div class="d-flex flex-wrap gap-3 small">
+                  <span>
+                  <i class="fa-solid fa-calendar me-1"></i>
+                  18/07/2026
+                  </span>
+                  <span>
+                  <i class="fa-solid fa-building me-1"></i>
+                  5 fornecedores
+                  </span>
+                  <span>
+                  <i class="fa-solid fa-envelope me-1"></i>
+                  4 respostas
+                  </span>
+                  <span>
+                  <i class="fa-solid fa-circle-check text-success me-1"></i>
+                  Finalizado
+                  </span>
+                </div>
+              </div>
+              <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <button class="btn btn-outline-primary me-2">
+                <i class="fa-solid fa-eye me-2"></i>
+                Visualizar
+                </button>
+                <button class="btn btn-primary">
+                <i class="fa-solid fa-download me-2"></i>
+                PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      {% endblock %}
