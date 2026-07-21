@@ -181,6 +181,8 @@ main {
 
 .wizard-header {
   position: relative;
+  min-width: 780px;
+  width: max-content;
 }
 
 .wizard-line {
@@ -205,6 +207,11 @@ main {
   font-size: .9rem;
 }
 
+.wizard-step span{
+  line-height: 1.1;
+  max-width: 95px;
+}
+
 .wizard-circle {
   width: 38px;
   height: 38px;
@@ -215,6 +222,7 @@ main {
   background: var(--main-light);
   border: 1px solid var(--main-light);
   transition: .3s;
+  flex: 0 0 42px;
 }
 
 .wizard-step.active {
@@ -242,4 +250,14 @@ main {
 .wizard-info-title{
     color: #495057;
     font-weight: 700;
+}
+
+/*Circulos do Relatório*/
+.circle-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
 }
