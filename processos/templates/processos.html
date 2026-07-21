@@ -1,242 +1,229 @@
-        
-			{% extends "base.html" %}
-
-			{% block content %}
-				
-        <div class="container">
-
-          <!-- 1. Seção do Banner Superior -->
-          <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
-            <div class="row align-items-center">
-              <div class="col-12">
-                <header class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
-                  <h2 class="mb-0 fw-bold"><i class="fa-solid fa-folder-open me-2"></i>Processos</h2>
-                  <a href="novoprocesso.html" class="btn btn-primary rounded-3 d-flex align-items-center gap-2 align-self-start align-self-sm-auto">
-                    <i class="fa-solid fa-plus"></i>
-                    Novo Processo
-                  </a>
-                </header>
-                <p class="text-justify fs-6 text-muted mt-3 mb-0">
-                  É a central de gerenciamento que reúne todos os processos cadastrados no sistema. Nela, você pode buscar, filtrar por data ou status, acompanhar o andamento de cada análise em tempo real e acessar o painel de detalhes de qualquer processo para visualizar seus e-mails, documentos e o mapa comparativo gerado.
-                </p>
-              </div>
-            </div>
-          </section>
-          
-          <!-- 2. Seção da Lista -->
-          <section class="lista bg-white p-4 rounded shadow-sm">
-            <div class="d-flex flex-wrap align-items-center gap-2 w-100">
-              <input type="text" class="form-control form-control-sm" placeholder="Buscar processo..." style="max-width: 200px; flex-shrink: 1;">
-              
-              <select class="form-select form-select-sm" style="max-width: 150px; flex-shrink: 0;">
-                <option selected>Qualquer data</option>
-                <option>Hoje</option>
-                <option>Este mês</option>
-                <option>Ano corrente</option>
-              </select>
-              
-              <select class="form-select form-select-sm" style="max-width: 150px; flex-shrink: 0;">
-                <option selected>Todos os status</option>
-                <option>Em andamento</option>
-                <option>Concluído</option>
-                <option>Pendente</option>
-              </select>
-              
-              <select class="form-select form-select-sm" style="max-width: 150px; flex-shrink: 0;">
-                <option selected>Mais recentes</option>
-                <option>Mais antigos</option>
-                <option>Número</option>
-              </select>
-              
-              <button class="btn btn-sm btn-outline-primary ">
-                <i class="fa-solid fa-filter me-2"></i>Filtrar
-              </button>
-            </div>
-            
-            <div class="d-lg-none mb-2 mt-2 text-muted small">
-              <i class="fa-solid fa-arrows-left-right me-1"></i>
-              Deslize a tabela para visualizar todas as colunas.
-            </div>
-
-            <section class="lista bg-white p-4 rounded shadow-sm">
-              <div class="lista-tabela">
-                <table class="table table-hover align-middle mb-0">
-                  <thead class="table-light">
-                    <tr>
-                      <th class="border-0">Processo</th>
-                      <th class="border-0">Descrição</th>
-                      <th class="border-0">Data de Abertura</th>
-                      <th class="border-0">Valor Estimado</th>
-                      <th class="border-0">Status</th>
-                      <th class="border-0 text-end">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong class="text-dark">00015/2026</strong></td>
-                      <td>Aquisição de Notebooks</td>
-                      <td class="text-muted small">15/05/2026</td>
-                      <td class="fw-semibold">R$ 45.000,00</td>
-                      <td>
-                        <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
-                          Em andamento
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a class="btn btn-sm btn-outline-primary" href="#">
-                            <i class="fa-solid fa-eye"></i>
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00016/2026</strong></td>
-                      <td>Material Elétrico</td>
-                      <td class="text-muted small">12/05/2026</td>
-                      <td class="fw-semibold">R$ 12.800,00</td>
-                      <td>
-                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
-                          Concluído
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a class="btn btn-sm btn-outline-primary" href="#">
-                            <i class="fa-solid fa-eye"></i>
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00017/2026</strong></td>
-                      <td>Serviços de Limpeza</td>
-                      <td class="text-muted small">10/05/2026</td>
-                      <td class="fw-semibold">R$ 8.500,00</td>
-                      <td>
-                        <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">
-                          Pendente
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a class="btn btn-sm btn-outline-primary" href="#">
-                          <i class="fa-solid fa-eye"></i>
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00018/2026</strong></td>
-                      <td>Serviços de Carga</td>
-                      <td class="text-muted small">10/06/2026</td>
-                      <td class="fw-semibold">R$ 9.500,00</td>
-                      <td>
-                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
-                          Concluído
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a class="btn btn-sm btn-outline-primary" href="#">
-                          <i class="fa-solid fa-eye"></i>
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00015/2026</strong></td>
-                      <td>Aquisição de Notebooks</td>
-                      <td class="text-muted small">15/05/2026</td>
-                      <td class="fw-semibold">R$ 45.000,00</td>
-                      <td>
-                        <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
-                          Em andamento
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a class="btn btn-sm btn-outline-primary" href="#">
-                          <i class="fa-solid fa-eye"></i>
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00016/2026</strong></td>
-                      <td>Material Elétrico</td>
-                      <td class="text-muted small">12/05/2026</td>
-                      <td class="fw-semibold">R$ 12.800,00</td>
-                      <td>
-                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
-                          Concluído
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a class="btn btn-sm btn-outline-primary" href="#">
-                          <i class="fa-solid fa-eye"></i>
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00017/2026</strong></td>
-                      <td>Serviços de Limpeza</td>
-                      <td class="text-muted small">10/05/2026</td>
-                      <td class="fw-semibold">R$ 8.500,00</td>
-                      <td>
-                        <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">
-                          Pendente
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a class="btn btn-sm btn-outline-primary" href="#">
-                          <i class="fa-solid fa-eye"></i>
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong class="text-dark">00018/2026</strong></td>
-                      <td>Serviços de Carga</td>
-                      <td class="text-muted small">10/06/2026</td>
-                      <td class="fw-semibold">R$ 9.500,00</td>
-                      <td>
-                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
-                          Concluído
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <a class="btn btn-sm btn-outline-primary" href="#">
-                          <i class="fa-solid fa-eye"></i>
-                        </a>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-
-            <hr class="my-3">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-              <small class="text-muted">
-                Mostrando <strong>1–10</strong> de <strong>84</strong> processos
-              </small>
-              <nav>
-                <ul class="pagination pagination-sm mb-0">
-                  <li class="page-item disabled">
-                    <a class="page-link" href="#">Anterior</a>
-                  </li>
-                  <li class="page-item active">
-                    <a class="page-link" href="#">1</a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">2</a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">3</a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">4</a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">5</a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">Próxima</a>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-          </section>
-        </div>
-
-			{% endblock %}
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <!-- 1. Seção do Banner Superior -->
+  <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
+    <div class="row align-items-center">
+      <div class="col-12">
+        <header class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+          <h2 class="mb-0 fw-bold"><i class="fa-solid fa-folder-open me-2"></i>Processos</h2>
+          <a href="novoprocesso.html" class="btn btn-primary rounded-3 d-flex align-items-center gap-2 align-self-start align-self-sm-auto">
+          <i class="fa-solid fa-plus"></i>
+          Novo Processo
+          </a>
+        </header>
+        <p class="text-justify fs-6 text-muted mt-3 mb-0">
+          É a central de gerenciamento que reúne todos os processos cadastrados no sistema. Nela, você pode buscar, filtrar por data ou status, acompanhar o andamento de cada análise em tempo real e acessar o painel de detalhes de qualquer processo para visualizar seus e-mails, documentos e o mapa comparativo gerado.
+        </p>
+      </div>
+    </div>
+  </section>
+  <!-- 2. Seção da Lista -->
+  <section class="lista bg-white p-4 rounded shadow-sm">
+    <div class="d-flex flex-wrap align-items-center gap-2 w-100">
+      <input type="text" class="form-control form-control-sm" placeholder="Buscar processo..." style="max-width: 200px; flex-shrink: 1;">
+      <select class="form-select form-select-sm" style="max-width: 150px; flex-shrink: 0;">
+        <option selected>Qualquer data</option>
+        <option>Hoje</option>
+        <option>Este mês</option>
+        <option>Ano corrente</option>
+      </select>
+      <select class="form-select form-select-sm" style="max-width: 150px; flex-shrink: 0;">
+        <option selected>Todos os status</option>
+        <option>Em andamento</option>
+        <option>Concluído</option>
+        <option>Pendente</option>
+      </select>
+      <select class="form-select form-select-sm" style="max-width: 150px; flex-shrink: 0;">
+        <option selected>Mais recentes</option>
+        <option>Mais antigos</option>
+        <option>Número</option>
+      </select>
+      <button class="btn btn-sm btn-outline-primary ">
+      <i class="fa-solid fa-filter me-2"></i>Filtrar
+      </button>
+    </div>
+    <div class="d-lg-none mb-2 mt-2 text-muted small">
+      <i class="fa-solid fa-arrows-left-right me-1"></i>
+      Deslize a tabela para visualizar todas as colunas.
+    </div>
+    <section class="lista bg-white p-4 rounded shadow-sm">
+      <div class="lista-tabela">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="border-0">Processo</th>
+              <th class="border-0">Descrição</th>
+              <th class="border-0">Data de Abertura</th>
+              <th class="border-0">Valor Estimado</th>
+              <th class="border-0">Status</th>
+              <th class="border-0 text-end">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong class="text-dark">00015/2026</strong></td>
+              <td>Aquisição de Notebooks</td>
+              <td class="text-muted small">15/05/2026</td>
+              <td class="fw-semibold">R$ 45.000,00</td>
+              <td>
+                <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
+                Em andamento
+                </span>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="#">
+                <i class="fa-solid fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td><strong class="text-dark">00016/2026</strong></td>
+              <td>Material Elétrico</td>
+              <td class="text-muted small">12/05/2026</td>
+              <td class="fw-semibold">R$ 12.800,00</td>
+              <td>
+                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                Concluído
+                </span>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="#">
+                <i class="fa-solid fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td><strong class="text-dark">00017/2026</strong></td>
+              <td>Serviços de Limpeza</td>
+              <td class="text-muted small">10/05/2026</td>
+              <td class="fw-semibold">R$ 8.500,00</td>
+              <td>
+                <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">
+                Pendente
+                </span>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="#">
+                <i class="fa-solid fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td><strong class="text-dark">00018/2026</strong></td>
+              <td>Serviços de Carga</td>
+              <td class="text-muted small">10/06/2026</td>
+              <td class="fw-semibold">R$ 9.500,00</td>
+              <td>
+                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                Concluído
+                </span>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="#">
+                <i class="fa-solid fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td><strong class="text-dark">00015/2026</strong></td>
+              <td>Aquisição de Notebooks</td>
+              <td class="text-muted small">15/05/2026</td>
+              <td class="fw-semibold">R$ 45.000,00</td>
+              <td>
+                <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
+                Em andamento
+                </span>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="#">
+                <i class="fa-solid fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td><strong class="text-dark">00016/2026</strong></td>
+              <td>Material Elétrico</td>
+              <td class="text-muted small">12/05/2026</td>
+              <td class="fw-semibold">R$ 12.800,00</td>
+              <td>
+                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                Concluído
+                </span>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="#">
+                <i class="fa-solid fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td><strong class="text-dark">00017/2026</strong></td>
+              <td>Serviços de Limpeza</td>
+              <td class="text-muted small">10/05/2026</td>
+              <td class="fw-semibold">R$ 8.500,00</td>
+              <td>
+                <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">
+                Pendente
+                </span>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="#">
+                <i class="fa-solid fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td><strong class="text-dark">00018/2026</strong></td>
+              <td>Serviços de Carga</td>
+              <td class="text-muted small">10/06/2026</td>
+              <td class="fw-semibold">R$ 9.500,00</td>
+              <td>
+                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                Concluído
+                </span>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="#">
+                <i class="fa-solid fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <hr class="my-3">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+      <small class="text-muted">
+      Mostrando <strong>1–10</strong> de <strong>84</strong> processos
+      </small>
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item disabled">
+            <a class="page-link" href="#">Anterior</a>
+          </li>
+          <li class="page-item active">
+            <a class="page-link" href="#">1</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#">2</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#">3</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#">4</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#">5</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#">Próxima</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+</div>
+{% endblock %}
