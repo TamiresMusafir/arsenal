@@ -1,160 +1,136 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-   <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Arsenal</title>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-      <link rel="stylesheet" href="stylesheets/bootstrap.min.css">
-      <link rel="stylesheet" href="stylesheets/style.css">
-   </head>
-   <body>
-      <div class="container-fluid px-0">
-         <div class="row g-0">
-            <!-- Header Mobile -->
-            <header class="mobile-header d-lg-none d-flex align-items-center justify-content-between p-3">
-               <button id="mobileMenuBtn" class="btn btn-primary">
-               <i class="fa-solid fa-bars"></i>
-               </button>
-            </header>
-            <!-- Sidebar -->
-            <aside class="sidebar col-lg-2 d-flex flex-column justify-content-between p-3 text-white">
-               <!-- Botão fechar (somente mobile) -->
-               <button class="close-menu btn btn-link text-white d-lg-none align-self-end mb-3">
-               <i class="fa-solid fa-xmark fa-xl"></i>
-               </button>
-               <div>
-                  <!-- Logo -->
-                  <div class="logo mb-4">
-                     <h2 class="h4 mb-0 fw-bold">Arsenal</h2>
-                     <span class="text-muted small">
-                     Depurador de Orçamentos
-                     </span>
-                  </div>
-                  <!-- Navegação -->
-                  <nav class="nav nav-pills flex-column gap-1">
-                     <a class="nav-link active" href="index.html">
-                     <i class="fa-solid fa-house fa-fw me-2"></i>
-                     <span>Início</span>
-                     </a>
-                     <a class="nav-link" href="dashboard.html">
-                     <i class="fa-solid fa-clipboard fa-fw me-2"></i>
-                     <span>Dashboard</span>
-                     </a>
-                     <!-- Processos -->
-                     <a
-                        class="nav-link d-flex justify-content-between align-items-center"
-                        data-bs-toggle="collapse"
-                        href="#submenuProcessos"
-                        role="button"
-                        aria-expanded="false"
-                        aria-controls="submenuProcessos">
-                     <span>
-                     <i class="fa-solid fa-folder-open fa-fw me-2"></i>
-                     Processos
-                     </span>
-                     <i class="fa-solid fa-chevron-down small seta-submenu"></i>
-                     </a>
-                     <div class="collapse" id="submenuProcessos">
-                        <div class="nav flex-column ms-3 ps-2 border-start border-secondary border-opacity-25">
-                           <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="processos.html">
-                           <i class="fa-solid fa-folder-open fa-fw me-2"></i>
-                           <span>Ver Processos</span>
-                           </a>
-                           <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="novoprocesso.html">
-                           <i class="fa-solid fa-file-circle-plus fa-fw me-2"></i>
-                           <span>Novo Processo</span>
-                           </a>
-                           <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="emails.html">
-                           <i class="fa-solid fa-envelope fa-fw me-2"></i>
-                           <span>E-mails</span>
-                           </a>
-                           <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="fornecedores.html">
-                           <i class="fa-solid fa-building fa-fw me-2"></i>
-                           <span>Fornecedores</span>
-                           </a>
-                           <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="documentos.html">
-                           <i class="fa-solid fa-file-lines fa-fw me-2"></i>
-                           <span>Documentos</span>
-                           </a>
-                        </div>
-                     </div>
-                     <a class="nav-link d-flex align-items-center" href="mapa.html">
-                     <i class="fa-solid fa-scale-balanced fa-fw me-2"></i>
-                     <span>
-                     Mapa<br>
-                     Comparativo
-                     </span>
-                     </a>
-                     <a class="nav-link" href="relatorios.html">
-                     <i class="fa-solid fa-chart-column fa-fw me-2"></i>
-                     <span>Relatórios</span>
-                     </a>
-                     <a class="nav-link" href="configuracoes.html">
-                     <i class="fa-solid fa-gear fa-fw me-2"></i>
-                     <span>Configurações</span>
-                     </a>
-                  </nav>
-               </div>
-               <!-- Perfil -->
-               <div class="perfil d-flex align-items-center gap-2 pt-3 mt-4 border-top border-secondary">
-                  <img
-                     src="https://placehold.co/40x40"
-                     class="rounded-circle"
-                     alt="Administrador">
-                  <div class="overflow-hidden">
-                     <strong class="d-block text-truncate small">
-                     Administrador
-                     </strong>
-                     <small class="text-muted d-block text-truncate">
-                     admin@teste.com
-                     </small>
-                  </div>
-               </div>
-            </aside>
-            <main class="col-12 col-lg-10 p-4">
-               <div class="container">
-                  <!-- 1. Seção do Banner Superior -->
-                  <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
-                     <div class="row align-items-center">
-                        <div class="col-lg-8 col-md-6">
-                           <h1 class="display-7 fw-bold text-dark">
-                              Bem-vindo ao Mapa Comparativo!
-                           </h1>
-                           <p class="fs-6 text-muted mt-3 mb-0">
-                              Nessa pagina temos um documento de ilustração na qual serve para utilizar como base para as planilhas do mapa comparativo. E aqui tambem temos a possibilidade de colocar csv para vocês poderem visualizar os seus arquivos.
-                           </p>
-                        </div>
-                     </div>
-                  </section>
-                  <!-- Área dos botões -->
-                  <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
-                     <div class="mb-4 d-flex gap-3 flex-wrap">
-                        <!-- Botão para baixar o modelo base -->
-                        <button class="btn btn-outline-success" id="btnBaixarModelo">
-                        <i class="fa-solid fa-download me-2"></i>
-                        Baixar Modelo Base
-                        </button>
-                        <!-- Botão para fazer upload de arquivos -->
-                        <button class="btn btn-outline-primary" id="btnUploadArquivo">
-                        <i class="fa-solid fa-upload me-2"></i>
-                        Enviar Arquivo
-                        </button>
-                        <!-- Input de arquivo oculto -->
-                        <input type="file" id="inputArquivo" accept=".csv,.xls,.xlsx,.ods" style="display: none;" multiple>
-                     </div>
-                     <div class="table-responsive" id="areaTabela" style="max-height: 400px; overflow-y: auto; display: none;">
-                        <table class="table table-striped table-hover table-bordered" id="tabelaDados">
-                           <thead class="table-dark sticky-top">
-                              <tr id="cabecalhoTabela"></tr>
-                           </thead>
-                           <tbody id="corpoTabela"></tbody>
-                        </table>
-                     </div>
-                  </section>
-               </div>
-            </main>
-         </div>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arsenal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
+  </head>
+  <body>
+    <div class="container-fluid px-0">
+      <div class="row g-0">
+        <!-- Header Mobile -->
+        <header class="mobile-header d-lg-none d-flex align-items-center justify-content-between p-3">
+          <button id="mobileMenuBtn" class="btn btn-primary">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </header>
+        <!-- Sidebar -->
+        <aside class="sidebar col-lg-2 d-flex flex-column justify-content-between p-3 text-white">
+          <button class="close-menu btn btn-link text-white d-lg-none align-self-end mb-3">
+            <i class="fa-solid fa-xmark fa-xl"></i>
+          </button>
+          <div>
+            <!-- Logo -->
+            <div class="logo mb-4">
+              <h2 class="h4 mb-0 fw-bold">Arsenal</h2>
+              <span class="text-muted small">Depurador de Orçamentos</span>
+            </div>
+            <!-- Navegação -->
+            <nav class="nav nav-pills flex-column gap-1">
+              <a class="nav-link" href="index.html">
+                <i class="fa-solid fa-house fa-fw me-2"></i>
+                <span>Início</span>
+              </a>
+              <a class="nav-link" href="dashboard.html">
+                <i class="fa-solid fa-clipboard fa-fw me-2"></i>
+                <span>Dashboard</span>
+              </a>
+              <!-- Processos -->
+              <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuProcessos" role="button" aria-expanded="true" aria-controls="submenuProcessos">
+                <span>
+                  <i class="fa-solid fa-folder-open fa-fw me-2"></i>
+                  Processos
+                </span>
+                <i class="fa-solid fa-chevron-down small seta-submenu"></i>
+              </a>
+              <div class="collapse show" id="submenuProcessos">
+                <div class="nav flex-column ms-3 ps-2 border-start border-secondary border-opacity-25">
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="processos.html">
+                    <i class="fa-solid fa-folder-open fa-fw me-2"></i>
+                    <span>Ver Processos</span>
+                  </a>
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="novoprocesso.html">
+                    <i class="fa-solid fa-file-circle-plus fa-fw me-2"></i>
+                    <span>Novo Processo</span>
+                  </a>
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="documentos.html">
+                    <i class="fa-solid fa-file-lines fa-fw me-2"></i>
+                    <span>Documentos</span>
+                  </a>
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="mapasgerados.html">
+                    <i class="fa-solid fa-file-circle-check fa-fw me-2"></i>
+                    <span>Mapas Gerados</span>
+                  </a>
+                </div>
+              </div>
+              <a class="nav-link active d-flex align-items-center" href="mapa.html">
+                <i class="fa-solid fa-scale-balanced fa-fw me-2"></i>
+                <span>Modelo de Mapa<br>Comparativo</span>
+              </a>
+              <a class="nav-link d-flex align-items-center" href="relatorios.html">
+                <i class="fa-solid fa-chart-column fa-fw me-2"></i>
+                <span>Relatórios</span>
+              </a>
+              <a class="nav-link d-flex align-items-center" href="configuracoes.html">
+                <i class="fa-solid fa-gear fa-fw me-2"></i>
+                <span>Configurações</span>
+              </a>
+            </nav>
+          </div>
+          <!-- Perfil -->
+          <div class="perfil d-flex align-items-center gap-2 pt-3 mt-4 border-top border-secondary">
+            <img src="https://placehold.co/40x40" class="rounded-circle" alt="Administrador">
+            <div class="overflow-hidden">
+              <strong class="d-block text-truncate small">Administrador</strong>
+              <small class="text-muted d-block text-truncate">admin@teste.com</small>
+            </div>
+          </div>
+        </aside>
+          <main class="col-12 col-lg-10 p-4">
+            <div class="container">
+              <!-- 1. Seção do Banner Superior -->
+              <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
+                <div class="">
+                  <h2 class="fw-bold text-dark mt-2">
+                    <i class="fa-solid fa-file-circle-check me-2"></i>
+                    Modelo de Mapa Comparativo
+                  </h2>
+                  <p class="fs-6 text-muted mt-3 mb-0">
+                    Nessa pagina temos um documento de ilustração na qual serve para utilizar como base para as planilhas do mapa comparativo. E aqui tambem temos a possibilidade de colocar csv para vocês poderem visualizar os seus arquivos.
+                  </p>
+                </div>
+              </section>
+              <!-- Área dos botões -->
+              <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
+                <div class="mb-4 d-flex gap-3 flex-wrap">
+                  <!-- Botão para baixar o modelo base -->
+                  <button class="btn btn-outline-success" id="btnBaixarModelo">
+                  <i class="fa-solid fa-download me-2"></i>
+                  Baixar Modelo Base
+                  </button>
+                  <!-- Botão para fazer upload de arquivos -->
+                  <button class="btn btn-outline-primary" id="btnUploadArquivo">
+                  <i class="fa-solid fa-upload me-2"></i>
+                  Enviar Arquivo
+                  </button>
+                  <!-- Input de arquivo oculto -->
+                  <input type="file" id="inputArquivo" accept=".csv,.xls,.xlsx,.ods" style="display: none;" multiple>
+                </div>
+                <div class="table-responsive" id="areaTabela" style="max-height: 400px; overflow-y: auto; display: none;">
+                  <table class="table table-striped table-hover table-bordered" id="tabelaDados">
+                    <thead class="table-dark sticky-top">
+                      <tr id="cabecalhoTabela"></tr>
+                    </thead>
+                    <tbody id="corpoTabela"></tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+
+          </main>
       </div>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
       <script src="js/sidebar.js"></script>
