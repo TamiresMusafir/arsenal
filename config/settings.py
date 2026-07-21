@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'processos',
     'mapa',
     'relatorios',
+    'configuracoes',
 ]
 
 MIDDLEWARE = [
