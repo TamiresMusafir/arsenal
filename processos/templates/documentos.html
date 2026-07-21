@@ -1,0 +1,175 @@
+      {% extends "base.html" %}
+
+			{% block content %}
+
+      <div class="container">
+        <!-- 1. Seção do Banner Superior -->
+        <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-4">
+          <div>
+            <h2 class="fw-bold text-dark mt-2"><i class="fa-solid fa-file-lines me-2"></i>Documentos</h2>
+            <p class="text-justify fs-6 text-muted mt-3">
+              Consulte todas as informações relacionadas aos processos de contratação. 
+              <br>Pesquise pelo número do processo para visualizar documentos, fornecedores envolvidos, comunicações realizadas, cotações e demais informações geradas durante o fluxo. 
+              <br>Utilize os filtros para acompanhar o andamento do processo e faça o download dos arquivos disponíveis.
+            </p>
+          </div>
+        </section>
+        <!-- 2. Seção da Lista --> 
+        <section class="lista bg-white p-4 rounded shadow-sm">
+          <div class="card shadow-sm mb-4">
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">
+                  Número do Processo
+                  </label>
+                  <input type="text" class="form-control" placeholder="Ex: 00015/2026">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">
+                  Status
+                  </label>
+                  <select class="form-select">
+                    <option>
+                      Todos
+                    </option>
+                    <option>
+                      Em andamento
+                    </option>
+                    <option>
+                      Concluído
+                    </option>
+                    <option>
+                      Pendente
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                  <button class="btn btn-primary w-100">
+                  <i class="fa-solid fa-magnifying-glass me-2"></i>
+                  Buscar
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="card shadow-sm">
+              <div class="card-header bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h5 class="mb-1 fw-bold">
+                      Processo 00015/2026
+                    </h5>
+                    <span class="text-muted">
+                    Aquisição de notebooks
+                    </span>
+                  </div>
+                  <span class="badge bg-warning text-dark">
+                  Em andamento
+                  </span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="row g-4">
+                  <!-- Documentos -->
+                  <div class="col-md-6 col-xl-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                      <div class="card-body">
+                        <h6 class="fw-bold">
+                          <i class="fa-solid fa-file-lines me-2 text-primary"></i>
+                          Documentos
+                        </h6>
+                        <p class="text-muted small">
+                          Documentos gerados no processo.
+                        </p>
+                        <button class="btn btn-outline-primary btn-sm">
+                          <i class="fa-solid fa-download"></i>
+                          Baixar PDF
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Emails -->
+                  <div class="col-md-6 col-xl-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                      <div class="card-body">
+                        <h6 class="fw-bold">
+                          <i class="fa-solid fa-envelope me-2 text-danger"></i>
+                          Comunicação
+                        </h6>
+                        <p class="text-muted small">
+                          10 e-mails enviados<br>
+                          6 respostas recebidas
+                        </p>
+                        <button class="btn btn-outline-danger btn-sm">
+                          <i class="fa-solid fa-download"></i>
+                          Baixar E-mails
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Fornecedores -->
+                  <div class="col-md-6 col-xl-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                      <div class="card-body">
+                        <h6 class="fw-bold">
+                          <i class="fa-solid fa-building me-2 text-success"></i>
+                          Fornecedores
+                        </h6>
+                        <p class="text-muted small">
+                          8 fornecedores consultados.
+                        </p>
+                        <button class="btn btn-outline-success btn-sm">
+                          <i class="fa-solid fa-download"></i>
+                          Baixar Lista
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Cotações -->
+                  <div class="col-md-6 col-xl-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                      <div class="card-body">
+                        <h6 class="fw-bold">
+                          <i class="fa-solid fa-money-bill me-2 text-warning"></i>
+                          Cotações
+                        </h6>
+                        <p class="text-muted small">
+                          5 respostas recebidas.
+                        </p>
+                        <button class="btn btn-outline-warning btn-sm">
+                          Visualizar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Mapa -->
+                <hr class="my-4">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h5 class="fw-bold">
+                      <i class="fa-solid fa-scale-balanced me-2"></i>
+                      Mapa Comparativo
+                    </h5>
+                    <p class="text-muted mb-0">
+                      Resultado gerado a partir das cotações recebidas.
+                    </p>
+                  </div>
+                  <div>
+                    <div class="d-flex flex-wrap gap-2 ms-2">
+                      <button class="btn btn-outline-dark">
+                          Visualizar
+                      </button>
+
+                      <button class="btn btn-dark">
+                          <i class="fa-solid fa-download me-2"></i>
+                          PDF
+                      </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </section>
+      </div>
+
+      {% endblock %}
