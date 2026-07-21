@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arsenal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
+  </head>
+  <body>
+    <div class="container-fluid px-0">
+      <div class="row g-0">
+        <!-- Header Mobile -->
+        <header class="mobile-header d-lg-none d-flex align-items-center justify-content-between p-3">
+          <button id="mobileMenuBtn" class="btn btn-primary">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </header>
+        <!-- Sidebar -->
+        <aside class="sidebar col-lg-2 d-flex flex-column justify-content-between p-3 text-white">
+          <button class="close-menu btn btn-link text-white d-lg-none align-self-end mb-3">
+            <i class="fa-solid fa-xmark fa-xl"></i>
+          </button>
+          <div>
+            <!-- Logo -->
+            <div class="logo mb-4">
+              <h2 class="h4 mb-0 fw-bold">Arsenal</h2>
+              <span class="text-muted small">Depurador de Orçamentos</span>
+            </div>
+            <!-- Navegação -->
+            <nav class="nav nav-pills flex-column gap-1">
+              <a class="nav-link" href="index.html">
+                <i class="fa-solid fa-house fa-fw me-2"></i>
+                <span>Início</span>
+              </a>
+              <a class="nav-link" href="dashboard.html">
+                <i class="fa-solid fa-clipboard fa-fw me-2"></i>
+                <span>Dashboard</span>
+              </a>
+              <!-- Processos -->
+              <a class="nav-link active d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuProcessos" role="button" aria-expanded="true" aria-controls="submenuProcessos">
+                <span>
+                  <i class="fa-solid fa-folder-open fa-fw me-2"></i>
+                  Processos
+                </span>
+                <i class="fa-solid fa-chevron-down small seta-submenu"></i>
+              </a>
+              <div class="collapse show" id="submenuProcessos">
+                <div class="nav flex-column ms-3 ps-2 border-start border-secondary border-opacity-25">
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="processos.html">
+                    <i class="fa-solid fa-folder-open fa-fw me-2"></i>
+                    <span>Ver Processos</span>
+                  </a>
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="novoprocesso.html">
+                    <i class="fa-solid fa-file-circle-plus fa-fw me-2"></i>
+                    <span>Novo Processo</span>
+                  </a>
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="documentos.html">
+                    <i class="fa-solid fa-file-lines fa-fw me-2"></i>
+                    <span>Documentos</span>
+                  </a>
+                  <a class="nav-link active py-2 text-white-50 small d-flex align-items-center" href="mapasgerados.html">
+                    <i class="fa-solid fa-file-circle-check fa-fw me-2"></i>
+                    <span>Mapas Gerados</span>
+                  </a>
+                </div>
+              </div>
+              <a class="nav-link d-flex align-items-center" href="mapa.html">
+                <i class="fa-solid fa-scale-balanced fa-fw me-2"></i>
+                <span>Modelo de Mapa<br>Comparativo</span>
+              </a>
+              <a class="nav-link d-flex align-items-center" href="relatorios.html">
+                <i class="fa-solid fa-chart-column fa-fw me-2"></i>
+                <span>Relatórios</span>
+              </a>
+              <a class="nav-link d-flex align-items-center" href="configuracoes.html">
+                <i class="fa-solid fa-gear fa-fw me-2"></i>
+                <span>Configurações</span>
+              </a>
+            </nav>
+          </div>
+          <!-- Perfil -->
+          <div class="perfil d-flex align-items-center gap-2 pt-3 mt-4 border-top border-secondary">
+            <img src="https://placehold.co/40x40" class="rounded-circle" alt="Administrador">
+            <div class="overflow-hidden">
+              <strong class="d-block text-truncate small">Administrador</strong>
+              <small class="text-muted d-block text-truncate">admin@teste.com</small>
+            </div>
+          </div>
+        </aside>
+        <div class="sidebar-backdrop"></div>
+        
+        <main class="col-12 col-lg-10 p-4">
+          <div class="container">
+
+            <!-- 1. Seção do Banner Superior -->
+            <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
+              <div>
+                <h2 class="fw-bold text-dark mt-2">
+                  <i class="fa-solid fa-file-circle-check me-2"></i>
+                  Mapas Gerados
+                </h2>
+                <p class="text-justify fs-6 text-muted mt-3 mb-0">
+                  Reúne todos os mapas comparativos gerados automaticamente pelos processos cadastrados no sistema. Nesta página, é possível localizar mapas por número do processo, data ou status, visualizar os resultados consolidados das propostas recebidas e realizar o download do mapa comparativo em formato PDF para consulta ou arquivamento.
+                </p>
+              </div>
+            </section>
+
+            <!-- 2. Seção dos Resultados -->
+            <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
+              <!-- Filtros -->
+              <div class="card border-0 shadow-sm p-4 mb-4">
+                <div class="row g-3">
+                  <div class="col-lg-4">
+                    <label class="form-label fw-semibold">
+                    Número do Processo
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Ex.: 0015/2026">
+                  </div>
+                  <div class="col-lg-3">
+                    <label class="form-label fw-semibold">
+                    Situação
+                    </label>
+                    <select class="form-select">
+                      <option>Todos</option>
+                      <option>Finalizado</option>
+                      <option>Em andamento</option>
+                      <option>Pendente</option>
+                    </select>
+                  </div>
+                  <div class="col-lg-3">
+                    <label class="form-label fw-semibold">
+                    Data de Geração
+                    </label>
+                    <input
+                      type="date"
+                      class="form-control">
+                  </div>
+                  <div class="col-lg-2 d-flex align-items-end">
+                    <button class="btn btn-primary w-100">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i>
+                    Buscar
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- Resultado -->
+              <div class="card border-0 shadow-sm p-4 mb-3">
+                <div class="row align-items-center">
+                  <div class="col-lg-8">
+                    <h5 class="fw-bold mb-2">
+                      Processo 0015/2026
+                    </h5>
+                    <p class="text-muted mb-2">
+                      Aquisição de Notebooks
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 small">
+                      <span>
+                      <i class="fa-solid fa-calendar me-1"></i>
+                      20/07/2026
+                      </span>
+                      <span>
+                      <i class="fa-solid fa-building me-1"></i>
+                      8 fornecedores
+                      </span>
+                      <span>
+                      <i class="fa-solid fa-envelope me-1"></i>
+                      6 respostas
+                      </span>
+                      <span>
+                      <i class="fa-solid fa-circle-check text-success me-1"></i>
+                      Finalizado
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <button class="btn btn-outline-primary me-2">
+                    <i class="fa-solid fa-eye me-2"></i>
+                    Visualizar
+                    </button>
+                    <button class="btn btn-primary">
+                    <i class="fa-solid fa-download me-2"></i>
+                    PDF
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="card border-0 shadow-sm p-4 mb-3">
+                <div class="row align-items-center">
+                  <div class="col-lg-8">
+                    <h5 class="fw-bold mb-2">
+                      Processo 0018/2026
+                    </h5>
+                    <p class="text-muted mb-2">
+                      Aquisição de Impressoras
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 small">
+                      <span>
+                      <i class="fa-solid fa-calendar me-1"></i>
+                      18/07/2026
+                      </span>
+                      <span>
+                      <i class="fa-solid fa-building me-1"></i>
+                      5 fornecedores
+                      </span>
+                      <span>
+                      <i class="fa-solid fa-envelope me-1"></i>
+                      4 respostas
+                      </span>
+                      <span>
+                      <i class="fa-solid fa-circle-check text-success me-1"></i>
+                      Finalizado
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <button class="btn btn-outline-primary me-2">
+                    <i class="fa-solid fa-eye me-2"></i>
+                    Visualizar
+                    </button>
+                    <button class="btn btn-primary">
+                    <i class="fa-solid fa-download me-2"></i>
+                    PDF
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+          </div>
+
+        </main>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/sidebar.js"></script>
+  </body>
+</html>
