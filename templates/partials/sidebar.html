@@ -20,11 +20,11 @@
             </div>
             <!-- Navegação -->
             <nav class="nav nav-pills flex-column gap-1">
-              <a class="nav-link active" href="/">
+              <a class="nav-link active" href="{% url 'home' %}">
                 <i class="fa-solid fa-house fa-fw me-2"></i>
                 <span>Início</span>
               </a>
-              <a class="nav-link" href="/dashboard">
+              <a class="nav-link" href="{% url 'dashboard' %}">
                 <i class="fa-solid fa-clipboard fa-fw me-2"></i>
                 <span>Dashboard</span>
               </a>
@@ -38,35 +38,35 @@
               </a>
               <div class="collapse" id="submenuProcessos">
                 <div class="nav flex-column ms-3 ps-2 border-start border-secondary border-opacity-25">
-                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="/processos">
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="{% url 'processos' %}">
                     <i class="fa-solid fa-folder-open fa-fw me-2"></i>
                     <span>Ver Processos</span>
                   </a>
-                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="novoprocesso.html">
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="{% url 'novo_processo' %}">
                     <i class="fa-solid fa-file-circle-plus fa-fw me-2"></i>
                     <span>Novo Processo</span>
                   </a>
-                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="documentos.html">
+                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="{% url 'documentos' %}">
                     <i class="fa-solid fa-file-lines fa-fw me-2"></i>
                     <span>Documentos</span>
                   </a>
                   <a
                     class="nav-link py-2 text-white-50 small d-flex align-items-center"
-                    href="mapasgerados.html">
+                    href="{% url 'mapas_gerados' %}">
                     <i class="fa-solid fa-file-circle-check fa-fw me-2"></i>
                     <span>Mapas Gerados</span>
                   </a>
                 </div>
               </div>
-              <a class="nav-link d-flex align-items-center" href="/mapa">
+              <a class="nav-link d-flex align-items-center" href="{% url 'mapa' %}">
                 <i class="fa-solid fa-scale-balanced fa-fw me-2"></i>
                 <span>Modelo de Mapa<br />Comparativo</span>
               </a>
-              <a class="nav-link d-flex align-items-center" href="/relatorios">
+              <a class="nav-link d-flex align-items-center" href="{% url 'relatorios' %}">
                 <i class="fa-solid fa-chart-column fa-fw me-2"></i>
                 <span>Relatórios</span>
               </a>
-              <a class="nav-link d-flex align-items-center" href="/configuracoes">
+              <a class="nav-link d-flex align-items-center" href="{% url 'configuracoes' %}">
                 <i class="fa-solid fa-gear fa-fw me-2"></i>
                 <span>Configurações</span>
               </a>
