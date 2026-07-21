@@ -1,0 +1,43 @@
+			{% extends "base.html" %}
+
+			{% block content %}
+            <div class="container">
+              <!-- 1. Seção do Banner Superior -->
+              <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
+                <div class="">
+                  <h2 class="fw-bold text-dark mt-2">
+                    <i class="fa-solid fa-file-circle-check me-2"></i>
+                    Modelo de Mapa Comparativo
+                  </h2>
+                  <p class="fs-6 text-muted mt-3 mb-0">
+                    Nessa pagina temos um documento de ilustração na qual serve para utilizar como base para as planilhas do mapa comparativo. E aqui tambem temos a possibilidade de colocar csv para vocês poderem visualizar os seus arquivos.
+                  </p>
+                </div>
+              </section>
+              <!-- Área dos botões -->
+              <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0">
+                <div class="mb-4 d-flex gap-3 flex-wrap">
+                  <!-- Botão para baixar o modelo base -->
+                  <button class="btn btn-outline-success" id="btnBaixarModelo">
+                  <i class="fa-solid fa-download me-2"></i>
+                  Baixar Modelo Base
+                  </button>
+                  <!-- Botão para fazer upload de arquivos -->
+                  <button class="btn btn-outline-primary" id="btnUploadArquivo">
+                  <i class="fa-solid fa-upload me-2"></i>
+                  Enviar Arquivo
+                  </button>
+                  <!-- Input de arquivo oculto -->
+                  <input type="file" id="inputArquivo" accept=".csv,.xls,.xlsx,.ods" style="display: none;" multiple>
+                </div>
+                <div class="table-responsive" id="areaTabela" style="max-height: 400px; overflow-y: auto; display: none;">
+                  <table class="table table-striped table-hover table-bordered" id="tabelaDados">
+                    <thead class="table-dark sticky-top">
+                      <tr id="cabecalhoTabela"></tr>
+                    </thead>
+                    <tbody id="corpoTabela"></tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+            {% endblock %}
