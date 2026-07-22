@@ -25,9 +25,16 @@ function updateWizard() {
   if (current === 0) {
     prevBtn.classList.add("d-none");
 	} else {
-			prevBtn.classList.remove("d-none");
+		prevBtn.classList.remove("d-none");
 	}
-  nextBtn.textContent = current === contents.length - 1 ? "Finalizar" : "Próximo";
+
+  if (current === contents.length - 1) {
+    nextBtn.textContent = "Finalizar";
+    nextBtn.type = "submit"; 
+  } else {
+    nextBtn.textContent = "Próximo";
+    nextBtn.type = "button";
+  }
 }
 
 nextBtn.addEventListener("click", () => {
