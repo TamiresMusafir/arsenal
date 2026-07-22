@@ -45,9 +45,10 @@
               
               <option value="antigos">Mais antigos</option>
               <option value="recentes">Mais recentes</option>
-              <option value="numero">Número</option>
+              <option value="numero">Número do processo</option>
+              <option value="maior_valor">Maior valor</option>
+              <option value="menor_valor">Menor valor</option>
             </select>
-
 
             <button type="submit" class="btn btn-sm btn-outline-primary">
               <i class="fa-solid fa-filter me-2"></i>Filtrar
@@ -100,33 +101,49 @@
           <hr class="my-3">
           <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <small class="text-muted">
-              Mostrando <strong>1–10</strong> de <strong>84</strong> processos
+              Mostrando <strong>{{ processos.start_index }} -  {{ processos.end_index }}</strong> de <strong> {{ processos.paginator.count}}</strong> processos
             </small>
             <nav>
               <ul class="pagination pagination-sm mb-0">
+                {% if processos.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ processos.previous_page_number }}">
+                  Anterior
+                  </a>
+                </li>
+                {% else %}
                 <li class="page-item disabled">
-                  <a class="page-link" href="#">Anterior</a>
+                  <span class="page-link">Anterior</span>
                 </li>
-                <li class="page-item active">
-                  <a class="page-link" href="#">1</a>
-                </li>
+                {% endif %}
+                {% for pagina in processos.paginator.page_range %}
+                  {% if pagina == processos.number %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ pagina }}</span>
+                  </li>
+                  {% else %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ pagina }}">
+                    {{ pagina }}
+                    </a>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+                
+                {% if processos.has_next %}
                 <li class="page-item">
-                  <a class="page-link" href="#">2</a>
+                  <a class="page-link" href="?page={{ processos.next_page_number }}">
+                  Próxima
+                  </a>
                 </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">3</a>
+                {% else %}
+                <li class="page-item disabled">
+                  <span class="page-link">Próxima</span>
                 </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">4</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">5</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">Próxima</a>
-                </li>
+                {% endif %}
               </ul>
             </nav>
+
           </div>
         </section>
       </div>
