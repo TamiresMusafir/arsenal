@@ -24,23 +24,24 @@ function updateWizard() {
 
   if (current === 0) {
     prevBtn.classList.add("d-none");
-	} else {
-		prevBtn.classList.remove("d-none");
-	}
+  } else {
+    prevBtn.classList.remove("d-none");
+  }
 
   if (current === contents.length - 1) {
     nextBtn.textContent = "Finalizar";
-    nextBtn.type = "submit"; 
   } else {
     nextBtn.textContent = "Próximo";
-    nextBtn.type = "button";
   }
 }
+
 
 nextBtn.addEventListener("click", () => {
   const currentContent = contents[current];
   const fields = currentContent.querySelectorAll("input,select,textarea");
+
   let valid = true;
+
   fields.forEach(field => {
 
     if (!field.checkValidity()) {
@@ -51,15 +52,19 @@ nextBtn.addEventListener("click", () => {
     }
   });
 
-  if (!valid) 
+  if (!valid) {
     return;
+  }
+
   if (current < contents.length - 1) {
     current++;
     updateWizard();
   } else {
     alert("Processo finalizado!");
+    document.getElementById("wizardForm").submit();
   }
 });
+
 
 prevBtn.addEventListener("click", () => {
   if (current > 0) {
@@ -67,5 +72,4 @@ prevBtn.addEventListener("click", () => {
     updateWizard();
   }
 });
-
 updateWizard();
