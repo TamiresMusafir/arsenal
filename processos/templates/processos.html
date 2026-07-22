@@ -25,33 +25,35 @@
         
         <!-- 2. Seção da Lista -->
         <section class="lista bg-white p-4 rounded shadow-sm">
-          <div class="d-flex flex-wrap align-items-center gap-2 w-100">
-            <input type="text" class="form-control form-control-sm" placeholder="Buscar processo..." style="max-width: 200px; flex-shrink: 1;">
-            
-            <select class="form-select form-select-sm" style="max-width: 150px; flex-shrink: 0;">
-              <option selected>Qualquer data</option>
-              <option>Hoje</option>
-              <option>Este mês</option>
-              <option>Ano corrente</option>
+          <form method="GET" class="d-flex flex-wrap align-items-center gap-2 w-100">
+
+            <input type="text" class="form-control form-control-sm" placeholder="Buscar processo..." name = "busca" style="max-width: 200px; flex-shrink: 1;">
+
+            <select 
+              class="form-select form-select-sm" 
+              name="data"
+              style="max-width: 150px; flex-shrink: 0;"
+            >
+              <option value="qualquer">Qualquer data</option>
+              <option value="hoje">Hoje</option>
+              <option value="mes">Este mês</option>
+              <option value="ano">Ano corrente</option>
             </select>
-            
-            <select class="form-select form-select-sm" style="max-width: 150px; flex-shrink: 0;">
-              <option selected>Todos os status</option>
-              <option>Em andamento</option>
-              <option>Concluído</option>
-              <option>Pendente</option>
+
+
+            <select class="form-select form-select-sm" name="ordem" style="max-width: 150px; flex-shrink: 0;">
+              
+              <option value="antigos">Mais antigos</option>
+              <option value="recentes">Mais recentes</option>
+              <option value="numero">Número</option>
             </select>
-            
-            <select class="form-select form-select-sm" style="max-width: 150px; flex-shrink: 0;">
-              <option selected>Mais recentes</option>
-              <option>Mais antigos</option>
-              <option>Número</option>
-            </select>
-            
-            <button class="btn btn-sm btn-outline-primary ">
+
+
+            <button type="submit" class="btn btn-sm btn-outline-primary">
               <i class="fa-solid fa-filter me-2"></i>Filtrar
             </button>
-          </div>
+
+          </form>
           
           <div class="d-lg-none mb-2 mt-2 text-muted small">
             <i class="fa-solid fa-arrows-left-right me-1"></i>
