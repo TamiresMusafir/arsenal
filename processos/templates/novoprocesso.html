@@ -17,7 +17,7 @@
           </div>
         </section>
 
-        <!-- 1. Seção de Criação de Novo Processo -->
+        <!-- 2. Seção de Criação de Novo Processo -->
         <section class="p-5 mb-4 bg-white rounded-3 shadow-sm border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-4">
           <div class="rounded-3 shadow-sm p-4 w-100">
             <div class="d-lg-none mb-2 mt-2 text-muted small">
@@ -47,7 +47,8 @@
               </div>
             </div>
             <!-- PASSO 1 -->
-            <form id="wizardForm" novalidate>
+            <form id="wizardForm" method="POST" enctype="multipart/form-data" novalidate>
+              {% csrf_token %}
               <div class="wizard-content active">
                 <h2 class="fw-bold">Dados do Processo</h2>
                 <p>
@@ -57,18 +58,23 @@
                 </p>
                 <div class="mb-3">
                   <label class="form-label fw-bold">Número do Processo</label>
-                  <input type="text" class="form-control" required>
+                  <input type="text" class="form-control" name="numero" required>
                   <div class="invalid-feedback">
                     <p>Informe o número do processo.</p>
                   </div>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label fw-bold">Título do Processo</label>
-                  <input
-                    class="form-control"
-                    required>
+                  <label class="form-label fw-bold">Descrição do Processo</label>
+                  <input class="form-control" name="descricao" required>
                   <div class="invalid-feedback">
                     Informe o objeto.
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Valor Estimado</label>
+                  <input class="form-control" name="valor_estimado" required>
+                  <div class="invalid-feedback">
+                    Informe o valor Estimado.
                   </div>
                 </div>
               </div>
@@ -80,7 +86,7 @@
                   <strong class="wizard-info-title"> O que acontece aqui:</strong> 
                   O usuário realiza o envio do pacote de arquivos compactados (geralmente em formato .tgz ou PDFs das propostas e e-mails). O Arsenal recebe esses arquivos e inicia uma varredura interna em segundo plano para identificar a estrutura de cada documento enviado.
                 </p>
-                <input type="file" class="form-control" required>
+                <input type="file" class="form-control" name="file" required>
               </div>
               <!-- PASSO 3 -->
               <div class="wizard-content">
