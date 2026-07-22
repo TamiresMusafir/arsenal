@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Processo
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 # Create your views here.
 def processos(request):
@@ -25,7 +26,7 @@ def processos(request):
         processos = processos.filter(data_abertura=hoje)
     elif data == "mes":
         processos = processos.filter(data_abertura__month=hoje.month, 
-                                data_abertura__year=hoje.year)
+                                     data_abertura__year=hoje.year)
     elif data == "ano":
         processos = processos.filter(data_abertura__year=hoje.year)
     elif data == "qualquer":
@@ -38,6 +39,15 @@ def processos(request):
         processos = processos.order_by("numero")
     elif ordem == "recentes":
         processos = processos.order_by("-id")
+    elif ordem == "maior_valor":
+        processos = processos.order_by("-valor_estimado")
+    elif ordem == "menor_valor":
+        processos = processos.order_by("valor_estimado")
+
+    #Paginação
+    paginator = Paginator(processos, 10)
+    page = request.GET.get("page")
+    processos = paginator.get_page(page)
 
     return render(request, "processos.html", {"processos": processos})
 
