@@ -106,21 +106,21 @@
             <nav>
               <ul class="pagination pagination-sm mb-0">
                 {% if processos.has_previous %}
-                <li class="page-item">
-                  <a class="page-link" href="?page={{ processos.previous_page_number }}">
-                  Anterior
-                  </a>
-                </li>
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ processos.previous_page_number }}">
+                    Anterior
+                    </a>
+                  </li>
                 {% else %}
-                <li class="page-item disabled">
-                  <span class="page-link">Anterior</span>
-                </li>
+                  <li class="page-item disabled">
+                    <span class="page-link">Anterior</span>
+                  </li>
                 {% endif %}
                 {% for pagina in processos.paginator.page_range %}
                   {% if pagina == processos.number %}
-                  <li class="page-item active">
-                    <span class="page-link">{{ pagina }}</span>
-                  </li>
+                    <li class="page-item active">
+                      <span class="page-link">{{ pagina }}</span>
+                    </li>
                   {% else %}
                   <li class="page-item">
                     <a class="page-link" href="?page={{ pagina }}">
@@ -129,17 +129,17 @@
                   </li>
                   {% endif %}
                 {% endfor %}
-                
+
                 {% if processos.has_next %}
-                <li class="page-item">
-                  <a class="page-link" href="?page={{ processos.next_page_number }}">
-                  Próxima
-                  </a>
-                </li>
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ processos.next_page_number }}">
+                    Próxima
+                    </a>
+                  </li>
                 {% else %}
-                <li class="page-item disabled">
-                  <span class="page-link">Próxima</span>
-                </li>
+                  <li class="page-item disabled">
+                    <span class="page-link">Próxima</span>
+                  </li>
                 {% endif %}
               </ul>
             </nav>
@@ -148,4 +148,4 @@
         </section>
       </div>
 
-			{% endblock %}
+	{% endblock %}
