@@ -1,7 +1,7 @@
         
-	{% extends "base.html" %}
+			{% extends "base.html" %}
 
-	{% block content %}
+			{% block content %}
 				
       <div class="container">
 
@@ -32,8 +32,7 @@
             <select 
               class="form-select form-select-sm" 
               name="data"
-              style="max-width: 150px; flex-shrink: 0;"
-            >
+              style="max-width: 150px; flex-shrink: 0;">
               <option value="qualquer">Qualquer data</option>
               <option value="hoje">Hoje</option>
               <option value="mes">Este mês</option>
@@ -53,6 +52,18 @@
             <button type="submit" class="btn btn-sm btn-outline-primary">
               <i class="fa-solid fa-filter me-2"></i>Filtrar
             </button>
+
+            <div class="mb-2 d-flex flex-wrap gap-3">
+              <button class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-file-csv me-1"></i>
+                Exportar CSV
+              </button>
+
+              <button class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-file-pdf me-1"></i>
+                Exportar PDF
+              </button>
+            </div>
 
           </form>
           
@@ -86,11 +97,17 @@
                         Em andamento
                       </span>
                     </td>
-                    <td class="text-end">
-                      <a class="btn btn-sm btn-outline-primary" href="#">
-                          <i class="fa-solid fa-eye"></i>
-                      </a>
-                    </td>
+                    <td>
+											<div class="d-flex gap-2">
+												<a href="#" class="btn btn-sm btn-outline-primary">
+													<i class="fa-solid fa-eye"></i>
+												</a>
+
+												<a href="#" class="btn btn-sm btn-outline-secondary">
+													<i class="fa-solid fa-download"></i>
+												</a>
+											</div>
+										</td>
                   </tr>
                   {% endfor %}
                 </tbody>
@@ -101,7 +118,7 @@
           <hr class="my-3">
           <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <small class="text-muted">
-              Mostrando <strong>{{ processos.start_index }} -  {{ processos.end_index }}</strong> de <strong> {{ processos.paginator.count}}</strong> processos
+              Mostrando <strong>{{ processos.start_index }} - {{ processos.end_index }}</strong> de <strong> {{ processos.paginator.count}}</strong> processos
             </small>
             <nav>
               <ul class="pagination pagination-sm mb-0">
@@ -148,4 +165,4 @@
         </section>
       </div>
 
-	{% endblock %}
+			{% endblock %}
