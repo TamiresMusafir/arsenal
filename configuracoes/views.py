@@ -7,3 +7,6 @@ def configuracoes(request):
 
 def conta(request):
     return render(request, "conta.html")
+
+def preferencias(request):
+    return render(request, "preferencias.html")
