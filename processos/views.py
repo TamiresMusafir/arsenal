@@ -3,6 +3,7 @@ from django.utils import timezone
 from .models import Processo
 from django.db.models import Q
 from django.core.paginator import Paginator
+import re
 
 # Create your views here.
 def processos(request):
@@ -53,9 +54,35 @@ def processos(request):
 
 def novo_processo(request):
     if request.method == 'POST':
-        Processo.objects.create(numero = request.POST["numero"],
-                                descricao = request.POST["descricao"],
-                                valor_estimado = request.POST["valor_estimado"])
+
+        numero = request.POST.get("numero")
+        descricao = request.POST.get("descricao")
+        valor_estimado = request.POST.get("valor_estimado")
+
+        erros = []
+
+        if not numero or not descricao or not valor_estimado:
+            erros.append("Todos os campos são obrigatórios!")
+        
+        if not re.match(r'^[0-9./-]+$', numero):
+            erros.append("O número do processo deve conter apenas números e os caracteres / . -")
+
+        try: 
+            valor_estimado = float(valor_estimado)
+
+            if valor_estimado < 0:
+                erros.append("O valor estimado deve ser maior que zero.")
+
+        except ValueError:
+            erros.append("O valor estimado deve ser um número.")
+        
+    
+        if erros:
+            return render(request, "novoprocesso.html", {"erros": erros})
+
+        Processo.objects.create(numero = numero,
+                                descricao = descricao,
+                                valor_estimado = valor_estimado)
 
         return redirect("processos")
     
