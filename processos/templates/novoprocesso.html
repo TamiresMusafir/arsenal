@@ -50,6 +50,15 @@
             <form id="wizardForm" method="POST" enctype="multipart/form-data" novalidate>
               {% csrf_token %}
               <div class="wizard-content active">
+
+                {% if erros %}
+                  <div class="alert alert-danger">
+                    <ul class="mb-0"></ul>
+                      {% for erro in erros %}
+                        <li>{{ erro }}</li>
+                      {% endfor %}
+                  </div>
+                {% endif %}
                 <h2 class="fw-bold">Dados do Processo</h2>
                 <p>
                   <i class="fa-solid fa-circle-info"></i>
