@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'dashboard',
     'processos',
     'mapa',
-    'relatorios',
     'configuracoes',
 ]
 
