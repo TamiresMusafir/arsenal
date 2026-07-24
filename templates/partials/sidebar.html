@@ -19,58 +19,60 @@
               <span class="text-muted small"> Depurador de Orçamentos </span>
             </div>
             <!-- Navegação -->
-            <nav class="nav nav-pills flex-column gap-1">
-              <a class="nav-link active" href="{% url 'home' %}">
-                <i class="fa-solid fa-house fa-fw me-2"></i>
-                <span>Início</span>
-              </a>
-              <a class="nav-link" href="{% url 'dashboard' %}">
-                <i class="fa-solid fa-clipboard fa-fw me-2"></i>
-                <span>Dashboard</span>
-              </a>
-              <!-- Processos -->
-              <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuProcessos" role="button" aria-expanded="false" aria-controls="submenuProcessos">
-                <span>
-                  <i class="fa-solid fa-folder-open fa-fw me-2"></i>
-                  Processos
-                </span>
-                <i class="fa-solid fa-chevron-down small seta-submenu"></i>
-              </a>
-              <div class="collapse" id="submenuProcessos">
-                <div class="nav flex-column ms-3 ps-2 border-start border-secondary border-opacity-25">
-                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="{% url 'processos' %}">
+            {% with pagina=request.resolver_match.url_name %}
+              <nav class="nav nav-pills flex-column gap-1">
+                <a class="nav-link {% if pagina == 'home' %} active {% endif %}" href="{% url 'home' %}">
+                  <i class="fa-solid fa-house fa-fw me-2"></i>
+                  <span>Início</span>
+                </a>
+                <a class="nav-link {% if pagina == 'dashboard' %} active {% endif %}" href="{% url 'dashboard' %}">
+                  <i class="fa-solid fa-clipboard fa-fw me-2"></i>
+                  <span>Dashboard</span>
+                </a>
+                <!-- Processos -->
+                <a class="nav-link {% if pagina == 'processos' %}active{% endif %}
+                                   {% if pagina == 'novo_processo' %}active{% endif %}
+                                   {% if pagina == 'documentos' %}active{% endif %}
+                                   {% if pagina == 'mapas_gerados' %}active{% endif %}
+                                   d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuProcessos" role="button" aria-expanded="false" aria-controls="submenuProcessos">
+                  <span>
                     <i class="fa-solid fa-folder-open fa-fw me-2"></i>
-                    <span>Ver Processos</span>
-                  </a>
-                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="{% url 'novo_processo' %}">
-                    <i class="fa-solid fa-file-circle-plus fa-fw me-2"></i>
-                    <span>Novo Processo</span>
-                  </a>
-                  <a class="nav-link py-2 text-white-50 small d-flex align-items-center" href="{% url 'documentos' %}">
-                    <i class="fa-solid fa-file-lines fa-fw me-2"></i>
-                    <span>Documentos</span>
-                  </a>
-                  <a
-                    class="nav-link py-2 text-white-50 small d-flex align-items-center"
-                    href="{% url 'mapas_gerados' %}">
-                    <i class="fa-solid fa-file-circle-check fa-fw me-2"></i>
-                    <span>Mapas Gerados</span>
-                  </a>
+                    Processos
+                  </span>
+                  <i class="fa-solid fa-chevron-down small seta-submenu"></i>
+                </a>
+                <div class="collapse" id="submenuProcessos">
+                  <div class="nav flex-column ms-3 ps-2 border-start border-secondary border-opacity-25">
+                    <a class="nav-link {% if pagina == 'processos' %} active {% endif %} py-2 text-white-50 small d-flex align-items-center" href="{% url 'processos' %}">
+                      <i class="fa-solid fa-folder-open fa-fw me-2"></i>
+                      <span>Ver Processos</span>
+                    </a>
+                    <a class="nav-link {% if pagina == 'novo_processo' %} active {% endif %} py-2 text-white-50 small d-flex align-items-center" href="{% url 'novo_processo' %}">
+                      <i class="fa-solid fa-file-circle-plus fa-fw me-2"></i>
+                      <span>Novo Processo</span>
+                    </a>
+                    <a class="nav-link {% if pagina == 'documentos' %} active {% endif %} py-2 text-white-50 small d-flex align-items-center" href="{% url 'documentos' %}">
+                      <i class="fa-solid fa-file-lines fa-fw me-2"></i>
+                      <span>Documentos</span>
+                    </a>
+                    <a
+                      class="nav-link {% if pagina == 'mapas_gerados' %} active {% endif %}py-2 text-white-50 small d-flex align-items-center"
+                      href="{% url 'mapas_gerados' %}">
+                      <i class="fa-solid fa-file-circle-check fa-fw me-2"></i>
+                      <span>Mapas Gerados</span>
+                    </a>
+                  </div>
                 </div>
-              </div>
-              <a class="nav-link d-flex align-items-center" href="{% url 'mapa' %}">
-                <i class="fa-solid fa-scale-balanced fa-fw me-2"></i>
-                <span>Modelo de Mapa<br />Comparativo</span>
-              </a>
-              <a class="nav-link d-flex align-items-center" href="{% url 'relatorios' %}">
-                <i class="fa-solid fa-chart-column fa-fw me-2"></i>
-                <span>Relatórios</span>
-              </a>
-              <a class="nav-link d-flex align-items-center" href="{% url 'configuracoes' %}">
-                <i class="fa-solid fa-gear fa-fw me-2"></i>
-                <span>Configurações</span>
-              </a>
-            </nav>
+                <a class="nav-link {% if pagina == 'mapa' %} active {% endif %}d-flex align-items-center" href="{% url 'mapa' %}">
+                  <i class="fa-solid fa-scale-balanced fa-fw me-2"></i>
+                  <span>Modelo de Mapa<br />Comparativo</span>
+                </a>
+                <a class="nav-link {% if pagina == 'configuracoes' %} active {% endif %} d-flex align-items-center" href="{% url 'configuracoes' %}">
+                  <i class="fa-solid fa-gear fa-fw me-2"></i>
+                  <span>Configurações</span>
+                </a>
+              </nav>
+            {% endwith %}
           </div>
           <!-- Perfil -->
           <div class="perfil d-flex align-items-center gap-2 pt-3 mt-4 border-top border-secondary">
