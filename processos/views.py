@@ -3,37 +3,40 @@ from django.utils import timezone
 from .models import Processo
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.http import HttpResponse, FileResponse
+from django.conf import settings
 import re
+import os
+import zipfile
+import tempfile
+import json
+from datetime import datetime
+import openpyxl
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from openpyxl.utils import get_column_letter
+from .ai_processor import AIProcessor
 
-# Create your views here.
+# ==================== VIEWS PRINCIPAIS ====================
+
 def processos(request):
     processos = Processo.objects.all()
-
     ordem = request.GET.get("ordem")
-    data  = request.GET.get("data")
+    data = request.GET.get("data")
     busca = request.GET.get("busca")
 
-    #Filtro de busca
-    if busca: 
+    if busca:
         palavras = busca.split()
-
         for palavra in palavras:
             processos = processos.filter(Q(numero__icontains=palavra) | Q(descricao__icontains=palavra))
 
-    #Filtro de data
     hoje = timezone.now().date()
-
     if data == "hoje":
         processos = processos.filter(data_abertura=hoje)
     elif data == "mes":
-        processos = processos.filter(data_abertura__month=hoje.month, 
-                                     data_abertura__year=hoje.year)
+        processos = processos.filter(data_abertura__month=hoje.month, data_abertura__year=hoje.year)
     elif data == "ano":
         processos = processos.filter(data_abertura__year=hoje.year)
-    elif data == "qualquer":
-        pass
 
-    #Filtro de ordenação
     if ordem == "antigos":
         processos = processos.order_by("id")
     elif ordem == "numero":
@@ -45,47 +48,273 @@ def processos(request):
     elif ordem == "menor_valor":
         processos = processos.order_by("valor_estimado")
 
-    #Paginação
     paginator = Paginator(processos, 10)
     page = request.GET.get("page")
     processos = paginator.get_page(page)
 
     return render(request, "processos.html", {"processos": processos})
 
+# ==================== FUNÇÕES DE PROCESSAMENTO ====================
+
+def preencher_mapa_comparativo(processo, dados_ai):
+    """Preenche o modelo Mapa_Comparativo_Base.xlsx com os dados extraídos pela IA"""
+    try:
+        template_path = os.path.join(settings.BASE_DIR, 'static-assets', 'modelos', 'Mapa_Comparativo_Base.xlsx')
+        
+        if os.path.exists(template_path):
+            wb = openpyxl.load_workbook(template_path)
+            ws = wb.active
+        else:
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = "MAPA COMPARATIVO DO PROCESSO"
+        
+        # Estilos
+        header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+        header_font = Font(bold=True, color="FFFFFF", size=10)
+        border = Border(left=Side(style='thin'), right=Side(style='thin'), 
+                       top=Side(style='thin'), bottom=Side(style='thin'))
+        center = Alignment(horizontal='center', vertical='center', wrap_text=True)
+        
+        # Cabeçalhos (linha 3 do template)
+        headers = ['ITEM', 'PI', 'NOME EM PORTUGUÊS', 'QTDE', 'UF', 'PAINEL DE PREÇO']
+        empresas = dados_ai.get('empresas', [])
+        for idx, empresa in enumerate(empresas[:20], 1):
+            headers.append(f'EMPRESA{idx}')
+        headers.extend(['VALOR UNITARIO ESTIMADO', 'VALOR TOTAL'])
+        
+        # Escreve cabeçalhos
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(row=3, column=col, value=header)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = center
+            cell.border = border
+        
+        # Preenche dados
+        itens = dados_ai.get('itens', [])
+        current_row = 4
+        
+        for item_idx, item in enumerate(itens, 1):
+            row = current_row + item_idx - 1
+            
+            # Colunas A-F: dados básicos
+            ws.cell(row=row, column=1, value=item.get('item', item_idx))
+            ws.cell(row=row, column=2, value=item.get('pi', ''))
+            ws.cell(row=row, column=3, value=item.get('nome_em_portugues', ''))
+            ws.cell(row=row, column=4, value=item.get('qtde', ''))
+            ws.cell(row=row, column=5, value=item.get('uf', ''))
+            ws.cell(row=row, column=6, value=item.get('painel_preco', ''))
+            
+            # Colunas G-Z: empresas
+            empresas_data = item.get('empresas', {})
+            for emp_idx in range(1, 21):
+                col = 6 + emp_idx
+                key = f'empresa{emp_idx}'
+                ws.cell(row=row, column=col, value=empresas_data.get(key, ''))
+                ws.cell(row=row, column=col).alignment = center
+            
+            # Colunas AA-AB: valores
+            ws.cell(row=row, column=27, value=item.get('valor_unitario_estimado', ''))
+            ws.cell(row=row, column=28, value=item.get('valor_total', ''))
+            
+            # Aplica bordas
+            for col in range(1, 29):
+                ws.cell(row=row, column=col).border = border
+        
+        # Ajusta largura das colunas
+        for col in range(1, 29):
+            col_letter = get_column_letter(col)
+            if col <= 6 or col >= 27:
+                ws.column_dimensions[col_letter].width = 20
+            else:
+                ws.column_dimensions[col_letter].width = 12
+        
+        # Salva
+        filename = f"mapa_comparativo_{processo.numero.replace('/', '_')}.xlsx"
+        filepath = os.path.join(settings.MEDIA_ROOT, 'processos', 'gerados', filename)
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        wb.save(filepath)
+        return filepath
+        
+    except Exception as e:
+        print(f"Erro ao preencher mapa: {e}")
+        raise
+
+def gerar_planilha_odt(processo, dados_ai):
+    """Gera arquivo ODT"""
+    try:
+        from odf.opendocument import OpenDocumentText
+        from odf.text import P, H
+        
+        doc = OpenDocumentText()
+        
+        # Título
+        doc.text.addElement(H(outlinelevel=1, text=f"Mapa Comparativo - Processo {processo.numero}"))
+        
+        # Informações
+        doc.text.addElement(H(outlinelevel=2, text="Informações do Processo"))
+        doc.text.addElement(P(text=f"Número: {processo.numero}"))
+        doc.text.addElement(P(text=f"Descrição: {processo.descricao}"))
+        doc.text.addElement(P(text=f"Valor Estimado: R$ {processo.valor_estimado:.2f}"))
+        doc.text.addElement(P(text=f"Data: {processo.data_abertura.strftime('%d/%m/%Y')}"))
+        doc.text.addElement(P(text=""))
+        
+        # Empresas
+        empresas = dados_ai.get('empresas', [])
+        if empresas:
+            doc.text.addElement(H(outlinelevel=2, text="Empresas Participantes"))
+            for emp in empresas:
+                doc.text.addElement(P(text=f"- {emp.get('nome', 'N/A')}"))
+                if emp.get('cnpj'):
+                    doc.text.addElement(P(text=f"  CNPJ: {emp.get('cnpj')}"))
+                if emp.get('valor_global'):
+                    doc.text.addElement(P(text=f"  Valor: {emp.get('valor_global')}"))
+                doc.text.addElement(P(text=""))
+        
+        # Itens
+        itens = dados_ai.get('itens', [])
+        if itens:
+            doc.text.addElement(H(outlinelevel=2, text="Itens do Processo"))
+            for item in itens:
+                doc.text.addElement(P(text=f"Item {item.get('item', '')}: {item.get('nome_em_portugues', '')}"))
+                doc.text.addElement(P(text=f"  Quantidade: {item.get('qtde', '')} {item.get('uf', '')}"))
+                if item.get('valor_unitario_estimado'):
+                    doc.text.addElement(P(text=f"  Valor Unitário: {item.get('valor_unitario_estimado')}"))
+                if item.get('valor_total'):
+                    doc.text.addElement(P(text=f"  Valor Total: {item.get('valor_total')}"))
+                # Empresas do item
+                empresas_data = item.get('empresas', {})
+                if empresas_data:
+                    doc.text.addElement(P(text="  Cotações:"))
+                    for key, value in empresas_data.items():
+                        if value:
+                            doc.text.addElement(P(text=f"    {key}: {value}"))
+                doc.text.addElement(P(text=""))
+        
+        # Salva
+        filename = f"mapa_comparativo_{processo.numero.replace('/', '_')}.odt"
+        filepath = os.path.join(settings.MEDIA_ROOT, 'processos', 'gerados', filename)
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        doc.save(filepath)
+        return filepath
+        
+    except Exception as e:
+        print(f"Erro ao gerar ODT: {e}")
+        raise
+
+# ==================== VIEWS DE CRIAÇÃO E DOWNLOAD ====================
+
 def novo_processo(request):
     if request.method == 'POST':
-
         numero = request.POST.get("numero")
         descricao = request.POST.get("descricao")
         valor_estimado = request.POST.get("valor_estimado")
+        arquivo = request.FILES.get('file')
 
         erros = []
 
+        # Validações
         if not numero or not descricao or not valor_estimado:
             erros.append("Todos os campos são obrigatórios!")
         
         if not re.match(r'^[0-9./-]+$', numero):
-            erros.append("O número do processo deve conter apenas números e os caracteres / . -")
+            erros.append("Número deve conter apenas números, /, . e -")
 
-        try: 
+        try:
             valor_estimado = float(valor_estimado)
-
             if valor_estimado < 0:
-                erros.append("O valor estimado deve ser maior que zero.")
-
+                erros.append("Valor estimado deve ser maior que zero.")
         except ValueError:
-            erros.append("O valor estimado deve ser um número.")
+            erros.append("Valor estimado deve ser um número.")
         
-    
+        if not arquivo:
+            erros.append("É necessário enviar um arquivo!")
+        
+        if arquivo and arquivo.size > 50 * 1024 * 1024:
+            erros.append("Arquivo muito grande. Máximo 50MB.")
+        
         if erros:
             return render(request, "novoprocesso.html", {"erros": erros})
 
-        Processo.objects.create(numero = numero,
-                                descricao = descricao,
-                                valor_estimado = valor_estimado)
+        try:
+            # Cria o processo
+            processo = Processo.objects.create(
+                numero=numero,
+                descricao=descricao,
+                valor_estimado=valor_estimado,
+                status='processando'
+            )
+            processo.arquivo_processo = arquivo
+            processo.save()
 
-        return redirect("processos")
-    
+            # Processa com IA
+            contexto = {
+                'numero': numero,
+                'descricao': descricao,
+                'valor_estimado': str(valor_estimado)
+            }
+            
+            ai_processor = AIProcessor()
+            
+            # Processa o arquivo
+            with tempfile.TemporaryDirectory() as tmpdir:
+                file_path = os.path.join(tmpdir, arquivo.name)
+                with open(file_path, 'wb+') as f:
+                    for chunk in arquivo.chunks():
+                        f.write(chunk)
+                
+                # Verifica se é compactado
+                if arquivo.name.lower().endswith(('.zip', '.tgz', '.tar.gz', '.tar')):
+                    extract_dir = os.path.join(tmpdir, 'extracted')
+                    os.makedirs(extract_dir, exist_ok=True)
+                    
+                    if file_path.endswith('.zip'):
+                        with zipfile.ZipFile(file_path, 'r') as zip_ref:
+                            zip_ref.extractall(extract_dir)
+                    else:
+                        import tarfile
+                        mode = 'r:gz' if file_path.endswith(('.tgz', '.tar.gz')) else 'r'
+                        with tarfile.open(file_path, mode) as tar_ref:
+                            tar_ref.extractall(extract_dir)
+                    
+                    results = ai_processor.process_directory(extract_dir, contexto)
+                    dados_ai = ai_processor.merge_results(results)
+                else:
+                    file_data = ai_processor.extract_text_from_file(file_path)
+                    result = ai_processor.process_with_ai(file_data['content'], contexto)
+                    dados_ai = result.get('data', {})
+                    if isinstance(dados_ai, str):
+                        try:
+                            dados_ai = json.loads(dados_ai)
+                        except:
+                            dados_ai = {'conteudo': dados_ai}
+            
+            # Salva dados da IA
+            json_path = os.path.join(settings.MEDIA_ROOT, 'processos', 'gerados', 
+                                    f'dados_ai_{processo.numero.replace("/", "_")}.json')
+            os.makedirs(os.path.dirname(json_path), exist_ok=True)
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(dados_ai, f, ensure_ascii=False, indent=2)
+            
+            # Gera arquivos
+            xlsx_path = preencher_mapa_comparativo(processo, dados_ai)
+            if xlsx_path:
+                processo.arquivo_gerado_xlsx = f'processos/gerados/{os.path.basename(xlsx_path)}'
+            
+            odt_path = gerar_planilha_odt(processo, dados_ai)
+            if odt_path:
+                processo.arquivo_gerado_odt = f'processos/gerados/{os.path.basename(odt_path)}'
+            
+            processo.status = 'concluido'
+            processo.save()
+            
+            return redirect("processos")
+
+        except Exception as e:
+            print(f"Erro: {e}")
+            return render(request, "novoprocesso.html", {"erros": [f"Erro ao processar: {str(e)}"]})
+
     return render(request, "novoprocesso.html")
 
 def documentos(request):
@@ -93,3 +322,34 @@ def documentos(request):
 
 def mapas_gerados(request):
     return render(request, "mapasgerados.html")
+
+def download_arquivo(request, tipo, processo_id):
+    try:
+        processo = Processo.objects.get(id=processo_id)
+        
+        if tipo == 'xlsx' and processo.arquivo_gerado_xlsx:
+            file_path = os.path.join(settings.MEDIA_ROOT, str(processo.arquivo_gerado_xlsx))
+            if os.path.exists(file_path):
+                return FileResponse(open(file_path, 'rb'), 
+                                  as_attachment=True,
+                                  filename=os.path.basename(file_path))
+        
+        elif tipo == 'odt' and processo.arquivo_gerado_odt:
+            file_path = os.path.join(settings.MEDIA_ROOT, str(processo.arquivo_gerado_odt))
+            if os.path.exists(file_path):
+                return FileResponse(open(file_path, 'rb'),
+                                  as_attachment=True,
+                                  filename=os.path.basename(file_path))
+        
+        elif tipo == 'json':
+            json_path = os.path.join(settings.MEDIA_ROOT, 'processos', 'gerados', 
+                                    f'dados_ai_{processo.numero.replace("/", "_")}.json')
+            if os.path.exists(json_path):
+                return FileResponse(open(json_path, 'rb'),
+                                  as_attachment=True,
+                                  filename=os.path.basename(json_path))
+        
+        return HttpResponse("Arquivo não encontrado", status=404)
+        
+    except Processo.DoesNotExist:
+        return HttpResponse("Processo não encontrado", status=404)
