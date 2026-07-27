@@ -1,0 +1,58 @@
+/* wizard.css - Estilos específicos para o wizard */
+
+/* Garante que o wizard funcione corretamente */
+.wizard-content {
+  display: none;
+}
+
+.wizard-content.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos para campos inválidos */
+.is-invalid {
+  border-color: #dc3545 !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.is-invalid ~ .invalid-feedback {
+  display: block;
+}
+
+/* Melhorias para tema escuro */
+body.dark-theme .wizard-step .wizard-circle {
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+
+body.dark-theme .wizard-step.active .wizard-circle {
+  background: #0d6efd;
+  color: white;
+}
+
+body.dark-theme .wizard-step.completed .wizard-circle {
+  background: #198754;
+  color: white;
+}
+
+body.dark-theme .wizard-line {
+  background: #444;
+}
+
+/* Estilos adicionais do wizard (já existentes no style.css) */
+/* Mantenha apenas os específicos do wizard aqui */
