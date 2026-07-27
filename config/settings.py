@@ -149,4 +149,7 @@ OPENROUTER_MODEL = "deepseek/deepseek-chat"
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800 # 50 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800 # 50 MB
 
+# Configurações de timeout
+OPENROUTER_TIMEOUT = 120 # segundos
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
