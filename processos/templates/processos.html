@@ -80,6 +80,7 @@
                     <th class="border-0">Processo</th>
                     <th class="border-0">Descrição</th>
                     <th class="border-0">Data de Abertura</th>
+                    <th class="border-0">Cadastrado em</th>
                     <th class="border-0">Valor Estimado</th>
                     <th class="border-0">Status</th>
                     <th class="border-0 text-end">Ações</th>
@@ -91,6 +92,7 @@
                     <td><strong class="theme-text">{{ processo.numero }}</strong></td>
                     <td>{{ processo.descricao }}</td>
                     <td class="theme-muted small">{{ processo.data_abertura }}</td>
+                    <td class="theme-muted small">{{ processo.data_criacao|date:"d/m/Y H:i" }}</td>
                     <td class="fw-semibold">R$ {{ processo.valor_estimado|floatformat:2 }}</td>
                     <td>
                       <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
