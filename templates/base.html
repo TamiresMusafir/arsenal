@@ -11,6 +11,9 @@
     <!--Estilos-->
     <link rel="stylesheet" href="{% static 'stylesheets/bootstrap.min.css' %}" />
     <link rel="stylesheet" href="{% static 'stylesheets/style.css' %}" />
+    {% block extra_css %}
+    {% endblock %}
+
   </head>
   <body>
     <div class="container-fluid px-0">
@@ -25,5 +28,6 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/sidebar.js' %}"></script>
     <script src="{% static 'js/theme.js' %}"></script>
+    {% block extra_js %}{% endblock %}
   </body>
 </html>
