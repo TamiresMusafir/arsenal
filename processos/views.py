@@ -15,8 +15,6 @@ import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
 from .ai_processor import AIProcessor
-from odf.opendocument import OpenDocumentText
-from odf.text import P, H
 
 # ==================== VIEWS PRINCIPAIS ====================
 
@@ -40,16 +38,6 @@ def processos(request):
         processos = processos.filter(data_abertura__year=hoje.year)
 
     if ordem == "antigos":
-        template_path = os.path.join(settings.BASE_DIR, 'static-assets', 'modelos', 'Mapa_Comparativo_Base.xlsx')
-        
-        if os.path.exists(template_path):
-            wb = openpyxl.load_workbook(template_path)
-            ws = wb.active
-        else:
-            wb = openpyxl.Workbook()
-            ws = wb.active
-            ws.title = "MAPA COMPARATIVO DO PROCESSO"
-        
         processos = processos.order_by("id")
     elif ordem == "numero":
         processos = processos.order_by("numero")
@@ -156,6 +144,9 @@ def preencher_mapa_comparativo(processo, dados_ai):
 def gerar_planilha_odt(processo, dados_ai):
     """Gera arquivo ODT"""
     try:
+        from odf.opendocument import OpenDocumentText
+        from odf.text import P, H
+        
         doc = OpenDocumentText()
         
         # Título
@@ -219,12 +210,13 @@ def novo_processo(request):
         numero = request.POST.get("numero")
         descricao = request.POST.get("descricao")
         valor_estimado = request.POST.get("valor_estimado")
+        data_abertura = request.POST.get("data_abertura")
         arquivo = request.FILES.get('file')
 
         erros = []
 
         # Validações
-        if not numero or not descricao or not valor_estimado:
+        if not numero or not descricao or not valor_estimado or not data_abertura:
             erros.append("Todos os campos são obrigatórios!")
         
         if not re.match(r'^[0-9./-]+$', numero):
@@ -252,6 +244,7 @@ def novo_processo(request):
                 numero=numero,
                 descricao=descricao,
                 valor_estimado=valor_estimado,
+                data_abertura=data_abertura,
                 status='processando'
             )
             processo.arquivo_processo = arquivo
