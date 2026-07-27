@@ -140,4 +140,13 @@ os.makedirs(MEDIA_TEMP_DIR, exist_ok=True)
 # Default primary key field type
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
 
+# Configurações OpenRouter
+OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', 'chave')
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_MODEL = "deepseek/deepseek-chat"
+
+# Configurações de upload
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800 # 50 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800 # 50 MB
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
