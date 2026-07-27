@@ -15,6 +15,8 @@ import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
 from .ai_processor import AIProcessor
+from odf.opendocument import OpenDocumentText
+from odf.text import P, H
 
 # ==================== VIEWS PRINCIPAIS ====================
 
@@ -38,6 +40,16 @@ def processos(request):
         processos = processos.filter(data_abertura__year=hoje.year)
 
     if ordem == "antigos":
+        template_path = os.path.join(settings.BASE_DIR, 'static-assets', 'modelos', 'Mapa_Comparativo_Base.xlsx')
+        
+        if os.path.exists(template_path):
+            wb = openpyxl.load_workbook(template_path)
+            ws = wb.active
+        else:
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = "MAPA COMPARATIVO DO PROCESSO"
+        
         processos = processos.order_by("id")
     elif ordem == "numero":
         processos = processos.order_by("numero")
@@ -144,9 +156,6 @@ def preencher_mapa_comparativo(processo, dados_ai):
 def gerar_planilha_odt(processo, dados_ai):
     """Gera arquivo ODT"""
     try:
-        from odf.opendocument import OpenDocumentText
-        from odf.text import P, H
-        
         doc = OpenDocumentText()
         
         # Título
