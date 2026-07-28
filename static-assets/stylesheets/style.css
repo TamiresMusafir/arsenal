@@ -275,103 +275,33 @@ body.menu-open{
   text-align:justify;
 }
 
-/* ---------- WIZARD ---------- */
+/* ---------- PAGINAÇÃO ---------- */
 
-.wizard-card{
-  background:var(--main-light);
-  border-radius:12px;
+/* Paginação normal */
+.pagination .page-link{
+  background: var(--bg-card) !important;
+  color: var(--text-color) !important;
+  border-color: var(--main-light) !important;
 }
 
-.wizard-header{
-  position:relative;
-  min-width:780px;
-  width:max-content;
+/* Hover */
+.pagination .page-link:hover{
+  background: var(--table-hover-bg) !important;
+  color: var(--text-color) !important;
 }
 
-.wizard-line{
-
-  position:absolute;
-
-  left:0;
-  right:0;
-
-  top:18px;
-  height:2px;
-
-  background:var(--main-dark);
-
-  z-index:1;
+/* Página atual */
+.pagination .page-item.active .page-link{
+  background: var(--btn-primary-bg) !important;
+  border-color: var(--btn-primary-bg) !important;
+  color: white !important;
 }
 
-.wizard-step{
-
-  position:relative;
-  z-index:2;
-
-  background:var(--bg-card);
-
-  color:var(--text-color);
-
-  padding:0 12px;
-
-  display:flex;
-  align-items:center;
-  gap:10px;
-
-  font-size:.9rem;
-
-}
-
-.wizard-step span{
-  line-height:1.1;
-  max-width:95px;
-}
-
-.wizard-circle{
-
-  width:38px;
-  height:38px;
-
-  border-radius:50%;
-
-  display:flex;
-  justify-content:center;
-  align-items:center;
-
-  background:var(--main-light);
-  border:1px solid var(--main-light);
-
-  transition:.3s;
-
-  flex:0 0 42px;
-
-}
-
-.wizard-step.active{
-  color:var(--text-color);
-}
-
-.wizard-step.active .wizard-circle{
-  background:#0d6efd;
-  border-color:#0d6efd;
-}
-
-.wizard-step.completed .wizard-circle{
-  background:#198754;
-  border-color:#198754;
-}
-
-.wizard-content{
-  display:none;
-}
-
-.wizard-content.active{
-  display:block;
-}
-
-.wizard-info-title{
-  color:var(--text-color);
-  font-weight:700;
+/* Desabilitado */
+.pagination .page-item.disabled .page-link{
+  background: var(--bg-card) !important;
+  color: var(--theme-muted) !important;
+  border-color: var(--main-light) !important;
 }
 
 /* ---------- CÍRCULOS ---------- */
@@ -389,7 +319,7 @@ body.menu-open{
 
 }
 
-/* ---------- TEMA ESCURO ---------- */
+/* ---------- TABELAS ---------- */
 
 body.dark-theme .form-control,
 body.dark-theme .form-select{
