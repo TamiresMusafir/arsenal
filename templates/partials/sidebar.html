@@ -16,7 +16,7 @@
             <!-- Logo -->
             <div class="logo mb-4">
               <h2 class="h4 mb-0 fw-bold">Arsenal</h2>
-              <span class="text-muted small"> Depurador de Orçamentos </span>
+              <span class="theme-muted small"> Depurador de Orçamentos </span>
             </div>
             <!-- Navegação -->
             {% with pagina=request.resolver_match.url_name %}
@@ -64,7 +64,7 @@
                   </div>
                 </div>
                 <a class="nav-link {% if pagina == 'mapa' %} active {% endif %}d-flex align-items-center" href="{% url 'mapa' %}">
-                  <i class="fa-solid fa-scale-balanced fa-fw me-2"></i>
+                  <i class="fa-solid fa-table fa-fw me-2"></i>
                   <span>Modelo de Mapa<br />Comparativo</span>
                 </a>
                 <a class="nav-link {% if pagina == 'configuracoes' %} active {% endif %} d-flex align-items-center" href="{% url 'configuracoes' %}">
@@ -81,7 +81,7 @@
               <strong class="d-block text-truncate small">
                 Administrador
               </strong>
-              <small class="text-muted d-block text-truncate">
+              <small class="theme-muted d-block text-truncate">
                 admin@teste.com
               </small>
             </div>
