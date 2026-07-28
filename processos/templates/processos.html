@@ -91,7 +91,7 @@
                   <tr>
                     <td><strong class="theme-text">{{ processo.numero }}</strong></td>
                     <td>{{ processo.descricao }}</td>
-                    <td class="theme-muted small">{{ processo.data_abertura }}</td>
+                    <td class="theme-muted small">{{ processo.data_abertura|date:"d/m/Y" }}</td>
                     <td class="theme-muted small">{{ processo.data_criacao|date:"d/m/Y H:i" }}</td>
                     <td class="fw-semibold">R$ {{ processo.valor_estimado|floatformat:2 }}</td>
                     <td>
