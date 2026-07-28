@@ -3,12 +3,12 @@ from django.db import models
 # Create your models here.
 
 class Mapa(models.Model):
-    titulo = models.CharField(max_length=100)
-    arquivo = models.FileField(upload_to='arquivos/', null=True, blank=True)
+    nome = models.CharField(max_length=255)
+    arquivo = models.FileField(upload_to="arquivos/")
     data_upload = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.titulo
+        return self.nome
 
 class DadosMapa(models.Model):
     mapa = models.ForeignKey(Mapa, on_delete=models.CASCADE, related_name='dados')
@@ -17,4 +17,4 @@ class DadosMapa(models.Model):
     valor =  models.TextField()
 
     def __str__(self):
-        return f"{self.mapa.titulo} - Linha {self.linha} - {self.coluna}"
+        return f"{self.mapa.nome} - Linha {self.linha} - {self.coluna}"
