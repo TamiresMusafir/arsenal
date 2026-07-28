@@ -3,6 +3,6 @@ from . import views
 
 urlpatterns = [
     path("", views.mapa, name="mapa"),
-    path("processar-upload/", views.processar_upload, name="processar_upload"),
-    path("baixar-modelo-base/", views.baixar_modelo_base, name="baixar_modelo_base"),
+    path("processar-upload/", views.processar_upload, name="processar_upload"),    path("carregar/", views.carregar_ultimo_mapa, name="carregar_ultimo_mapa"),
+     path("baixar-mapa/", views.baixar_mapa, name="baixar_mapa"),
 ]   
