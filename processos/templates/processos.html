@@ -126,7 +126,7 @@
               <ul class="pagination pagination-sm mb-0">
                 {% if processos.has_previous %}
                   <li class="page-item">
-                    <a class="page-link" href="?page={{ processos.previous_page_number }}">
+                    <a class="page-link" href="?page={{ processos.previous_page_number }}{% if busca %}&busca={{ busca }}{% endif %}{% if ordem %}&ordem={{ ordem }}{% endif %}{% if data %}&data={{ data }}{% endif %}">
                     Anterior
                     </a>
                   </li>
@@ -142,7 +142,7 @@
                     </li>
                   {% else %}
                   <li class="page-item">
-                    <a class="page-link" href="?page={{ pagina }}">
+                    <a class="page-link" href="?page={{ pagina }}{% if busca %}&busca={{ busca }}{% endif %}{% if ordem %}&ordem={{ ordem }}{% endif %}{% if data %}&data={{ data }}{% endif %}">
                     {{ pagina }}
                     </a>
                   </li>
@@ -151,7 +151,7 @@
 
                 {% if processos.has_next %}
                   <li class="page-item">
-                    <a class="page-link" href="?page={{ processos.next_page_number }}">
+                    <a class="page-link" href="?page={{ processos.next_page_number }}{% if busca %}&busca={{ busca }}{% endif %}{% if ordem %}&ordem={{ ordem }}{% endif %}{% if data %}&data={{ data }}{% endif %}">
                     Próxima
                     </a>
                   </li>
