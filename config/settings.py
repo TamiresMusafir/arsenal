@@ -86,7 +86,24 @@ DATABASES = {
 }
 
 
-# Password validation
+# Password validation# Configurações OpenRouter
+OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY')
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_MODEL = os.environ.get(
+    "OPENROUTER_MODEL", "google/gemini-3-flash-preview"
+)
+OPENROUTER_PDF_ENGINE_SCAN = os.environ.get("OPENROUTER_PDF_ENGINE_SCAN", "native")
+
+# Configurações de upload
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760 # acima disso o Django grava em disco,
+                                         # o que é melhor para PDF grande
+
+# Configurações de timeout
+OPENROUTER_TIMEOUT = 300 # segundos
+OPENROUTER_SITE_URL = "http://localhost:8000"
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -141,15 +158,20 @@ os.makedirs(MEDIA_TEMP_DIR, exist_ok=True)
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
 
 # Configurações OpenRouter
-OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', 'chave')
+OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY')
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-OPENROUTER_MODEL = "deepseek/deepseek-chat"
+OPENROUTER_MODEL = os.environ.get(
+    "OPENROUTER_MODEL", "google/gemini-3-flash-preview"
+)
+OPENROUTER_PDF_ENGINE_SCAN = os.environ.get("OPENROUTER_PDF_ENGINE_SCAN", "native")
 
 # Configurações de upload
-DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800 # 50 MB
-FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800 # 50 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760 # acima disso o Django grava em disco,
+                                         # o que é melhor para PDF grande
 
 # Configurações de timeout
-OPENROUTER_TIMEOUT = 120 # segundos
+OPENROUTER_TIMEOUT = 300 # segundos
+OPENROUTER_SITE_URL = "http://localhost:8000"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
