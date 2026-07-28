@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const config = {
         baseUrl: window.location.pathname.replace(/\/$/, ''),
         formatosAceitos: ['.csv', '.xls', '.xlsx', '.ods'],
-        tempoExibicaoMensagem: 5000,
         tempoExibicaoProgresso: 1500
     };
     
@@ -32,9 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function inicializarEventos(el, cfg) {
-    // Download do modelo base
+    // Download do último mapa enviado
     el.btnBaixarModelo.addEventListener('click', () => {
-        window.location.href = cfg.baseUrl + '/baixar-modelo-base/';
+        window.location.href = el.btnBaixarModelo.dataset.url;
     });
     
     // Abrir seletor de arquivos
@@ -54,6 +53,7 @@ function inicializarEventos(el, cfg) {
     
     // Drag and drop
     inicializarDragAndDrop(el, cfg);
+    carregarUltimoMapa(el, cfg);
 }
 
 async function processarUpload(arquivos, el, cfg) {
@@ -149,7 +149,7 @@ function exibirDados(dados, el) {
             // Tratar valores nulos/undefined
             if (celula === null || celula === undefined || celula === 'None') {
                 td.textContent = '';
-                td.className = 'text-muted font-italic';
+                td.className = 'theme-muted font-italic';
             } else {
                 td.textContent = typeof celula === 'object' ? JSON.stringify(celula) : String(celula);
             }
@@ -287,4 +287,34 @@ function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+async function carregarUltimoMapa(el, cfg) {
+
+    try {
+
+        const response = await fetch(
+            cfg.baseUrl + "/carregar/"
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            exibirDados(data.dados, el);
+
+            mostrarMensagem(
+                el.mensagemStatus,
+                "info",
+                `<i class="fa-solid fa-file me-2"></i>
+                Último mapa carregado.`
+            );
+        }
+
+    } catch (error) {
+
+        console.log("Nenhum mapa salvo.");
+
+    }
+
 }
