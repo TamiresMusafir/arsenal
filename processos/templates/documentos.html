@@ -14,55 +14,56 @@
 </section>
 <!-- 2. Seção da Lista --> 
 <section class="lista theme-card p-4 rounded shadow-sm">
+  <!-- FILTRO: a linha de campos virou um form method="get", mesmos campos e classes -->
   <div class="card shadow-sm mb-4">
   <div class="card-body">
-    <div class="row g-3">
+    <form method="get" class="row g-3">
       <div class="col-md-6">
         <label class="form-label">
         Número do Processo
         </label>
-        <input type="text" class="form-control" placeholder="Ex: 00015/2026">
+        <input type="text" name="numero" value="{{ filtro_numero }}" class="form-control" placeholder="Ex: 00015/2026">
       </div>
       <div class="col-md-3">
         <label class="form-label">
         Status
         </label>
-        <select class="form-select">
-          <option>
+        <select name="status" class="form-select">
+          <option value="todos" {% if filtro_status == "todos" %}selected{% endif %}>
             Todos
           </option>
-          <option>
-            Em andamento
+          {% for valor, rotulo in status_choices %}
+          <option value="{{ valor }}" {% if filtro_status == valor %}selected{% endif %}>
+            {{ rotulo }}
           </option>
-          <option>
-            Concluído
-          </option>
-          <option>
-            Pendente
-          </option>
+          {% endfor %}
         </select>
       </div>
       <div class="col-md-3 d-flex align-items-end">
-        <button class="btn btn-primary w-100">
+        <button type="submit" class="btn btn-primary w-100">
         <i class="fa-solid fa-magnifying-glass me-2"></i>
         Buscar
         </button>
       </div>
-    </div>
+    </form>
   </div>
-  <div class="card shadow-sm">
+  </div>
+
+  <!-- LISTA: o card do processo agora se repete para cada resultado -->
+  {% for resumo in resumos %}
+  <div class="card shadow-sm mb-4">
     <div class="card-header theme-card">
       <div class="d-flex justify-content-between align-items-center">
         <div>
           <h5 class="mb-1 fw-bold">
-            Processo 00015/2026
+            Processo {{ resumo.processo.numero }}
           </h5>
           <span class="theme-muted">
-          Aquisição de notebooks
+          {{ resumo.processo.descricao }}
           </span>
         </div>
-        <span class="badge bg-warning theme-text">
-        Em andamento
+        <span class="badge {{ resumo.processo.status_badge }} theme-text">
+        {{ resumo.processo.status_label }}
         </span>
       </div>
     </div>
@@ -79,10 +80,17 @@
               <p class="theme-muted small">
                 Documentos gerados no processo.
               </p>
-              <button class="btn btn-outline-primary btn-sm">
+              {% if resumo.tem_xlsx %}
+              <a href="{% url 'download_arquivo' 'xlsx' resumo.processo.id %}" class="btn btn-outline-primary btn-sm">
               <i class="fa-solid fa-download"></i>
-              Baixar PDF
+              Baixar XLSX
+              </a>
+              {% else %}
+              <button class="btn btn-outline-primary btn-sm" disabled>
+              <i class="fa-solid fa-download"></i>
+              Baixar XLSX
               </button>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -95,13 +103,20 @@
                 Comunicação
               </h6>
               <p class="theme-muted small">
-                10 e-mails enviados<br>
-                6 respostas recebidas
+                {{ resumo.emails_enviados }} e-mails enviados<br>
+                {{ resumo.emails_recebidos }} respostas recebidas
               </p>
-              <button class="btn btn-outline-danger btn-sm">
+              {% if resumo.tem_pacote %}
+              <a href="{% url 'download_arquivo' 'original' resumo.processo.id %}" class="btn btn-outline-danger btn-sm">
+              <i class="fa-solid fa-download"></i>
+              Baixar E-mails
+              </a>
+              {% else %}
+              <button class="btn btn-outline-danger btn-sm" disabled>
               <i class="fa-solid fa-download"></i>
               Baixar E-mails
               </button>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -114,11 +129,11 @@
                 Fornecedores
               </h6>
               <p class="theme-muted small">
-                8 fornecedores consultados.
+                {{ resumo.total_fornecedores }} fornecedores consultados.
               </p>
-              <button class="btn btn-outline-success btn-sm">
-              <i class="fa-solid fa-download"></i>
-              Baixar Lista
+              <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#fornecedores{{ resumo.processo.id }}" {% if not resumo.empresas %}disabled{% endif %}>
+              <i class="fa-solid fa-list"></i>
+              Ver Lista
               </button>
             </div>
           </div>
@@ -132,9 +147,9 @@
                 Cotações
               </h6>
               <p class="theme-muted small">
-                5 respostas recebidas.
+                {{ resumo.total_cotacoes }} respostas recebidas.
               </p>
-              <button class="btn btn-outline-warning btn-sm">
+              <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#cotacoes{{ resumo.processo.id }}" {% if not resumo.itens %}disabled{% endif %}>
               Visualizar
               </button>
             </div>
@@ -155,17 +170,134 @@
         </div>
         <div>
           <div class="d-flex flex-wrap gap-2 ms-2">
-            <button class="btn btn-outline-dark">
+            <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#cotacoes{{ resumo.processo.id }}" {% if not resumo.itens %}disabled{% endif %}>
             Visualizar
             </button>
-            <button class="btn btn-dark">
+            {% if resumo.tem_odt %}
+            <a href="{% url 'download_arquivo' 'odt' resumo.processo.id %}" class="btn btn-dark">
             <i class="fa-solid fa-download me-2"></i>
-            PDF
+            ODT
+            </a>
+            {% else %}
+            <button class="btn btn-dark" disabled>
+            <i class="fa-solid fa-download me-2"></i>
+            ODT
             </button>
+            {% endif %}
           </div>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Modal da lista de fornecedores (fica oculto até o clique) -->
+  <div class="modal fade" id="fornecedores{{ resumo.processo.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content theme-card">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Fornecedores &middot; Processo {{ resumo.processo.numero }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr><th>#</th><th>Empresa</th><th>CNPJ</th><th>Contato</th><th class="text-end">Valor global</th></tr>
+            </thead>
+            <tbody>
+              {% for empresa in resumo.empresas %}
+              <tr>
+                <td>{{ empresa.indice }}</td>
+                <td>{{ empresa.nome }}</td>
+                <td>{{ empresa.cnpj|default:"—" }}</td>
+                <td>{{ empresa.email|default:"—" }}</td>
+                <td class="text-end">{{ empresa.valor_global|default:"—" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal do mapa de cotações (fica oculto até o clique) -->
+  <div class="modal fade" id="cotacoes{{ resumo.processo.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content theme-card">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Cotações &middot; Processo {{ resumo.processo.numero }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Item</th><th>PI</th><th>Descrição</th><th>Qtde</th><th>UF</th>
+                  {% for empresa in resumo.empresas %}<th class="text-end">{{ empresa.nome }}</th>{% endfor %}
+                  <th class="text-end">Menor preço</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in resumo.itens %}
+                <tr>
+                  <td>{{ item.posicao }}</td>
+                  <td>{{ item.pi|default:"—" }}</td>
+                  <td>{{ item.descricao|default:"—" }}</td>
+                  <td>{{ item.qtde|default:"—" }}</td>
+                  <td>{{ item.uf|default:"—" }}</td>
+                  {% for cotacao in item.cotacoes %}
+                  <td class="text-end {% if cotacao.melhor %}fw-bold text-success{% endif %}">{{ cotacao.texto }}</td>
+                  {% endfor %}
+                  <td class="text-end">
+                    {% if item.menor_preco %}
+                    R$ {{ item.menor_preco|floatformat:2 }}<br>
+                    <span class="theme-muted small">{{ item.menor_fornecedor }}</span>
+                    {% else %}—{% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if resumo.itens_ocultos %}
+          <p class="theme-muted small mb-0">
+            Exibindo os primeiros {{ resumo.itens|length }} itens. Baixe a planilha para ver os {{ resumo.itens_ocultos }} restantes.
+          </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="card shadow-sm">
+    <div class="card-body text-center py-5">
+      <i class="fa-solid fa-folder-open fa-2x theme-muted mb-3"></i>
+      <h5 class="fw-bold">Nenhum processo encontrado</h5>
+      <p class="theme-muted mb-0">Ajuste o número ou o status e busque novamente.</p>
+    </div>
+  </div>
+  {% endfor %}
+
+  {% if pagina.paginator.num_pages > 1 %}
+  <nav aria-label="Paginação">
+    <ul class="pagination justify-content-center mb-0">
+      {% if pagina.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ pagina.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Anterior</a>
+      </li>
+      {% endif %}
+      <li class="page-item disabled">
+        <span class="page-link">Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+      </li>
+      {% if pagina.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ pagina.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Próxima</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
 </section>
 </div>
 {% endblock %}
