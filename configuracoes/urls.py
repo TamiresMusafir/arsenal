@@ -1,0 +1,8 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.configuracoes, name="configuracoes"),
+    path("conta/", views.conta, name="conta"),
+    path("preferencias/", views.preferencias, name="preferencias")
+]

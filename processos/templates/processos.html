@@ -1,0 +1,170 @@
+        
+			{% extends "base.html" %}
+
+			{% block content %}
+				
+      <div class="container">
+
+        <!-- 1. Seção do Banner Superior -->
+        <section class="p-5 mb-4 theme-card rounded-3 shadow-sm border-0">
+          <div class="row align-items-center">
+            <div class="col-12">
+              <header class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+                <h2 class="mb-0 fw-bold"><i class="fa-solid fa-folder-open me-2"></i>Processos</h2>
+                <a href="{% url 'novo_processo' %}" class="btn btn-primary rounded-3 d-flex align-items-center gap-2 align-self-start align-self-sm-auto">
+                  <i class="fa-solid fa-plus"></i>
+                  Novo Processo
+                </a>
+              </header>
+              <p class="text-justify fs-6 theme-muted mt-3 mb-0">
+                É a central de gerenciamento que reúne todos os processos cadastrados no sistema. Nela, você pode buscar, filtrar por data ou status, acompanhar o andamento de cada análise em tempo real e acessar o painel de detalhes de qualquer processo para visualizar seus e-mails, documentos e o mapa comparativo gerado.
+              </p>
+            </div>
+          </div>
+        </section>
+        
+        <!-- 2. Seção da Lista -->
+        <section class="lista theme-card p-4 rounded shadow-sm">
+          <form method="GET" class="d-flex flex-wrap align-items-center gap-2 w-100">
+
+            <input type="text" class="form-control form-control-sm" placeholder="Buscar processo..." name = "busca" style="max-width: 200px; flex-shrink: 1;">
+
+            <select 
+              class="form-select form-select-sm" 
+              name="data"
+              style="max-width: 150px; flex-shrink: 0;">
+              <option value="qualquer">Qualquer data</option>
+              <option value="hoje">Hoje</option>
+              <option value="mes">Este mês</option>
+              <option value="ano">Ano corrente</option>
+            </select>
+
+
+            <select class="form-select form-select-sm" name="ordem" style="max-width: 150px; flex-shrink: 0;">
+              
+              <option value="antigos">Mais antigos</option>
+              <option value="recentes">Mais recentes</option>
+              <option value="numero">Número do processo</option>
+              <option value="maior_valor">Maior valor</option>
+              <option value="menor_valor">Menor valor</option>
+            </select>
+
+            <button type="submit" class="btn btn-sm btn-outline-primary">
+              <i class="fa-solid fa-filter me-2"></i>Filtrar
+            </button>
+
+            <div class="mb-2 d-flex flex-wrap gap-3">
+              <button class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-file-csv me-1"></i>
+                Exportar CSV
+              </button>
+
+              <button class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-file-pdf me-1"></i>
+                Exportar PDF
+              </button>
+            </div>
+
+          </form>
+          
+          <div class="d-lg-none mb-2 mt-2 theme-muted small">
+            <i class="fa-solid fa-arrows-left-right me-1"></i>
+            Deslize a tabela para visualizar todas as colunas.
+          </div>
+
+          <section class="lista theme-card p-4 rounded shadow-sm">
+            <div class="lista-tabela">
+              <table class="table table-hover theme-table align-middle mb-0">
+                <thead class="theme-table-header">
+                  <tr>
+                    <th class="border-0">Processo</th>
+                    <th class="border-0">Descrição</th>
+                    <th class="border-0">Data de Abertura</th>
+                    <th class="border-0">Cadastrado em</th>
+                    <th class="border-0">Valor Estimado</th>
+                    <th class="border-0">Status</th>
+                    <th class="border-0 text-end">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for processo in processos %}
+                  <tr>
+                    <td><strong class="theme-text">{{ processo.numero }}</strong></td>
+                    <td>{{ processo.descricao }}</td>
+                    <td class="theme-muted small">{{ processo.data_abertura|date:"d/m/Y" }}</td>
+                    <td class="theme-muted small">{{ processo.data_criacao|date:"d/m/Y H:i" }}</td>
+                    <td class="fw-semibold">R$ {{ processo.valor_estimado|floatformat:2 }}</td>
+                    <td>
+                      <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
+                        Em andamento
+                      </span>
+                    </td>
+                    <td>
+											<div class="d-flex gap-2">
+												<a href="#" class="btn btn-sm btn-outline-primary">
+													<i class="fa-solid fa-eye"></i>
+												</a>
+
+												<a href="#" class="btn btn-sm btn-outline-secondary">
+													<i class="fa-solid fa-download"></i>
+												</a>
+											</div>
+										</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <hr class="my-3">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <small class="theme-muted">
+              Mostrando <strong>{{ processos.start_index }} - {{ processos.end_index }}</strong> de <strong> {{ processos.paginator.count}}</strong> processos
+            </small>
+            <nav>
+              <ul class="pagination pagination-sm mb-0">
+                {% if processos.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ processos.previous_page_number }}{% if busca %}&busca={{ busca }}{% endif %}{% if ordem %}&ordem={{ ordem }}{% endif %}{% if data %}&data={{ data }}{% endif %}">
+                    Anterior
+                    </a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled">
+                    <span class="page-link">Anterior</span>
+                  </li>
+                {% endif %}
+                {% for pagina in processos.paginator.page_range %}
+                  {% if pagina == processos.number %}
+                    <li class="page-item active">
+                      <span class="page-link">{{ pagina }}</span>
+                    </li>
+                  {% else %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ pagina }}{% if busca %}&busca={{ busca }}{% endif %}{% if ordem %}&ordem={{ ordem }}{% endif %}{% if data %}&data={{ data }}{% endif %}">
+                    {{ pagina }}
+                    </a>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+
+                {% if processos.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ processos.next_page_number }}{% if busca %}&busca={{ busca }}{% endif %}{% if ordem %}&ordem={{ ordem }}{% endif %}{% if data %}&data={{ data }}{% endif %}">
+                    Próxima
+                    </a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled">
+                    <span class="page-link">Próxima</span>
+                  </li>
+                {% endif %}
+              </ul>
+            </nav>
+
+          </div>
+        </section>
+      </div>
+
+			{% endblock %}

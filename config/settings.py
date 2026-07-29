@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,6 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'home',
+    'dashboard',
+    'processos',
+    'mapa',
+    'configuracoes',
 ]
 
 MIDDLEWARE = [
@@ -81,7 +86,24 @@ DATABASES = {
 }
 
 
-# Password validation
+# Password validation# Configurações OpenRouter
+OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY')
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_MODEL = os.environ.get(
+    "OPENROUTER_MODEL", "google/gemini-3-flash-preview"
+)
+OPENROUTER_PDF_ENGINE_SCAN = os.environ.get("OPENROUTER_PDF_ENGINE_SCAN", "native")
+
+# Configurações de upload
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760 # acima disso o Django grava em disco,
+                                         # o que é melhor para PDF grande
+
+# Configurações de timeout
+OPENROUTER_TIMEOUT = 300 # segundos
+OPENROUTER_SITE_URL = "http://localhost:8000"
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -105,7 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
@@ -115,8 +137,41 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / 'static-assets',
 ]
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Media files (Uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Criar pastas necessárias
+MEDIA_TEMP_DIR = os.path.join(MEDIA_ROOT, 'temp')
+os.makedirs(MEDIA_TEMP_DIR, exist_ok=True)
+
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
+
+# Configurações OpenRouter
+OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY')
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_MODEL = os.environ.get(
+    "OPENROUTER_MODEL", "google/gemini-3-flash-preview"
+)
+OPENROUTER_PDF_ENGINE_SCAN = os.environ.get("OPENROUTER_PDF_ENGINE_SCAN", "native")
+
+# Configurações de upload
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760 # acima disso o Django grava em disco,
+                                         # o que é melhor para PDF grande
+
+# Configurações de timeout
+OPENROUTER_TIMEOUT = 300 # segundos
+OPENROUTER_SITE_URL = "http://localhost:8000"
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
