@@ -1,6 +1,11 @@
-/* wizard.css - Estilos específicos para o wizard */
+/* ============================================================
+   wizard.css  —  versão corrigida
+   Agora contém TODOS os estilos do wizard (o style.css não tinha
+   as regras .wizard-step / .wizard-circle / .wizard-line).
+   ============================================================ */
 
-/* Garante que o wizard funcione corretamente */
+/* ---------- Alternância de passos ---------- */
+
 .wizard-content {
   display: none;
 }
@@ -11,17 +16,76 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Estilos para campos inválidos */
+/* ---------- Barra de etapas (stepper) ---------- */
+
+.wizard-header {
+  position: relative;
+}
+
+/* linha cinza que conecta os círculos */
+.wizard-line {
+  position: absolute;
+  top: 20px;              /* metade da altura do círculo (40px) */
+  left: 10%;
+  right: 10%;
+  height: 3px;
+  background: var(--main-light, #9ca3af);
+  z-index: 0;
+}
+
+.wizard-step {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  text-align: center;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  color: var(--theme-muted, #6c757d);
+  transition: color 0.3s ease;
+}
+
+.wizard-circle {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  background: #e9ecef;
+  color: #6c757d;
+  /* borda na cor do card "corta" a linha atrás do círculo */
+  border: 3px solid var(--bg-card, #ffffff);
+  box-shadow: 0 0 0 3px var(--bg-card, #ffffff);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.wizard-step.active {
+  color: var(--text-color, #212529);
+  font-weight: 600;
+}
+
+.wizard-step.active .wizard-circle {
+  background: var(--btn-primary-bg, #0d6efd);
+  color: #fff;
+}
+
+.wizard-step.completed .wizard-circle {
+  background: #198754;
+  color: #fff;
+}
+
+.wizard-info-title {
+  color: var(--text-color, #212529);
+}
+
+/* ---------- Campos inválidos ---------- */
+
 .is-invalid {
   border-color: #dc3545 !important;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
@@ -34,25 +98,33 @@
   display: block;
 }
 
-/* Melhorias para tema escuro */
-body.dark-theme .wizard-step .wizard-circle {
+/* ---------- Tema escuro ---------- */
+
+body.dark-theme .wizard-circle {
   background: #2d2d2d;
   color: #e0e0e0;
+  border-color: var(--bg-card, #1f1f1f);
+  box-shadow: 0 0 0 3px var(--bg-card, #1f1f1f);
 }
 
 body.dark-theme .wizard-step.active .wizard-circle {
-  background: #0d6efd;
-  color: white;
+  background: #2563eb;
+  color: #fff;
 }
 
 body.dark-theme .wizard-step.completed .wizard-circle {
   background: #198754;
-  color: white;
+  color: #fff;
 }
 
 body.dark-theme .wizard-line {
   background: #444;
 }
 
-/* Estilos adicionais do wizard (já existentes no style.css) */
-/* Mantenha apenas os específicos do wizard aqui */
+/* ---------- Responsivo ---------- */
+
+@media (max-width: 576px) {
+  .wizard-step span { font-size: 0.72rem; }
+  .wizard-circle { width: 32px; height: 32px; font-size: 0.85rem; }
+  .wizard-line { top: 16px; }
+}
