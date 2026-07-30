@@ -1,96 +1,111 @@
-{% extends "base.html" %}
-{% block content %}
-  <div class="container">
-    <!-- Cabeçalho -->
-    <section class="p-5 mb-4 theme-card rounded-3 shadow-sm">
-      <h2 class="fw-bold theme-text">
-        <i class="fa-solid fa-user me-2"></i>
-        Minha Conta
-      </h2>
-      <p class="theme-muted mb-0">
-        Gerencie suas informações pessoais e configurações de acesso.
-      </p>
-    </section>
-    <div class="row g-4">
-      <!-- FOTO -->
-      <div class="col-lg-4">
-        <div class="card border-0 shadow-sm p-4 text-center">
-          <img 
-            src="https://via.placeholder.com/150"
-            class="rounded-circle mx-auto mb-3"
-            style="width:150px; height:150px; object-fit:cover;"
-            >
-          <h5 class="fw-bold">
-            Nome do Usuário
-          </h5>
-          <p class="theme-muted small">
-            Administrador
-          </p>
-          <button class="btn btn-outline-primary btn-sm">
+{% extends "base.html" %} {% block content %}
+
+<div class="container">
+  <!-- Cabeçalho -->
+  <section class="p-5 mb-4 theme-card rounded-3 shadow-sm">
+    <h2 class="fw-bold theme-text">
+      <i class="fa-solid fa-user me-2"></i>
+      Minha Conta
+    </h2>
+
+    <p class="theme-muted mb-0">Gerencie suas informações pessoais e configurações de acesso.</p>
+  </section>
+
+  <div class="row g-4">
+    <!-- PERFIL -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm p-4 text-center">
+        {% if perfil.foto %}
+        <img
+          src="{{ perfil.foto.url }}"
+          class="rounded-circle mx-auto mb-3"
+          style="width: 150px; height: 150px; object-fit: cover"
+        />
+        {% else %}
+        <img
+          src="https://via.placeholder.com/150"
+          class="rounded-circle mx-auto mb-3"
+          style="width: 150px; height: 150px; object-fit: cover"
+        />
+        {% endif %}
+
+        <h5 class="fw-bold">{{ usuario.first_name }} {{ usuario.last_name }}</h5>
+
+        <p class="theme-muted small">{{ usuario.username }}</p>
+
+        <button class="btn btn-outline-primary btn-sm">
           <i class="fa-solid fa-camera me-2"></i>
           Alterar foto
-          </button>
-        </div>
+        </button>
       </div>
-      <!-- DADOS -->
-      <div class="col-lg-8">
-        <div class="card border-0 shadow-sm p-4">
-          <h4 class="fw-bold mb-4">
-            Informações pessoais
-          </h4>
-          <form>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label fw-semibold">
-                Nome
-                </label>
-                <input 
-                  type="text"
-                  class="form-control"
-                  placeholder="Nome"
-                  >
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label fw-semibold">
-                Sobrenome
-                </label>
-                <input 
-                  type="text"
-                  class="form-control"
-                  placeholder="Sobrenome"
-                  >
-              </div>
+    </div>
+
+    <!-- DADOS -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm p-4">
+        <h4 class="fw-bold mb-4">Informações pessoais</h4>
+
+        <form method="POST">
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold"> Nome </label>
+
+              <input type="text" class="form-control" name="nome" value="{{ usuario.first_name }}" />
             </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">
-              Email
-              </label>
-              <input 
-                type="email"
-                class="form-control"
-                placeholder="email@exemplo.com"
-                >
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold"> Sobrenome </label>
+
+              <input type="text" class="form-control" name="sobrenome" value="{{ usuario.last_name }}" />
             </div>
-            <button class="btn btn-primary">
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold"> E-mail </label>
+
+            <input type="email" class="form-control" name="email" value="{{ usuario.email }}" />
+          </div>
+          <button class="btn btn-outline-primary" type="submit">
             <i class="fa-solid fa-save me-2"></i>
-            Salvar alterações
-            </button>
-          </form>
-        </div>
-        <!-- SENHA -->
-        <div class="card border-0 shadow-sm p-4 mt-4">
-          <h4 class="fw-bold mb-3">
-            Segurança
-          </h4>
-          <p class="theme-muted small">
-            Atualize sua senha para manter sua conta segura.
-          </p>
-          <button class="btn btn-outline-secondary">
-          <i class="fa-solid fa-key me-2"></i>
-          Alterar senha
+              Salvar alterações
           </button>
+        </form>
+      </div>
+
+      <!-- Segurança e Sessão -->
+      <div class="row g-4 mt-1">
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm p-4 h-100">
+            <h4 class="fw-bold mb-3">Segurança</h4>
+
+            <p class="theme-muted small">Atualize sua senha para manter sua conta protegida.</p>
+
+            <a href="{% url 'alterar_senha' %}" class="btn btn-outline-secondary mt-auto">
+              <i class="fa-solid fa-key me-2"></i>
+
+              Alterar senha
+            </a>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm p-4 h-100">
+            <h4 class="fw-bold mb-3">Sessão</h4>
+
+            <p class="theme-muted small">Encerre sua sessão atual e retorne à tela de login.</p>
+
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger mt-auto">
+              <i class="fa-solid fa-right-from-bracket me-2"></i>
+
+              Sair da conta
+            </a>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</div>
+
 {% endblock %}
