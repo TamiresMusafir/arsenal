@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from usuarios.models import Perfil
@@ -10,7 +12,9 @@ def configuracoes(request):
 def conta(request):
     usuario = request.user
 
-    return render(request, "conta.html", {"usuario": usuario,})
+    return render(request, "conta.html", {
+        "usuario": usuario,
+    })
 
 @login_required
 def editar_conta(request):
@@ -18,16 +22,15 @@ def editar_conta(request):
     perfil, created = Perfil.objects.get_or_create(usuario=usuario)
 
     if request.method == "POST":
-    
-        # Atualizar dados do usuário
         usuario.first_name = request.POST.get("nome")
         usuario.last_name = request.POST.get("sobrenome")
         usuario.email = request.POST.get("email")
-
         usuario.save()
 
-        # Atualizar foto
         if request.FILES.get("foto"):
+            if perfil.foto and os.path.exists(perfil.foto.path):
+                os.remove(perfil.foto.path)
+
             perfil.foto = request.FILES["foto"]
             perfil.save()
 
