@@ -76,14 +76,19 @@
           </div>
           <!-- Perfil -->
           <div class="perfil d-flex align-items-center gap-2 pt-3 mt-4 border-top border-secondary">
-            <img src="https://placehold.co/40x40" class="rounded-circle" alt="Administrador"/>
-            <div class="overflow-hidden">
+            {% if perfil.foto %}
+              <img
+                src="{{ perfil.foto.url }}"
+                class="rounded-circle mx-auto mb-3"
+                style="width: 40px; height: 40px; object-fit: cover"
+              />
+            {% else %}
+              <img src="https://placehold.co/40x40" class="rounded-circle" alt="Administrador"/>
+            {% endif %}
+              <div class="overflow-hidden">
               <strong class="d-block text-truncate small">
-                Administrador
+                {{ request.user.first_name }}<br>{{ request.user.last_name }}
               </strong>
-              <small class="theme-muted d-block text-truncate">
-                admin@teste.com
-              </small>
             </div>
           </div>
         </aside>
