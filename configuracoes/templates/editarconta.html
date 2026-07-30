@@ -1,4 +1,91 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} 
+{% load static %}
+{% block content %}
+
+<div class="container">
+  <!-- Cabeçalho -->
+  <section class="p-5 mb-4 theme-card rounded-3 shadow-sm">
+    <h2 class="fw-bold theme-text">
+      <i class="fa-solid fa-user-pen me-2"></i>
+      Editar Conta
+    </h2>
+
+    <p class="theme-muted mb-0">Atualize suas informações pessoais e sua foto de perfil.</p>
+  </section>
+
+  <div class="card border-0 shadow-sm p-4">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- FOTO -->
+      <div class="text-center mb-4">
+        {% if perfil.foto %}
+        <img
+          id="previewFoto"
+          src="{{ perfil.foto.url }}"
+          class="rounded-circle mb-3"
+          style="width: 150px; height: 150px; object-fit: cover"
+        />
+        {% else %}
+        <img
+          id="previewFoto"
+          src="https://placehold.co/150x150"
+          class="rounded-circle mb-3"
+          style="width: 150px; height: 150px; object-fit: cover"
+        />
+        {% endif %}
+
+        <div>
+          <label class="btn btn-outline-primary">
+            <i class="fa-solid fa-camera me-2"></i>
+
+            Escolher nova foto
+
+            <input type="file" id="id_foto" name="foto" hidden accept="image/*" />
+          </label>
+        </div>
+      </div>
+
+      <!-- DADOS -->
+
+      <h4 class="fw-bold mb-4 theme-text">Informações pessoais</h4>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold theme-text"> Nome </label>
+
+          <input type="text" class="form-control" name="nome" value="{{ usuario.first_name }}" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold theme-text"> Sobrenome </label>
+
+          <input type="text" class="form-control" name="sobrenome" value="{{ usuario.last_name }}" />
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-semibold theme-text"> E-mail </label>
+
+        <input type="email" class="form-control" name="email" value="{{ usuario.email }}" />
+      </div>
+
+      <!-- BOTÕES -->
+
+      <button type="submit" class="btn btn-primary">
+        <i class="fa-solid fa-save me-2"></i>
+        Salvar alterações
+      </button>
+
+      <a href="{% url 'conta' %}" class="btn btn-outline-secondary ms-2"> Cancelar </a>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/perfil.js' %}"></script>
+{% endblock %}{% extends "base.html" %} {% block content %}
 
 <div class="container">
   <!-- Cabeçalho -->
