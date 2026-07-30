@@ -68,6 +68,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # Contexto global do perfil do usuário
+                'usuarios.context_processors.perfil_usuario',
             ],
         },
     },
