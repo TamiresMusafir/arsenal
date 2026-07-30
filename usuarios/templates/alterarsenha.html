@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <div class="container">
+    <div class="card shadow-sm p-4">
+      <h3 class="fw-bold mb-4">
+          Alterar senha
+      </h3>
+
+      <form method="POST">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button class="btn btn-primary">
+          Salvar nova senha
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+{% endblock %}

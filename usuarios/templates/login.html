@@ -1,0 +1,47 @@
+{% extends "baselogin.html" %}
+
+{% block content %}
+
+  <div class="container min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="card border-0 shadow-lg theme-card" style="max-width:450px; width:100%;">
+      <div class="card-body p-5">
+
+        <div class="text-center mb-4">
+          <i class="fa-solid fa-shield-halved fa-3x text-primary mb-3"></i>
+          <h2 class="fw-bold theme-text">
+            Arsenal
+          </h2>
+          <p class="theme-muted mb-0">
+            Sistema de Gestão de Processos
+          </p>
+        </div>
+
+        <form method="POST">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold theme-text">
+                Usuário
+            </label>
+            <input type="text" name="username" class="form-control" placeholder="Digite seu usuário" required>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold theme-text">
+                Senha
+            </label>
+            <input type="password" name="password" class="form-control" placeholder="Digite sua senha" required>
+          </div>
+
+          <button
+            class="btn btn-primary w-100" type="submit">
+            <i class="fa-solid fa-right-to-bracket me-2"></i>
+              Entrar
+          </button>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
