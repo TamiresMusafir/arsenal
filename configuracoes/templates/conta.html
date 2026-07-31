@@ -1,5 +1,4 @@
-{% extends "base.html" %} 
-{% block content %}
+{% extends "base.html" %} {% block content %}
 
 <div class="container">
   <!-- Cabeçalho -->
@@ -15,36 +14,29 @@
     <p class="theme-muted mb-0">Gerencie suas informações pessoais e configurações de acesso.</p>
   </section>
 
-  <section class="mb-4">
+  <section class="">
     <div class="row g-4">
       <!-- PERFIL -->
       <div class="col-lg-4">
         <div class="card border-0 shadow-sm p-4 text-center">
           {% if perfil.foto %}
-
           <img
             src="{{ perfil.foto.url }}"
             class="rounded-circle mx-auto mb-3"
             style="width: 150px; height: 150px; object-fit: cover"
           />
-
           {% else %}
-
           <img
             src="https://via.placeholder.com/150"
             class="rounded-circle mx-auto mb-3"
             style="width: 150px; height: 150px; object-fit: cover"
           />
-
           {% endif %}
 
           <h5 class="fw-bold">{{ usuario.first_name }} {{ usuario.last_name }}</h5>
-
           <p class="theme-muted small">{{ usuario.username }}</p>
-
           <a href="{% url 'editar_conta' %}" class="btn btn-outline-primary btn-sm">
             <i class="fa-solid fa-pen me-2"></i>
-
             Editar perfil
           </a>
         </div>
@@ -52,70 +44,44 @@
 
       <!-- DADOS -->
       <div class="col-lg-8">
-        <h4 class="fw-bold mb-4 theme-text">
-          Informações pessoais
-        </h4>
+        <h4 class="fw-bold mb-4 theme-text">Informações pessoais</h4>
 
         <div class="mb-3">
-          <label class="form-label fw-semibold theme-text">
-            Nome
-          </label>
-
-          <p class="form-control theme-card">
-            {{ usuario.first_name }}
-          </p>
+          <label class="form-label fw-semibold theme-text"> Nome </label>
+          <p class="form-control theme-card">{{ usuario.first_name }}</p>
         </div>
 
         <div class="mb-3">
-          <label class="form-label fw-semibold theme-text">
-            Sobrenome
-          </label>
-
-          <p class="form-control theme-card">
-            {{ usuario.last_name }}
-          </p>
+          <label class="form-label fw-semibold theme-text"> Sobrenome </label>
+          <p class="form-control theme-card">{{ usuario.last_name }}</p>
         </div>
 
         <div class="mb-3">
-          <label class="form-label fw-semibold theme-text">
-            E-mail
-          </label>
-
-          <p class="form-control theme-card">
-            {{ usuario.email }}
-          </p>
+          <label class="form-label fw-semibold theme-text"> E-mail </label>
+          <p class="form-control theme-card">{{ usuario.email }}</p>
         </div>
 
         <!-- Segurança e Sessão -->
-
         <div class="row g-4 mt-1">
           <!-- Segurança -->
-
           <div class="col-md-6">
             <div class="card border-0 shadow-sm p-4 h-100">
               <h4 class="fw-bold mb-3">Segurança</h4>
-
               <p class="theme-muted small">Atualize sua senha para manter sua conta protegida.</p>
-
               <a href="{% url 'alterar_senha' %}" class="btn btn-outline-secondary">
                 <i class="fa-solid fa-key me-2"></i>
-
                 Alterar senha
               </a>
             </div>
           </div>
 
           <!-- Sessão -->
-
           <div class="col-md-6">
             <div class="card border-0 shadow-sm p-4 h-100">
               <h4 class="fw-bold mb-3">Sessão</h4>
-
               <p class="theme-muted small">Encerre sua sessão atual e retorne à tela de login.</p>
-
               <a href="{% url 'logout' %}" class="btn btn-outline-danger">
                 <i class="fa-solid fa-right-from-bracket me-2"></i>
-
                 Sair da conta
               </a>
             </div>
