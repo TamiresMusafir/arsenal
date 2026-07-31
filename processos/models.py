@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
- 
+from django.contrib.auth.models import User
  
 class Processo(models.Model):
     STATUS_PENDENTE = 'pendente'
@@ -22,6 +22,8 @@ class Processo(models.Model):
         STATUS_ERRO: 'bg-danger',
     }
  
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name="processos")
+
     numero = models.CharField(max_length=20, unique=True)
     descricao = models.CharField(max_length=255)
     data_abertura = models.DateField(default=timezone.now)
