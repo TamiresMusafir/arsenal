@@ -5,4 +5,14 @@ from .models import Perfil
 
 @admin.register(Perfil)
 class PerfilAdmin(admin.ModelAdmin):
-    list_display = ("usuario", "foto",)
+    list_display = (
+        "usuario", 
+        "foto", 
+        "tema_escuro",
+    )
+
+    search_fields = (
+        "usuario__username",
+        "usuario__first_name",
+        "usuario__last_name",
+    )
