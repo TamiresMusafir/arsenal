@@ -1,9 +1,13 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} 
+{% block content %}
 
 <div class="container">
   <!-- Cabeçalho -->
   <section class="p-5 mb-4 theme-card rounded-3 shadow-sm">
-    <h2 class="fw-bold theme-text">
+    <a href="{% url 'configuracoes' %}" class="text-decoration-none small fw-bold">
+      <i class="fa-solid fa-arrow-left"></i> Voltar a todas as configurações
+    </a>
+    <h2 class="fw-bold theme-text mt-2">
       <i class="fa-solid fa-user me-2"></i>
       Minha Conta
     </h2>
@@ -11,101 +15,115 @@
     <p class="theme-muted mb-0">Gerencie suas informações pessoais e configurações de acesso.</p>
   </section>
 
-  <div class="row g-4">
-    <!-- PERFIL -->
-    <div class="col-lg-4">
-      <div class="card border-0 shadow-sm p-4 text-center">
-        {% if perfil.foto %}
-        <img
-          src="{{ perfil.foto.url }}"
-          class="rounded-circle mx-auto mb-3"
-          style="width: 150px; height: 150px; object-fit: cover"
-        />
-        {% else %}
-        <img
-          src="https://via.placeholder.com/150"
-          class="rounded-circle mx-auto mb-3"
-          style="width: 150px; height: 150px; object-fit: cover"
-        />
-        {% endif %}
+  <section class="mb-4">
+    <div class="row g-4">
+      <!-- PERFIL -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm p-4 text-center">
+          {% if perfil.foto %}
 
-        <h5 class="fw-bold">{{ usuario.first_name }} {{ usuario.last_name }}</h5>
+          <img
+            src="{{ perfil.foto.url }}"
+            class="rounded-circle mx-auto mb-3"
+            style="width: 150px; height: 150px; object-fit: cover"
+          />
 
-        <p class="theme-muted small">{{ usuario.username }}</p>
+          {% else %}
 
-        <button class="btn btn-outline-primary btn-sm">
-          <i class="fa-solid fa-camera me-2"></i>
-          Alterar foto
-        </button>
-      </div>
-    </div>
+          <img
+            src="https://via.placeholder.com/150"
+            class="rounded-circle mx-auto mb-3"
+            style="width: 150px; height: 150px; object-fit: cover"
+          />
 
-    <!-- DADOS -->
-    <div class="col-lg-8">
-      <div class="card border-0 shadow-sm p-4">
-        <h4 class="fw-bold mb-4">Informações pessoais</h4>
+          {% endif %}
 
-        <form method="POST">
-          {% csrf_token %}
+          <h5 class="fw-bold">{{ usuario.first_name }} {{ usuario.last_name }}</h5>
 
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label fw-semibold"> Nome </label>
+          <p class="theme-muted small">{{ usuario.username }}</p>
 
-              <input type="text" class="form-control" name="nome" value="{{ usuario.first_name }}" />
-            </div>
+          <a href="{% url 'editar_conta' %}" class="btn btn-outline-primary btn-sm">
+            <i class="fa-solid fa-pen me-2"></i>
 
-            <div class="col-md-6 mb-3">
-              <label class="form-label fw-semibold"> Sobrenome </label>
-
-              <input type="text" class="form-control" name="sobrenome" value="{{ usuario.last_name }}" />
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <label class="form-label fw-semibold"> E-mail </label>
-
-            <input type="email" class="form-control" name="email" value="{{ usuario.email }}" />
-          </div>
-          <button class="btn btn-outline-primary" type="submit">
-            <i class="fa-solid fa-save me-2"></i>
-              Salvar alterações
-          </button>
-        </form>
-      </div>
-
-      <!-- Segurança e Sessão -->
-      <div class="row g-4 mt-1">
-        <div class="col-md-6">
-          <div class="card border-0 shadow-sm p-4 h-100">
-            <h4 class="fw-bold mb-3">Segurança</h4>
-
-            <p class="theme-muted small">Atualize sua senha para manter sua conta protegida.</p>
-
-            <a href="{% url 'alterar_senha' %}" class="btn btn-outline-secondary mt-auto">
-              <i class="fa-solid fa-key me-2"></i>
-
-              Alterar senha
-            </a>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <div class="card border-0 shadow-sm p-4 h-100">
-            <h4 class="fw-bold mb-3">Sessão</h4>
-
-            <p class="theme-muted small">Encerre sua sessão atual e retorne à tela de login.</p>
-
-            <a href="{% url 'logout' %}" class="btn btn-outline-danger mt-auto">
-              <i class="fa-solid fa-right-from-bracket me-2"></i>
-
-              Sair da conta
-            </a>
-          </div>
+            Editar perfil
+          </a>
         </div>
       </div>
+
+      <!-- DADOS -->
+      <div class="col-lg-8">
+        <h4 class="fw-bold mb-4 theme-text">
+          Informações pessoais
+        </h4>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold theme-text">
+            Nome
+          </label>
+
+          <p class="form-control theme-card">
+            {{ usuario.first_name }}
+          </p>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold theme-text">
+            Sobrenome
+          </label>
+
+          <p class="form-control theme-card">
+            {{ usuario.last_name }}
+          </p>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold theme-text">
+            E-mail
+          </label>
+
+          <p class="form-control theme-card">
+            {{ usuario.email }}
+          </p>
+        </div>
+
+        <!-- Segurança e Sessão -->
+
+        <div class="row g-4 mt-1">
+          <!-- Segurança -->
+
+          <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-4 h-100">
+              <h4 class="fw-bold mb-3">Segurança</h4>
+
+              <p class="theme-muted small">Atualize sua senha para manter sua conta protegida.</p>
+
+              <a href="{% url 'alterar_senha' %}" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-key me-2"></i>
+
+                Alterar senha
+              </a>
+            </div>
+          </div>
+
+          <!-- Sessão -->
+
+          <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-4 h-100">
+              <h4 class="fw-bold mb-3">Sessão</h4>
+
+              <p class="theme-muted small">Encerre sua sessão atual e retorne à tela de login.</p>
+
+              <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                <i class="fa-solid fa-right-from-bracket me-2"></i>
+
+                Sair da conta
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 </div>
 
 {% endblock %}
