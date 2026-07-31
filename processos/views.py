@@ -19,11 +19,13 @@ from django.db import IntegrityError
 # >>> NOVO: dois imports
 from .services import montar_resumo
 from .persistencia import salvar_dados_ai
+from django.contrib.auth.decorators import login_required
 
 # ==================== VIEWS PRINCIPAIS ====================
 
+@login_required
 def processos(request):
-    processos = Processo.objects.all()
+    processos = Processo.objects.filter(usuario=request.user)
     ordem = request.GET.get("ordem")
     data = request.GET.get("data")
     busca = request.GET.get("busca")
@@ -265,6 +267,7 @@ def novo_processo(request):
         try:
             # Cria o processo
             processo = Processo.objects.create(
+                usuario=request.user,
                 numero=numero,
                 descricao=descricao,
                 valor_estimado=valor_estimado,
