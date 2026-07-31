@@ -8,6 +8,7 @@ class ProcessoAdmin(admin.ModelAdmin):
   # Colunas que aparecem na tabela
     list_display = (
         "numero",
+        "usuario",
         "descricao",
         "data_abertura",
         "valor_estimado_formatado",
@@ -18,12 +19,16 @@ class ProcessoAdmin(admin.ModelAdmin):
     search_fields = (
         "numero",
         "descricao",
+        "usuario__username",
+        "usuario__first_name",
+        "usuario__last_name",
     )
 
     # Filtros laterais
     list_filter = (
         "status",
         "data_abertura",
+        "usuario",
     )
 
     # Ordenação padrão do admin
@@ -35,4 +40,4 @@ class ProcessoAdmin(admin.ModelAdmin):
     list_per_page = 20
 
     def valor_estimado_formatado(self, obj):
-      return f"R$ {obj.valor_estimado:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        return f"R$ {obj.valor_estimado:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
