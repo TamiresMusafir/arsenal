@@ -1,5 +1,3 @@
-console.log("CARREGOU THEME.JS");
-
 const switchTheme = document.getElementById("darkModeSwitch");
 
 if (switchTheme) {
