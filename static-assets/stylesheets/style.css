@@ -183,21 +183,83 @@ main{
 body.menu-open{
   overflow:hidden;
 }
-
+ 
 /* ---------- PERFIL ---------- */
 
 .perfil{
-  padding:15px 10px;
+  position: relative;
+  padding: 15px 10px;
 }
 
 .perfil img{
-  width:45px;
-  height:45px;
-  border-radius:50%;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
 }
 
 .perfil small{
-  color:var(--theme-muted);
+  color: var(--theme-muted);
+}
+
+/* ---------- Dropdown ---------- */
+
+.perfil-dropdown{
+  position: absolute;
+
+  left: calc(100% + 12px);
+  bottom: 0;
+
+  width: 220px;
+
+  display: none;
+
+  padding: .5rem;
+
+  background: var(--bg-card);
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.08);
+
+  box-shadow: 0 10px 25px rgba(0,0,0,.25);
+
+  z-index: 9999;
+}
+
+.perfil-dropdown.show{
+  display: block;
+}
+
+/* ---------- Itens ---------- */
+
+.perfil-menu-item{
+  display: flex;
+  align-items: center;
+  padding: .55rem .75rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-color);
+  transition: .2s;
+}
+
+.perfil-menu-item:hover{
+  background: var(--main-light);
+  color: var(--text-color);
+}
+
+.perfil-menu-item i{
+  width: 20px;
+}
+
+/* ---------- Logout ---------- */
+
+.logout-item{
+
+  color: #dc3545;
+}
+
+.logout-item:hover{
+
+  background: rgba(220,53,69,.15);
+  color: #dc3545;
 }
 
 /* ---------- CARDS ---------- */
