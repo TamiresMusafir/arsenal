@@ -1,0 +1,171 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+
+<div class="container">
+  <!-- Banner -->
+  <section class="p-5 mb-4 theme-card rounded-3 shadow-sm border-0">
+    <a href="{% url 'visualizar_processo' processo.numero_slug %}" class="text-decoration-none small fw-bold">
+      <i class="fa-solid fa-arrow-left"></i>
+      Voltar para o processo
+    </a>
+
+    <h2 class="fw-bold theme-text mt-3">
+      <i class="fa-solid fa-pen-to-square me-2"></i>
+      Editar Processo
+    </h2>
+
+    <p class="theme-muted mb-0">Altere as informações cadastrais do processo administrativo.</p>
+  </section>
+
+  <!-- Formulário -->
+  <section class="theme-card rounded-3 shadow-sm p-5">
+    <form method="POST">
+      {% csrf_token %} {% if erros %}
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          {% for erro in erros %}
+          <li>{{ erro }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <div class="row">
+        <!-- Número -->
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold theme-text"> Número do Processo </label>
+
+          <input type="text" class="form-control" value="{{ processo.numero }}" disabled />
+
+          <small class="theme-muted"> O número não pode ser alterado. </small>
+        </div>
+
+        <!-- Data -->
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold theme-text"> Data de Abertura </label>
+
+          <input
+            type="date"
+            name="data_abertura"
+            class="form-control"
+            value="{{ processo.data_abertura|date:'Y-m-d' }}"
+          />
+        </div>
+
+        <!-- Descrição -->
+        <div class="col-12 mb-3">
+          <label class="form-label fw-bold theme-text"> Descrição </label>
+
+          <textarea name="descricao" class="form-control" rows="3">{{ processo.descricao }}</textarea>
+        </div>
+
+        <!-- Valor -->
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold theme-text"> Valor Estimado </label>
+
+          <input
+            type="number"
+            step="0.01"
+            name="valor_estimado"
+            class="form-control"
+            value="{{ processo.valor_estimado }}"
+          />
+        </div>
+
+        <!-- Status -->
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold theme-text"> Status </label>
+
+          <input class="form-control" value="{{ processo.status_label }}" disabled />
+        </div>
+      </div>
+
+      <!-- Arquivos -->
+      <!-- Arquivos -->
+      <hr class="my-4" />
+
+      <h5 class="fw-bold theme-text mb-3">
+        <i class="fa-solid fa-folder-open me-2"></i>
+        Arquivos
+      </h5>
+
+      <!-- Arquivo atual -->
+      <div class="mb-4">
+        <h6 class="fw-bold theme-text">Arquivo atual</h6>
+
+        {% if processo.arquivo_processo %}
+
+        <div class="d-flex justify-content-between align-items-center theme-card p-3 rounded">
+          <div>
+            <i class="fa-solid fa-file-zipper me-2"></i>
+
+            {{ processo.arquivo_processo.name }}
+          </div>
+
+          <a href="{{ processo.arquivo_processo.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+            <i class="fa-solid fa-download me-1"></i>
+            Baixar
+          </a>
+        </div>
+
+        {% else %}
+
+        <div class="theme-muted">Nenhum arquivo enviado.</div>
+
+        {% endif %}
+      </div>
+
+      <!-- Arquivos gerados -->
+      <div class="mb-4">
+        <h6 class="fw-bold theme-text">Arquivos gerados</h6>
+
+        {% if processo.arquivo_gerado_xlsx %}
+        <div class="d-flex justify-content-between align-items-center theme-card p-3 rounded mb-2">
+          <span>
+            <i class="fa-solid fa-file-excel text-success me-2"></i>
+            Mapa Comparativo (.xlsx)
+          </span>
+
+          <a href="{{ processo.arquivo_gerado_xlsx.url }}" class="btn btn-sm btn-outline-success"> Baixar </a>
+        </div>
+
+        {% endif %} {% if processo.arquivo_gerado_odt %}
+        <div class="d-flex justify-content-between align-items-center theme-card p-3 rounded">
+          <span>
+            <i class="fa-solid fa-file-word text-primary me-2"></i>
+            Documento (.odt)
+          </span>
+
+          <a href="{{ processo.arquivo_gerado_odt.url }}" class="btn btn-sm btn-outline-primary"> Baixar </a>
+        </div>
+
+        {% endif %}
+      </div>
+
+      <!-- Substituir arquivo -->
+      <div class="mb-3">
+        <h6 class="fw-bold theme-text">Enviar novo arquivo</h6>
+
+        <input
+          type="file"
+          name="file"
+          class="form-control"
+          accept=".zip,.tgz,.tar.gz,.tar,.pdf,.docx,.xlsx,.odt,.txt"
+        />
+
+        <small class="theme-muted"> Ao enviar um novo arquivo, o sistema irá executar a IA novamente. </small>
+      </div>
+
+      <!-- Botões -->
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'visualizar_processo' processo.numero_slug %}" class="btn btn-outline-secondary"> Cancelar </a>
+
+        <button type="submit" class="btn btn-primary">
+          <i class="fa-solid fa-check me-1"></i>
+          Salvar alterações
+        </button>
+      </div>
+    </form>
+  </section>
+</div>
+
+{% endblock %}
