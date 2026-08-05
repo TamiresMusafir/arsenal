@@ -1,0 +1,304 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="container">
+  <!-- Banner -->
+  <section class="p-5 mb-4 theme-card rounded-3 shadow-sm border-0">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+      <div>
+        <a href="{% url 'processos' %}" class="text-decoration-none small fw-bold">
+          <i class="fa-solid fa-arrow-left"></i>
+          Voltar para Processos
+        </a>
+        <h2 class="fw-bold theme-text mt-2">
+          <i class="fa-solid fa-file-lines me-2"></i>
+          Processo {{ processo.numero }}
+        </h2>
+
+        <p class="theme-muted mb-0">{{ processo.descricao }}</p>
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'editar_processo' processo.numero_slug %}" class="btn btn-outline-primary">
+          <i class="fa-solid fa-pen me-1"></i>
+          Editar
+        </a>
+        <a href="{% url 'download_arquivo' 'xlsx' processo.id %}" class="btn btn-success">
+          <i class="fa-solid fa-file-excel me-1"></i>
+          XLSX
+        </a>
+        <a href="{% url 'download_arquivo' 'odt' processo.id %}" class="btn btn-primary">
+          <i class="fa-solid fa-file-word me-1"></i>
+          ODT
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cards -->
+  <section class="row g-3 mb-4">
+    <div class="col-md-4 col-lg-2">
+      <div class="theme-card rounded-3 shadow-sm p-3 h-100 text-center">
+        <small class="theme-muted">Status</small>
+        <h6 class="mt-2">
+          <span class="badge {{ processo.status_badge }}"> {{ processo.status_label }} </span>
+        </h6>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-2">
+      <div class="theme-card rounded-3 shadow-sm p-3 h-100 text-center">
+        <small class="theme-muted">Valor</small>
+        <h6 class="mt-2">R$ {{ processo.valor_estimado }}</h6>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-2">
+      <div class="theme-card rounded-3 shadow-sm p-3 h-100 text-center">
+        <small class="theme-muted">Fornecedores</small>
+        <h6 class="mt-2">{{ processo.qtd_fornecedores }}</h6>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-2">
+      <div class="theme-card rounded-3 shadow-sm p-3 h-100 text-center">
+        <small class="theme-muted">Itens</small>
+        <h6 class="mt-2">{{ processo.qtd_itens }}</h6>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-2">
+      <div class="theme-card rounded-3 shadow-sm p-3 h-100 text-center">
+        <small class="theme-muted">E-mails</small>
+        <h6 class="mt-2">{{ processo.emails_recebidos }}</h6>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-2">
+      <div class="theme-card rounded-3 shadow-sm p-3 h-100 text-center">
+        <small class="theme-muted">Data</small>
+        <h6 class="mt-2">{{ processo.data_abertura|date:"d/m/Y" }}</h6>
+      </div>
+    </div>
+  </section>
+
+  <!-- Informações -->
+  <section class="theme-card rounded-3 shadow-sm p-4 mb-4">
+    <h5 class="fw-bold mb-4">
+      <i class="fa-solid fa-circle-info me-2"></i>
+      Informações do Processo
+    </h5>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <strong>Número</strong>
+        <div class="theme-muted">{{ processo.numero }}</div>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <strong>Data de abertura</strong>
+        <div class="theme-muted">{{ processo.data_abertura|date:"d/m/Y" }}</div>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <strong>Valor estimado</strong>
+        <div class="theme-muted">R$ {{ processo.valor_estimado }}</div>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <strong>Cadastrado em</strong>
+        <div class="theme-muted">
+            {{ processo.data_criacao|date:"d/m/Y H:i" }}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <strong>Descrição</strong>
+        <div class="theme-muted">{{ processo.descricao }}</div>
+      </div>
+
+      <div class="col-md-6">
+        <strong>Status</strong>
+        <div class="theme-muted">{{ processo.status_label }}</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Arquivos -->
+  <section class="theme-card rounded-3 shadow-sm p-4 mb-4">
+
+    <h5 class="fw-bold mb-4">
+      <i class="fa-solid fa-folder-open me-2"></i>
+      Arquivos
+    </h5>
+
+    <table class="table theme-table align-middle">
+      <thead>
+        <tr>
+          <th>Arquivo</th>
+          <th>Tipo</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr>
+          <td>
+            <i class="fa-solid fa-file-zipper me-2"></i>
+            Arquivo Original
+          </td>
+          <td>ZIP</td>
+          <td>
+            <a href="{% url 'download_arquivo' 'original' processo.id %}" 
+              class="btn btn-sm btn-outline-primary">
+              <i class="fa-solid fa-download"></i>
+            </a>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <i class="fa-solid fa-file-excel text-success me-2"></i>
+            Mapa Comparativo
+          </td>
+          <td>XLSX</td>
+          <td>
+            <a href="{% url 'download_arquivo' 'xlsx' processo.id %}" 
+              class="btn btn-sm btn-outline-success">
+              <i class="fa-solid fa-download"></i>
+            </a>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <i class="fa-solid fa-file-word text-primary me-2"></i>
+            Documento
+          </td>
+          <td>ODT</td>
+          <td>
+            <a href="{% url 'download_arquivo' 'odt' processo.id %}" 
+              class="btn btn-sm btn-outline-primary">
+              <i class="fa-solid fa-download"></i>
+            </a>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+
+  </section>
+
+  <!-- Fornecedores -->
+  <section class="theme-card rounded-3 shadow-sm p-4 mb-4">
+
+    <h5 class="fw-bold mb-4">
+      <i class="fa-solid fa-building me-2"></i>
+      Fornecedores
+    </h5>
+
+    <table class="table theme-table align-middle">
+
+      <thead>
+        <tr>
+          <th>Empresa</th>
+          <th>CNPJ</th>
+          <th>Valor Global</th>
+        </tr>
+      </thead>
+
+    <tbody>
+
+    {% for fornecedor in processo.fornecedores.all %}
+
+      <tr>
+        <td>{{ fornecedor.nome }}</td>
+        <td>{{ fornecedor.cnpj }}</td>
+        <td>
+          {% if fornecedor.valor_global %}
+            R$ {{ fornecedor.valor_global }}
+          {% else %}
+            -
+          {% endif %}
+        </td>
+      </tr>
+
+      {% empty %}
+
+      <tr>
+        <td colspan="3" class="text-center theme-muted">
+          Nenhum fornecedor encontrado.
+        </td>
+      </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+    </table>
+
+  </section>
+
+  <!-- Itens -->
+  <section class="theme-card rounded-3 shadow-sm p-4 mb-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+      <h5 class="fw-bold mb-0">
+        <i class="fa-solid fa-list-check me-2"></i>
+        Itens
+      </h5>
+
+      <a href="{% url 'download_arquivo' 'xlsx' processo.id %}"
+        class="btn btn-outline-success btn-sm">
+        Ver mapa completo
+      </a>
+
+    </div>
+
+    <table class="table theme-table align-middle">
+
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Descrição</th>
+          <th>Quantidade</th>
+          <th>Unidade</th>
+          <th>Valor Estimado</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      {% for item in processo.itens.all %}
+
+        <tr>
+          <td>{{ item.posicao }}</td>
+          <td>{{ item.descricao }}</td>
+          <td>{{ item.qtde }}</td>
+          <td>{{ item.uf }}</td>
+          <td>
+            {% if item.valor_total %}
+              R$ {{ item.valor_total }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+        </tr>
+
+        {% empty %}
+
+        <tr>
+          <td colspan="5" class="text-center theme-muted">
+            Nenhum item encontrado.
+          </td>
+        </tr>
+
+      {% endfor %}
+
+      </tbody>
+
+    </table>
+
+  </section>
+</div>
+{% endblock %}
