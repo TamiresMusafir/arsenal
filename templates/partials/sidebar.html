@@ -75,20 +75,34 @@
             {% endwith %}
           </div>
           <!-- Perfil -->
-          <div class="perfil d-flex align-items-center gap-2 pt-3 mt-4 border-top border-secondary">
-            {% if perfil.foto %}
-              <img
-                src="{{ perfil.foto.url }}"
-                class="rounded-circle mx-auto mb-3"
-                style="width: 40px; height: 40px; object-fit: cover"
-              />
-            {% else %}
-              <img src="https://placehold.co/40x40" class="rounded-circle" alt="Administrador"/>
-            {% endif %}
-              <div class="overflow-hidden">
-              <strong class="d-block text-truncate small">
-                {{ request.user.first_name }}<br>{{ request.user.last_name }}
-              </strong>
+          <div class="perfil pt-3 mt-4 border-top border-secondary">
+            <a href="#" id="perfilToggle" class="d-flex align-items-center justify-content-between text-decoration-none">
+              <div class="d-flex align-items-center gap-2">
+                {% if perfil.foto %}
+                <img src="{{ perfil.foto.url }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover" />
+                {% else %}
+                <img src="https://placehold.co/40x40" class="rounded-circle" alt="Usuário" />
+                {% endif %}
+                <div>
+                  <strong class="d-block small text-white">
+                    {{ request.user.first_name }}<br>
+                    {{ request.user.last_name }}
+                  </strong>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right small"></i>
+            </a>
+
+            <div id="menuPerfil" class="perfil-dropdown">
+              <a href="{% url 'conta' %}" class="perfil-menu-item">
+                <i class="fa-solid fa-user me-2"></i>
+                Minha conta
+              </a>
+
+              <a href="{% url 'logout' %}" class="perfil-menu-item logout-item">
+                <i class="fa-solid fa-right-from-bracket me-2"></i>
+                Sair
+              </a>
             </div>
           </div>
         </aside>
