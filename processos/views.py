@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404 
 from django.utils import timezone
 from .models import Processo
 from django.db.models import Q
@@ -264,11 +264,14 @@ def novo_processo(request):
         if erros:
             return render(request, "novoprocesso.html", {"erros": erros})
 
+        numero_slug = numero.replace("/", "-")
+
         try:
             # Cria o processo
             processo = Processo.objects.create(
                 usuario=request.user,
                 numero=numero,
+                numero_slug=numero_slug,
                 descricao=descricao,
                 valor_estimado=valor_estimado,
                 data_abertura=data_abertura,
@@ -367,10 +370,31 @@ def novo_processo(request):
                 }
             )
 
-    return render(request, "novoprocesso.html")
+    return render(request, "novoprocesso.html", {"processos":processo})
 
+@login_required
+def visualizar_processo(request, numero_slug):
+    numero = numero_slug.replace("_", "/")
+    processo = get_object_or_404(Processo, numero=numero, usuario=request.user)
 
-# >>> SUBSTITUÍDA: era "return render(request, 'documentos.html')"
+    return render(request, "verprocesso.html", {"processo": processo})
+
+@login_required
+def editar_processo(request, numero_slug):
+    numero = numero_slug.replace("_", "/")
+    processo = get_object_or_404(Processo, numero=numero, usuario=request.user)
+
+    if request.method == "POST":
+        processo.descricao = request.POST.get("descricao")
+        processo.valor_estimado = request.POST.get("valor_estimado")
+        processo.data_abertura = request.POST.get("data_abertura")
+
+        processo.save()
+
+        return redirect("visualizar_processo", numero_slug=numero_slug)
+    return render(request, "editarprocesso.html", {"processo":processo})
+    
+@login_required
 def documentos(request):
     """Lista os processos com os dados consolidados pela IA."""
     numero = (request.GET.get("numero") or "").strip()
@@ -404,7 +428,7 @@ def documentos(request):
         }
     )
 
-
+@login_required
 def mapas_gerados(request):
     return render(request, "mapasgerados.html")
 
