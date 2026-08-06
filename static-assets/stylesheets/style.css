@@ -206,7 +206,7 @@ body.menu-open{
 .perfil-dropdown{
   position: absolute;
   left: calc(100% + 10px);
-  top: -20px;
+  top: -10px;
   width: 220px;
   display: none;
   padding: .5rem;
