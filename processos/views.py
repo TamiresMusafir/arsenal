@@ -228,8 +228,147 @@ def gerar_planilha_odt(processo, dados_ai):
         raise
 
 
+def processar_arquivo_ia(processo, arquivo):
+    """
+    Recebe um processo e um arquivo.
+    Executa IA, salva JSON, banco e gera XLSX/ODT.
+    """
+
+    contexto = {
+        "numero": processo.numero,
+        "descricao": processo.descricao,
+        "valor_estimado": str(processo.valor_estimado)
+    }
+
+    ai_processor = AIProcessor()
+    emails_recebidos = 0
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+
+        file_path = os.path.join(tmpdir, arquivo.name)
+
+        with open(file_path, "wb+") as f:
+            for chunk in arquivo.chunks():
+                f.write(chunk)
+
+
+        if arquivo.name.lower().endswith(
+            (".zip", ".tgz", ".tar.gz", ".tar")
+        ):
+
+            extract_dir = os.path.join(tmpdir, "extracted")
+            os.makedirs(extract_dir, exist_ok=True)
+
+
+            if file_path.endswith(".zip"):
+
+                with zipfile.ZipFile(file_path, "r") as zip_ref:
+                    zip_ref.extractall(extract_dir)
+
+            else:
+                import tarfile
+
+                mode = (
+                    "r:gz"
+                    if file_path.endswith((".tgz", ".tar.gz"))
+                    else "r"
+                )
+
+                with tarfile.open(file_path, mode) as tar_ref:
+                    tar_ref.extractall(extract_dir)
+
+
+            emails_recebidos = contar_emails(extract_dir)
+
+            results = ai_processor.process_directory(
+                extract_dir,
+                contexto
+            )
+
+            dados_ai = ai_processor.merge_results(results)
+
+
+        else:
+
+            file_data = ai_processor.extract_text_from_file(file_path)
+
+            result = ai_processor.process_with_ai(
+                file_data["content"],
+                contexto
+            )
+
+            dados_ai = result.get("data", {})
+
+
+            if isinstance(dados_ai, str):
+                try:
+                    dados_ai = json.loads(dados_ai)
+
+                except:
+                    dados_ai = {
+                        "conteudo": dados_ai
+                    }
+
+
+    # Salva JSON
+    json_path = os.path.join(
+        settings.MEDIA_ROOT,
+        "processos",
+        "gerados",
+        f"dados_ai_{processo.numero_slug}.json"
+    )
+
+    os.makedirs(
+        os.path.dirname(json_path),
+        exist_ok=True
+    )
+
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(
+            dados_ai,
+            f,
+            ensure_ascii=False,
+            indent=2
+        )
+
+
+    # Salva no banco
+    salvar_dados_ai(
+        processo,
+        dados_ai,
+        emails_recebidos
+    )
+
+
+    # Gera arquivos
+    xlsx_path = preencher_mapa_comparativo(
+        processo,
+        dados_ai
+    )
+
+    if xlsx_path:
+        processo.arquivo_gerado_xlsx = (
+            f"processos/gerados/{os.path.basename(xlsx_path)}"
+        )
+
+
+    odt_path = gerar_planilha_odt(
+        processo,
+        dados_ai
+    )
+
+    if odt_path:
+        processo.arquivo_gerado_odt = (
+            f"processos/gerados/{os.path.basename(odt_path)}"
+        )
+
+
+    processo.status = "concluido"
+    processo.save()
+
 # ==================== VIEWS DE CRIAÇÃO E DOWNLOAD ====================
 
+@login_required
 def novo_processo(request):
     if request.method == 'POST':
         numero = request.POST.get("numero")
@@ -280,71 +419,7 @@ def novo_processo(request):
             processo.arquivo_processo = arquivo
             processo.save()
 
-            # Processa com IA
-            contexto = {
-                'numero': numero,
-                'descricao': descricao,
-                'valor_estimado': str(valor_estimado)
-            }
-
-            ai_processor = AIProcessor()
-            emails_recebidos = 0   # >>> NOVO
-
-            # Processa o arquivo
-            with tempfile.TemporaryDirectory() as tmpdir:
-                file_path = os.path.join(tmpdir, arquivo.name)
-                with open(file_path, 'wb+') as f:
-                    for chunk in arquivo.chunks():
-                        f.write(chunk)
-
-                # Verifica se é compactado
-                if arquivo.name.lower().endswith(('.zip', '.tgz', '.tar.gz', '.tar')):
-                    extract_dir = os.path.join(tmpdir, 'extracted')
-                    os.makedirs(extract_dir, exist_ok=True)
-
-                    if file_path.endswith('.zip'):
-                        with zipfile.ZipFile(file_path, 'r') as zip_ref:
-                            zip_ref.extractall(extract_dir)
-                    else:
-                        import tarfile
-                        mode = 'r:gz' if file_path.endswith(('.tgz', '.tar.gz')) else 'r'
-                        with tarfile.open(file_path, mode) as tar_ref:
-                            tar_ref.extractall(extract_dir)
-
-                    emails_recebidos = contar_emails(extract_dir)   # >>> NOVO
-                    results = ai_processor.process_directory(extract_dir, contexto)
-                    dados_ai = ai_processor.merge_results(results)
-                else:
-                    file_data = ai_processor.extract_text_from_file(file_path)
-                    result = ai_processor.process_with_ai(file_data['content'], contexto)
-                    dados_ai = result.get('data', {})
-                    if isinstance(dados_ai, str):
-                        try:
-                            dados_ai = json.loads(dados_ai)
-                        except:
-                            dados_ai = {'conteudo': dados_ai}
-
-            # Salva dados da IA (JSON bruto, para auditoria)
-            json_path = os.path.join(settings.MEDIA_ROOT, 'processos', 'gerados',
-                                     f'dados_ai_{processo.numero_slug}.json')
-            os.makedirs(os.path.dirname(json_path), exist_ok=True)
-            with open(json_path, 'w', encoding='utf-8') as f:
-                json.dump(dados_ai, f, ensure_ascii=False, indent=2)
-
-            # >>> NOVO: grava os mesmos dados no SQLite (Fornecedor / Item / Cotacao)
-            salvar_dados_ai(processo, dados_ai, emails_recebidos)
-
-            # Gera arquivos
-            xlsx_path = preencher_mapa_comparativo(processo, dados_ai)
-            if xlsx_path:
-                processo.arquivo_gerado_xlsx = f'processos/gerados/{os.path.basename(xlsx_path)}'
-
-            odt_path = gerar_planilha_odt(processo, dados_ai)
-            if odt_path:
-                processo.arquivo_gerado_odt = f'processos/gerados/{os.path.basename(odt_path)}'
-
-            processo.status = 'concluido'
-            processo.save()
+            processar_arquivo_ia(processo, arquivo)
 
             return redirect("processos")
 
@@ -370,7 +445,7 @@ def novo_processo(request):
                 }
             )
 
-    return render(request, "novoprocesso.html", {"processos":processo})
+    return render(request, "novoprocesso.html")
 
 @login_required
 def visualizar_processo(request, numero_slug):
@@ -390,8 +465,18 @@ def editar_processo(request, numero_slug):
         processo.data_abertura = request.POST.get("data_abertura")
 
         processo.save()
+    
+        novo_arquivo = request.FILES.get("arquivo_processo")
 
-        return redirect("visualizar_processo", numero_slug=numero_slug)
+        if novo_arquivo:
+            processo.arquivo_processo = novo_arquivo
+            processo.status = "processando"
+            processo.save()
+
+            processar_arquivo_ia(processo, novo_arquivo)
+
+            return redirect("visualizar_processo", numero_slug=numero_slug)
+
     return render(request, "editarprocesso.html", {"processo":processo})
     
 @login_required
@@ -400,7 +485,7 @@ def documentos(request):
     numero = (request.GET.get("numero") or "").strip()
     status = (request.GET.get("status") or "").strip()
 
-    consulta = Processo.objects.all()
+    consulta = Processo.objects.filter(usuario=request.user)
 
     if numero:
         consulta = consulta.filter(numero__icontains=numero)
@@ -432,11 +517,10 @@ def documentos(request):
 def mapas_gerados(request):
     return render(request, "mapasgerados.html")
 
-
-# >>> ALTERADA: aceita também 'original' (o pacote de e-mails enviado)
+@login_required
 def download_arquivo(request, tipo, processo_id):
     try:
-        processo = Processo.objects.get(id=processo_id)
+        processo = get_object_or_404(Processo, id=processo_id, usuario=request.user)
     except Processo.DoesNotExist:
         return HttpResponse("Processo não encontrado", status=404)
 
@@ -454,3 +538,4 @@ def download_arquivo(request, tipo, processo_id):
                             filename=os.path.basename(caminho))
 
     return HttpResponse("Arquivo não disponível para este processo", status=404)
+
