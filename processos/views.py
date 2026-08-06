@@ -460,9 +460,9 @@ def editar_processo(request, numero_slug):
     processo = get_object_or_404(Processo, numero=numero, usuario=request.user)
 
     if request.method == "POST":
-        processo.descricao = request.POST.get("descricao")
-        processo.valor_estimado = request.POST.get("valor_estimado")
-        processo.data_abertura = request.POST.get("data_abertura")
+        processo.descricao = request.POST.get("descricao") or processo.descricao
+        processo.valor_estimado = request.POST.get("valor_estimado") or processo.valor_estimado
+        processo.data_abertura = request.POST.get("data_abertura") or processo.data_abertura
 
         processo.save()
     
@@ -475,7 +475,7 @@ def editar_processo(request, numero_slug):
 
             processar_arquivo_ia(processo, novo_arquivo)
 
-            return redirect("visualizar_processo", numero_slug=numero_slug)
+        return redirect("visualizar_processo", numero_slug=numero_slug)
 
     return render(request, "editarprocesso.html", {"processo":processo})
     
