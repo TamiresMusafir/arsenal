@@ -410,7 +410,6 @@ def novo_processo(request):
             processo = Processo.objects.create(
                 usuario=request.user,
                 numero=numero,
-                numero_slug=numero_slug,
                 descricao=descricao,
                 valor_estimado=valor_estimado,
                 data_abertura=data_abertura,
