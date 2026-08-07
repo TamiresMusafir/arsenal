@@ -12,22 +12,23 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+from datetime import timedelta
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv(BASE_DIR/'.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8e5hz42qqo-qcv!1&(&9i)#bk#f6_yn%lf#()1(_3$vq2z1byj'
+SECRET_KEY = os.environ['DJANGO_SECRET_KEy']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -38,6 +39,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # ===== PACOTES DE TERCEIROS =====
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'corsheaders',
+    'django_filters',
+    'guardian',  # Nome correto para django-guardian
+    'djoser',
+
+    # ===== SEUS APPS =====
     'home',
     'dashboard',
     'processos',
@@ -49,6 +60,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Deve vir ANTES do CommonMiddleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -77,36 +89,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
-# Database
+# ===== DATABASE =====
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        #'ENGINE': 'django.db.backends.sqlite3',
+        #'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',      # >>> ALTERADO
+        'NAME': os.environ.get('DB_NAME', 'postgres'),
+        'USER': os.environ['DB_USER'],
+        'PASSWORD': os.environ['DB_PASSWORD'],
+        'HOST': os.environ['DB_HOST'],
+        'PORT': os.environ.get('DB_PORT', '5432'),
+        'CONN_MAX_AGE': 0,
+        'OPTIONS': {'sslmode': 'require'},
     }
 }
 
-
-# Password validation# Configurações OpenRouter
-OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY')
-OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-OPENROUTER_MODEL = os.environ.get(
-    "OPENROUTER_MODEL", "google/gemini-3-flash-preview"
-)
-OPENROUTER_PDF_ENGINE_SCAN = os.environ.get("OPENROUTER_PDF_ENGINE_SCAN", "native")
-
-# Configurações de upload
-DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760 # acima disso o Django grava em disco,
-                                         # o que é melhor para PDF grande
-
-# Configurações de timeout
-OPENROUTER_TIMEOUT = 300 # segundos
-OPENROUTER_SITE_URL = "http://localhost:8000"
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# ===== AUTHENTICATION =====
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -124,31 +125,152 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# ===== CONFIGURAÇÕES DO DJANGO GUARDIAN =====
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # Backend padrão do Django
+    'guardian.backends.ObjectPermissionBackend',  # Backend do Guardian
+)
 
-# Internationalization
+# ===== CONFIGURAÇÕES DO DJOSER =====
+DJOSER = {
+    'LOGIN_FIELD': 'email',  # Usar email como campo de login
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'SEND_CONFIRMATION_EMAIL': True,
+    'SET_PASSWORD_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SERIALIZERS': {
+        'user_create': 'djoser.serializers.UserCreateSerializer',
+        'user': 'djoser.serializers.UserSerializer',
+        'current_user': 'djoser.serializers.UserSerializer',
+        'user_delete': 'djoser.serializers.UserDeleteSerializer',
+    },
+    'PERMISSIONS': {
+        'user': ['rest_framework.permissions.IsAuthenticated'],
+        'user_list': ['rest_framework.permissions.IsAuthenticated'],
+        'user_delete': ['rest_framework.permissions.IsAuthenticated'],
+    }
+}
+
+# ===== CONFIGURAÇÕES DO SIMPLE JWT =====
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=60),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
+
+# ===== CONFIGURAÇÕES DO DJANGO REST FRAMEWORK =====
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+}
+
+# ===== CONFIGURAÇÕES DO CORS =====
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
+# Para desenvolvimento, você pode permitir todos (cuidado em produção!)
+# CORS_ALLOW_ALL_ORIGINS = True
+O
+# Configurações adicionais de CORS
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# ===== CONFIGURAÇÕES DO OPENROUTER (IA) =====
+# Configurações OpenRouter
+OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY')
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_MODEL = os.environ.get(
+    "OPENROUTER_MODEL", "inclusionai/ling-3.0-flash:free"
+)
+OPENROUTER_PDF_ENGINE_SCAN = os.environ.get("OPENROUTER_PDF_ENGINE_SCAN", "native")
+
+# Configurações de timeout
+OPENROUTER_TIMEOUT = 300  # segundos
+OPENROUTER_SITE_URL = "http://localhost:8000"
+
+# ===== CONFIGURAÇÕES DE UPLOAD =====
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB (acima disso o Django grava em disco)
+
+# ===== INTERNATIONALIZATION =====
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
 LANGUAGE_CODE = "pt-br"
-
 TIME_ZONE = 'America/Sao_Paulo'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
+# ===== STATIC FILES =====
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = '/static/'
-
 STATICFILES_DIRS = [
     BASE_DIR / 'static-assets',
 ]
-
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Media files (Uploads)
+# ===== MEDIA FILES =====
+# https://docs.djangoproject.com/en/6.0/ref/settings/#media-root
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -156,25 +278,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_TEMP_DIR = os.path.join(MEDIA_ROOT, 'temp')
 os.makedirs(MEDIA_TEMP_DIR, exist_ok=True)
 
-
-# Default primary key field type
+# ===== DEFAULT AUTO FIELD =====
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
-
-# Configurações OpenRouter
-OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY')
-OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-OPENROUTER_MODEL = os.environ.get(
-    "OPENROUTER_MODEL", "google/gemini-3-flash-preview"
-)
-OPENROUTER_PDF_ENGINE_SCAN = os.environ.get("OPENROUTER_PDF_ENGINE_SCAN", "native")
-
-# Configurações de upload
-DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760 # acima disso o Django grava em disco,
-                                         # o que é melhor para PDF grande
-
-# Configurações de timeout
-OPENROUTER_TIMEOUT = 300 # segundos
-OPENROUTER_SITE_URL = "http://localhost:8000"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
