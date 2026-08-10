@@ -14,16 +14,19 @@ from datetime import datetime
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
-from .ai_processor import AIProcessor
+# >>> ALTERADO: parse_modelo_proposta é função de módulo, não método da classe
+from .ai_processor import AIProcessor, parse_modelo_proposta
 from django.db import IntegrityError
-# >>> NOVO: dois imports
-from .services import montar_resumo
+# >>> ALTERADO: linha_base (2ª fase) e chave_empresa (casamento das cotações)
+from .services import montar_resumo, linha_base, chave_empresa
 from .persistencia import salvar_dados_ai
+from django.contrib.auth.decorators import login_required
 
 # ==================== VIEWS PRINCIPAIS ====================
 
+@login_required
 def processos(request):
-    processos = Processo.objects.all()
+    processos = Processo.objects.filter(usuario=request.user)
     ordem = request.GET.get("ordem")
     data = request.GET.get("data")
     busca = request.GET.get("busca")
@@ -77,6 +80,47 @@ def contar_emails(diretorio):
     return total
 
 
+# >>> NOVO: consolida a "rota" de cada arquivo (a que o ai_processor devolve em
+# resultado['rota']: 'modelo/deterministico', 'pdf/pdf-text', 'pdf/pdf-text+ocr-local',
+# 'pdf/native', 'imagem', 'texto/eml'...). Sem isso essa informação morria no merge.
+def resumo_extracao(results):
+    arquivos = []
+    tokens_entrada = tokens_saida = 0
+    custo = 0.0
+
+    for registro in results:
+        resultado = registro.get('ai_result') or {}
+        uso = resultado.get('uso') or {}
+        tokens_entrada += uso.get('entrada') or 0
+        tokens_saida += uso.get('saida') or 0
+        try:
+            custo += float(uso.get('custo_usd') or 0)
+        except (TypeError, ValueError):
+            pass
+        arquivos.append({
+            'arquivo': registro.get('filename', ''),
+            'rota': resultado.get('rota', '') or '',
+            'status': resultado.get('status', '') or '',
+            'erro': resultado.get('error', '') or '',
+            'truncado': bool(resultado.get('truncado')),
+        })
+
+    def nomes(condicao):
+        return sorted({a['arquivo'] for a in arquivos if condicao(a)})
+
+    return {
+        'arquivos': arquivos,
+        'tokens_entrada': tokens_entrada,
+        'tokens_saida': tokens_saida,
+        'custo_usd': round(custo, 6),
+        'ocr_local': getattr(settings, 'OCR_LOCAL', True),
+        'com_ocr_local': nomes(lambda a: 'ocr-local' in a['rota']),
+        'sem_ia': nomes(lambda a: 'deterministico' in a['rota']),
+        'com_falha': nomes(lambda a: a['status'] not in ('success', '')),
+        'truncados': nomes(lambda a: a['truncado']),
+    }
+
+
 def preencher_mapa_comparativo(processo, dados_ai):
     """Preenche o modelo Mapa_Comparativo_Base.xlsx com os dados extraídos pela IA"""
     try:
@@ -100,8 +144,10 @@ def preencher_mapa_comparativo(processo, dados_ai):
         # Cabeçalhos (linha 3 do template)
         headers = ['ITEM', 'PI', 'NOME EM PORTUGUÊS', 'QTDE', 'UF', 'PAINEL DE PREÇO']
         empresas = dados_ai.get('empresas', [])
+        # >>> ALTERADO: o cabeçalho traz a razão social, não "EMPRESA1"
         for idx, empresa in enumerate(empresas[:20], 1):
-            headers.append(f'EMPRESA{idx}')
+            nome = (empresa.get('nome') or '').strip() if isinstance(empresa, dict) else str(empresa)
+            headers.append((nome or f'EMPRESA{idx}')[:30])
         headers.extend(['VALOR UNITARIO ESTIMADO', 'VALOR TOTAL'])
 
         # Escreve cabeçalhos
@@ -128,11 +174,16 @@ def preencher_mapa_comparativo(processo, dados_ai):
             ws.cell(row=row, column=6, value=item.get('painel_preco', ''))
 
             # Colunas G-Z: empresas
-            empresas_data = item.get('empresas', {})
-            for emp_idx in range(1, 21):
+            # >>> ALTERADO: a IA devolve {NOME DA EMPRESA: preço}, não {empresaN: preço}
+            empresas_data = item.get('empresas', {}) or {}
+            por_nome = {chave_empresa(k): v for k, v in empresas_data.items()}
+            for emp_idx, empresa in enumerate(empresas[:20], start=1):
                 col = 6 + emp_idx
-                key = f'empresa{emp_idx}'
-                ws.cell(row=row, column=col, value=empresas_data.get(key, ''))
+                nome = empresa.get('nome') if isinstance(empresa, dict) else empresa
+                valor = por_nome.get(chave_empresa(nome))
+                if valor in (None, ''):
+                    valor = empresas_data.get(f'empresa{emp_idx}', '')   # JSON antigo
+                ws.cell(row=row, column=col, value=valor)
                 ws.cell(row=row, column=col).alignment = center
 
             # Colunas AA-AB: valores
@@ -190,6 +241,12 @@ def gerar_planilha_odt(processo, dados_ai):
                 doc.text.addElement(P(text=f"- {emp.get('nome', 'N/A')}"))
                 if emp.get('cnpj'):
                     doc.text.addElement(P(text=f"  CNPJ: {emp.get('cnpj')}"))
+                # >>> NOVO: registra declínio/dúvida no relatório
+                tipo = emp.get('tipo_resposta') or 'cotacao'
+                if tipo != 'cotacao':
+                    rotulo = 'Declinou' if tipo == 'declinio' else 'Apenas dúvida/esclarecimento'
+                    motivo = emp.get('motivo_declinio') or ''
+                    doc.text.addElement(P(text=f"  {rotulo}{': ' + motivo if motivo else ''}"))
                 if emp.get('valor_global'):
                     doc.text.addElement(P(text=f"  Valor: {emp.get('valor_global')}"))
                 doc.text.addElement(P(text=""))
@@ -200,6 +257,7 @@ def gerar_planilha_odt(processo, dados_ai):
             doc.text.addElement(H(outlinelevel=2, text="Itens do Processo"))
             for item in itens:
                 doc.text.addElement(P(text=f"Item {item.get('item', '')}: {item.get('nome_em_portugues', '')}"))
+                doc.text.addElement(P(text=f"  PI: {item.get('pi', '')}"))   # >>> NOVO
                 doc.text.addElement(P(text=f"  Quantidade: {item.get('qtde', '')} {item.get('uf', '')}"))
                 if item.get('valor_unitario_estimado'):
                     doc.text.addElement(P(text=f"  Valor Unitário: {item.get('valor_unitario_estimado')}"))
@@ -212,7 +270,50 @@ def gerar_planilha_odt(processo, dados_ai):
                     for key, value in empresas_data.items():
                         if value:
                             doc.text.addElement(P(text=f"    {key}: {value}"))
+                else:
+                    doc.text.addElement(P(text="  Sem cotação"))   # >>> NOVO
                 doc.text.addElement(P(text=""))
+
+        # >>> NOVO: de onde veio cada dado — rota de extração, OCR local e custo
+        extracao = dados_ai.get('extracao') or {}
+        if extracao.get('arquivos'):
+            doc.text.addElement(H(outlinelevel=2, text="Origem da Extração"))
+            for arquivo in extracao['arquivos']:
+                linha = f"- {arquivo.get('arquivo', '')}: {arquivo.get('rota') or 'n/d'}"
+                if arquivo.get('status') and arquivo['status'] != 'success':
+                    linha += f" [{arquivo['status']}: {arquivo.get('erro', '')}]"
+                if arquivo.get('truncado'):
+                    linha += " [resposta truncada por limite de tokens]"
+                doc.text.addElement(P(text=linha))
+
+            if extracao.get('com_ocr_local'):
+                doc.text.addElement(P(text=""))
+                doc.text.addElement(P(text=(
+                    "ATENÇÃO: OCR local (Tesseract) foi aplicado em "
+                    + ", ".join(extracao['com_ocr_local'])
+                    + ". Preços e PI desses arquivos exigem conferência dígito a dígito "
+                      "antes da homologação da pesquisa.")))
+
+            doc.text.addElement(P(text=(
+                f"Tokens: {extracao.get('tokens_entrada', 0)} entrada / "
+                f"{extracao.get('tokens_saida', 0)} saída. "
+                f"Custo estimado: USD {extracao.get('custo_usd', 0)}.")))
+            doc.text.addElement(P(text=""))
+
+        # >>> NOVO: perguntas e avisos ficam no documento, não só no JSON
+        perguntas = dados_ai.get('perguntas') or []
+        if perguntas:
+            doc.text.addElement(H(outlinelevel=2, text="Perguntas dos Fornecedores"))
+            for pergunta in perguntas:
+                doc.text.addElement(P(text=f"- {pergunta.get('empresa', '')}: "
+                                           f"{pergunta.get('pergunta', '')}"))
+            doc.text.addElement(P(text=""))
+
+        avisos = dados_ai.get('avisos_gerais') or []
+        if avisos:
+            doc.text.addElement(H(outlinelevel=2, text="Avisos do Processamento"))
+            for aviso in avisos:
+                doc.text.addElement(P(text=f"- {aviso}"))
 
         # Salva
         filename = f"mapa_comparativo_{processo.numero_slug}.odt"   # >>> ALTERADO: usa a property
@@ -228,13 +329,39 @@ def gerar_planilha_odt(processo, dados_ai):
 
 # ==================== VIEWS DE CRIAÇÃO E DOWNLOAD ====================
 
+@login_required   # >>> NOVO: a view usa request.user; sem isso, anônimo estoura
 def novo_processo(request):
+    """
+    Duas etapas, no mesmo formulário. O NÚMERO do processo liga uma na outra.
+
+    Etapa 1 - campo "modelo": o Modelo de Proposta (.xls/.xlsx) vira a LINHA DE
+              BASE (itens e PI). Lido direto da planilha, sem IA.
+    Etapa 2 - campo "file": pacote de respostas (.tgz/.zip) ou documento avulso.
+              As cotações são casadas com a linha de base PELO PI.
+
+    Os dois campos são opcionais, mas ao menos um tem de vir. Enviando só o
+    modelo, o processo fica 'pendente' esperando as respostas. Enviando os dois
+    de uma vez, as duas etapas rodam na mesma requisição.
+    """
     if request.method == 'POST':
         numero = request.POST.get("numero")
         descricao = request.POST.get("descricao")
         valor_estimado = request.POST.get("valor_estimado")
         data_abertura = request.POST.get("data_abertura")
-        arquivo = request.FILES.get("file")
+        modelo = request.FILES.get("modelo")     # >>> NOVO: linha de base
+        arquivo = request.FILES.get("file")      # >>> ALTERADO: agora é opcional
+
+        # >>> NOVO: devolve o que foi digitado quando a tela volta com erro
+        formulario = {
+            "form_numero": numero,
+            "form_descricao": descricao,
+            "form_valor_estimado": valor_estimado,
+            "form_data_abertura": data_abertura,
+        }
+
+        def erro(mensagens):
+            return render(request, "novoprocesso.html",
+                          dict(formulario, erros=mensagens))
 
         erros = []
 
@@ -253,25 +380,55 @@ def novo_processo(request):
         except (TypeError, ValueError):   # >>> ALTERADO: float(None) levanta TypeError, não ValueError
             erros.append("Valor estimado deve ser um número.")
 
-        if not arquivo:
-            erros.append("É necessário enviar um arquivo!")
+        # >>> ALTERADO: pelo menos um dos dois envios
+        if not modelo and not arquivo:
+            erros.append("Envie o Modelo de Proposta, o pacote de respostas, ou os dois.")
 
-        if arquivo and arquivo.size > 50 * 1024 * 1024:
-            erros.append("Arquivo muito grande. Máximo 50MB.")
+        for enviado, rotulo in ((modelo, "Modelo de Proposta"), (arquivo, "Arquivo de respostas")):
+            if enviado and enviado.size > 50 * 1024 * 1024:
+                erros.append(f"{rotulo}: arquivo muito grande. Máximo 50MB.")
+
+        if modelo and os.path.splitext(modelo.name)[1].lower() not in ('.xls', '.xlsx', '.xlsm'):
+            erros.append("O Modelo de Proposta precisa ser uma planilha .xls ou .xlsx.")
 
         if erros:
-            return render(request, "novoprocesso.html", {"erros": erros})
+            return erro(erros)
 
+        processo = None       # usados no except
+        criado_agora = False
         try:
-            # Cria o processo
-            processo = Processo.objects.create(
-                numero=numero,
-                descricao=descricao,
-                valor_estimado=valor_estimado,
-                data_abertura=data_abertura,
-                status='processando'
-            )
-            processo.arquivo_processo = arquivo
+            # >>> ALTERADO: número repetido virou caminho normal (etapa 2)
+            processo = Processo.objects.filter(numero=numero).first()
+
+            if processo is not None:
+                if processo.usuario_id not in (None, request.user.id):
+                    return erro(["Esse número pertence a um processo de outro responsável."])
+                if modelo and processo.itens.exists() and processo.fornecedores.exists():
+                    return erro([
+                        "Esse processo já tem linha de base e respostas processadas. "
+                        "Para trocar o Modelo de Proposta, exclua o processo antes."])
+                if not modelo and not processo.itens.exists():
+                    return erro([
+                        "Esse processo ainda não tem linha de base. Envie primeiro o "
+                        "Modelo de Proposta com a coluna NÚMERO DE ESTOQUE (PI)."])
+                processo.status = 'processando'
+            else:
+                if not modelo:
+                    return erro([
+                        "Processo novo começa pelo Modelo de Proposta: é ele que define "
+                        "os itens e os PI da linha de base."])
+                processo = Processo.objects.create(
+                    usuario=request.user,
+                    numero=numero,
+                    descricao=descricao,
+                    valor_estimado=valor_estimado,
+                    data_abertura=data_abertura,
+                    status='processando'
+                )
+                criado_agora = True
+
+            # o pacote de respostas é o anexo principal; sem ele, guarda o modelo
+            processo.arquivo_processo = arquivo or modelo
             processo.save()
 
             # Processa com IA
@@ -286,10 +443,36 @@ def novo_processo(request):
 
             # Processa o arquivo
             with tempfile.TemporaryDirectory() as tmpdir:
-                file_path = os.path.join(tmpdir, arquivo.name)
-                with open(file_path, 'wb+') as f:
-                    for chunk in arquivo.chunks():
-                        f.write(chunk)
+
+                def gravar(upload):   # >>> NOVO: são dois uploads possíveis
+                    caminho = os.path.join(tmpdir, upload.name)
+                    with open(caminho, 'wb+') as destino:
+                        for chunk in upload.chunks():
+                            destino.write(chunk)
+                    return caminho
+
+                # ---------- ETAPA 1: linha de base ----------  >>> NOVO
+                if modelo:
+                    base = parse_modelo_proposta(gravar(modelo))
+                    if not base or not any(item.get('pi') for item in base['itens']):
+                        if criado_agora:
+                            processo.delete()   # não deixa processo órfão travando o número
+                            processo = None
+                        return erro([
+                            "Não consegui ler o Modelo de Proposta. Confira se é a planilha "
+                            "enviada às empresas (com o cabeçalho ITEM / NÚMERO DE ESTOQUE / "
+                            "NOMENCLATURA) e se a coluna NÚMERO DE ESTOQUE (PI) está preenchida."])
+                    salvar_dados_ai(processo, base, modo='base')
+
+                # sem respostas ainda: para aqui, aguardando as cotações
+                if not arquivo:
+                    processo.status = 'pendente'
+                    processo.save(update_fields=['status'])
+                    return redirect("processos")
+
+                # ---------- ETAPA 2: respostas ----------  >>> NOVO
+                base = linha_base(processo)
+                file_path = gravar(arquivo)
 
                 # Verifica se é compactado
                 if arquivo.name.lower().endswith(('.zip', '.tgz', '.tar.gz', '.tar')):
@@ -306,17 +489,35 @@ def novo_processo(request):
                             tar_ref.extractall(extract_dir)
 
                     emails_recebidos = contar_emails(extract_dir)   # >>> NOVO
-                    results = ai_processor.process_directory(extract_dir, contexto)
-                    dados_ai = ai_processor.merge_results(results)
+                    results = ai_processor.process_directory(extract_dir, contexto, base)
+                    dados_ai = ai_processor.merge_results(results, base)
                 else:
-                    file_data = ai_processor.extract_text_from_file(file_path)
-                    result = ai_processor.process_with_ai(file_data['content'], contexto)
-                    dados_ai = result.get('data', {})
-                    if isinstance(dados_ai, str):
-                        try:
-                            dados_ai = json.loads(dados_ai)
-                        except:
-                            dados_ai = {'conteudo': dados_ai}
+                    # >>> ALTERADO: process_file (planilha não gasta IA) + merge com a base
+                    resultado = ai_processor.process_file(file_path, contexto, base)
+                    if arquivo.name.lower().endswith(('.eml', '.msg')):
+                        emails_recebidos = 1
+                    results = [{'filename': arquivo.name, 'ai_result': resultado}]
+                    dados_ai = ai_processor.merge_results(results, base)
+
+            # >>> NOVO: rota de extração de cada arquivo + custo, e os avisos que
+            # dependem dela (OCR local, falha de leitura, resposta truncada)
+            extracao = resumo_extracao(results)
+            dados_ai['extracao'] = extracao
+            avisos = dados_ai.setdefault('avisos_gerais', [])
+
+            if extracao['com_ocr_local']:
+                avisos.append(
+                    "OCR local (Tesseract) aplicado em " +
+                    ", ".join(extracao['com_ocr_local']) +
+                    ": confira preços e PI desses arquivos dígito a dígito — "
+                    "erro de OCR em número não é detectável pelo sistema.")
+            for nome in extracao['com_falha']:
+                detalhe = next((a['erro'] for a in extracao['arquivos']
+                                if a['arquivo'] == nome and a['erro']), 'motivo não informado')
+                avisos.append(f"{nome}: não foi possível extrair ({detalhe}).")
+            for nome in extracao['truncados']:
+                avisos.append(f"{nome}: resposta truncada por limite de tokens — "
+                              f"itens podem ter ficado de fora.")
 
             # Salva dados da IA (JSON bruto, para auditoria)
             json_path = os.path.join(settings.MEDIA_ROOT, 'processos', 'gerados',
@@ -326,7 +527,8 @@ def novo_processo(request):
                 json.dump(dados_ai, f, ensure_ascii=False, indent=2)
 
             # >>> NOVO: grava os mesmos dados no SQLite (Fornecedor / Item / Cotacao)
-            salvar_dados_ai(processo, dados_ai, emails_recebidos)
+            # modo='completo' preserva os itens da linha de base e casa pelo PI
+            salvar_dados_ai(processo, dados_ai, emails_recebidos, modo='completo')
 
             # Gera arquivos
             xlsx_path = preencher_mapa_comparativo(processo, dados_ai)
@@ -343,26 +545,15 @@ def novo_processo(request):
             return redirect("processos")
 
         except IntegrityError:
-            return render(
-                request,
-                "novoprocesso.html",
-                {
-                    "erros": [
-                        "Já existe um processo cadastrado com esse número."
-                    ]
-                }
-            )
+            return erro(["Não foi possível gravar o processo (número duplicado ou dado "
+                         "inconsistente). Confira o número e tente de novo."])
 
         except Exception as e:
-            return render(
-                request,
-                "novoprocesso.html",
-                {
-                    "erros": [
-                        f"Erro ao processar processo: {str(e)}"
-                    ]
-                }
-            )
+            # >>> NOVO: não deixa o processo travado em 'processando'
+            if processo is not None and processo.pk:
+                processo.status = 'erro'
+                processo.save(update_fields=['status'])
+            return erro([f"Erro ao processar processo: {str(e)}"])
 
     return render(request, "novoprocesso.html")
 
@@ -373,7 +564,7 @@ def documentos(request):
     numero = (request.GET.get("numero") or "").strip()
     status = (request.GET.get("status") or "").strip()
 
-    consulta = Processo.objects.all()
+    consulta = Processo.objects.prefetch_related('fornecedores', 'itens__cotacoes')
 
     if numero:
         consulta = consulta.filter(numero__icontains=numero)
