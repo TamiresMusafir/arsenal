@@ -13,6 +13,13 @@ O que muda por dentro:
     lê esses formatos: o parsing é responsabilidade sua.
   * O motor de PDF é escolhido por documento: `pdf-text` (grátis) quando há
     camada de texto, `native`/`mistral-ocr` quando é escaneado.
+  * >>> NOVO: PDF escaneado passa antes pelo OCR local (ocrmypdf/Tesseract),
+    que carimba a camada de texto de volta NO PDF. O arquivo continua indo
+    inteiro para a API — o layout da tabela é preservado — mas pelo motor
+    grátis. O motor pago só entra quando o OCR local falha ou rende pouco.
+
+Dependências de sistema (Ubuntu 22.04, tudo via apt, sem pip):
+    sudo apt install python3-xlrd ocrmypdf tesseract-ocr-por poppler-utils
 """
 import base64
 import email
@@ -22,6 +29,9 @@ import mimetypes
 import os
 import random
 import re
+import shutil          # >>> NOVO
+import subprocess      # >>> NOVO
+import tempfile        # >>> NOVO
 import time
 from pathlib import Path
 
@@ -81,6 +91,197 @@ EXTENSOES_IMAGEM = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".
 
 
 # =====================================================================
+# >>> NOVO: OCR local (ocrmypdf + Tesseract), tudo via apt
+# ---------------------------------------------------------------------
+# Estratégia: NÃO extrair texto solto — texto solto perde a coluna, e
+# proposta é tabela. O ocrmypdf devolve o MESMO PDF com uma camada de
+# texto posicionada sobre a imagem, então o documento segue inteiro para
+# a API e o motor cai no `pdf-text`, que é grátis.
+#
+# Devolve o caminho do PDF ocerizado (em diretório temporário, que o
+# chamador apaga) ou None quando não deu — aí o fluxo antigo assume.
+# =====================================================================
+def ocr_pdf(file_path, idiomas=None, timeout=None):
+    if not shutil.which("ocrmypdf"):
+        return None
+
+    pasta = tempfile.mkdtemp(prefix="ocr_")
+    destino = os.path.join(pasta, os.path.basename(file_path))
+    comando = [
+        "ocrmypdf",
+        "-l", idiomas or getattr(settings, "OCR_IDIOMAS", "por+eng"),
+        "--skip-text",                    # página que já tem texto passa intacta
+        "--rotate-pages", "--deskew",     # scanner torto / foto de proposta
+        "--optimize", "0",                # não depende de jbig2enc/pngquant
+        "--tesseract-timeout", str(getattr(settings, "OCR_TIMEOUT_PAGINA", 180)),
+        "--quiet",
+        file_path, destino,
+    ]
+
+    try:
+        subprocess.run(comando, check=True,
+                       timeout=timeout or getattr(settings, "OCR_TIMEOUT_TOTAL", 900),
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except (subprocess.SubprocessError, OSError):
+        shutil.rmtree(pasta, ignore_errors=True)
+        return None
+
+    if not os.path.exists(destino):
+        shutil.rmtree(pasta, ignore_errors=True)
+        return None
+    return destino
+
+
+# =====================================================================
+# >>> NOVO: leitura determinística do Modelo de Proposta (MB / COMRJ)
+# ---------------------------------------------------------------------
+# Serve para as duas pontas:
+#   * modelo em branco enviado às empresas -> LINHA DE BASE (itens/PI)
+#   * modelo devolvido preenchido          -> cotação, sem custo de IA
+# Devolve o MESMO dicionário do merge_results, ou None se o layout não
+# for reconhecido (aí o arquivo segue para a IA, como hoje).
+# =====================================================================
+_CAB_MODELO = {
+    "item": "item", "numero de estoque": "pi", "nr de estoque": "pi",
+    "nomenclatura": "descricao", "u.f.": "uf", "uf": "uf",
+    "qt.": "qtde", "qt": "qtde", "qtde": "qtde",
+    "prazo entrega": "prazo_entrega",
+    "preco unit. (r$)": "preco_unitario", "preco unitario": "preco_unitario",
+    "preco total (r$)": "preco_total", "preco total": "preco_total",
+}
+_ROTULOS_EMPRESA = {
+    "razao social": "nome", "cnpj": "cnpj", "codemp": "codemp",
+    "e-mail": "email", "email": "email", "telefone": "telefone",
+}
+_RUIDO_MODELO = {"", "*", "mrc", "marca", "local de entrega", "referencia",
+                 "descricao caracteristica", "resposta decodificada",
+                 "--------------------"}
+_ACENTOS = str.maketrans("áàâãäéèêëíìîïóòôõöúùûüç", "aaaaaeeeeiiiiooooouuuuc")
+
+
+def _norm_modelo(valor):
+    return re.sub(r"\s+", " ", str(valor or "").strip().lower().translate(_ACENTOS))
+
+
+def _ler_grade(file_path):
+    """Matriz de células. Números inteiros viram string sem '.0' (PI!)."""
+    if file_path.lower().endswith(".xls"):
+        import xlrd
+        aba = xlrd.open_workbook(file_path).sheet_by_index(0)
+
+        def celula(r, c):
+            cel = aba.cell(r, c)
+            if cel.ctype == xlrd.XL_CELL_NUMBER and float(cel.value).is_integer():
+                return str(int(cel.value))
+            return cel.value
+
+        return [[celula(r, c) for c in range(aba.ncols)] for r in range(aba.nrows)]
+
+    from openpyxl import load_workbook
+    wb = load_workbook(file_path, data_only=True)
+    grade = [list(linha) for linha in wb.worksheets[0].iter_rows(values_only=True)]
+    wb.close()
+    return grade
+
+
+def parse_modelo_proposta(file_path, limite_descricao=500):
+    from .services import para_float          # import tardio: evita ciclo
+
+    if Path(file_path).suffix.lower() not in (".xls", ".xlsx", ".xlsm"):
+        return None
+    try:
+        grade = _ler_grade(file_path)
+    except Exception:
+        return None
+
+    # --- acha a linha de cabeçalho da tabela de itens ------------------
+    colunas, linha_cab = {}, None
+    for i, linha in enumerate(grade[:80]):
+        achadas = {}
+        for c, valor in enumerate(linha):
+            campo = _CAB_MODELO.get(_norm_modelo(valor))
+            if campo and campo not in achadas:
+                achadas[campo] = c
+        if {"item", "pi", "descricao"} <= set(achadas):
+            colunas, linha_cab = achadas, i
+            break
+    if linha_cab is None:
+        return None
+
+    def cel(linha, campo):
+        c = colunas.get(campo)
+        return "" if c is None or c >= len(linha) else str(linha[c] or "").strip()
+
+    # --- identificação da empresa (só existe na proposta devolvida) ----
+    identificacao = {}
+    for linha in grade[:linha_cab]:
+        for c, valor in enumerate(linha):
+            campo = _ROTULOS_EMPRESA.get(_norm_modelo(valor))
+            if not campo or identificacao.get(campo):
+                continue
+            for d in range(c + 1, min(c + 6, len(linha))):
+                preenchido = str(linha[d] or "").strip()
+                if preenchido and preenchido != "*":
+                    identificacao[campo] = preenchido
+                    break
+    nome_empresa = identificacao.get("nome", "")
+
+    # --- blocos de item: a linha do item começa com o número ----------
+    itens, atual = [], None
+    for linha in grade[linha_cab + 1:]:
+        primeiro = cel(linha, "item")
+        if re.fullmatch(r"\d{1,4}([.,]0+)?", primeiro):
+            preco = para_float(cel(linha, "preco_unitario"))
+            atual = {
+                "item": int(float(primeiro.replace(",", "."))),
+                "pi": cel(linha, "pi"),
+                "nsn": "", "codigo": cel(linha, "pi"),
+                "nome_em_portugues": cel(linha, "descricao"),
+                "qtde": para_float(cel(linha, "qtde")),
+                "uf": cel(linha, "uf"),
+                "prazo_entrega": cel(linha, "prazo_entrega"),
+                "empresas": {nome_empresa: preco} if (nome_empresa and preco) else {},
+                "valor_unitario_estimado": None,
+                # na proposta devolvida o total é da EMPRESA, não da estimativa
+                "valor_total": None if nome_empresa else para_float(cel(linha, "preco_total")),
+                "confianca": 100,
+                "avisos": [],
+            }
+            itens.append(atual)
+            continue
+
+        # linhas de continuação da nomenclatura / descrição característica
+        if atual is None or len(atual["nome_em_portugues"]) >= limite_descricao:
+            continue
+        extra = cel(linha, "descricao")
+        if extra and _norm_modelo(extra) not in _RUIDO_MODELO and not extra.startswith("<<"):
+            atual["nome_em_portugues"] = (
+                atual["nome_em_portugues"] + " " + extra).strip()[:limite_descricao]
+
+    if not itens:
+        return None
+
+    avisos = []
+    sem_pi = [i["item"] for i in itens if not i["pi"]]
+    if sem_pi:
+        avisos.append("itens sem PI no modelo (não entram no mapa): "
+                      + ", ".join(map(str, sem_pi)))
+    if nome_empresa and not any(i["empresas"] for i in itens):
+        identificacao["tipo_resposta"] = "declinio"
+        avisos.append(f"{nome_empresa} devolveu o modelo sem nenhum preço")
+
+    return {
+        "informacoes_gerais": {},
+        "empresas": [dict(identificacao,
+                          tipo_resposta=identificacao.get("tipo_resposta", "cotacao"))]
+                    if nome_empresa else [],
+        "itens": itens,
+        "avisos_gerais": avisos,
+        "origem": "modelo-deterministico",
+    }
+
+
+# =====================================================================
 # Extração do JSON da resposta
 # =====================================================================
 def extrair_json(texto):
@@ -108,7 +309,7 @@ def extrair_json(texto):
     if inicio == -1:
         raise ValueError("nenhum objeto JSON na resposta")
 
-    profundidade = em_string = escape = 0
+    profundidade = 0
     em_string = False
     escape = False
     for i in range(inicio, len(t)):
@@ -148,15 +349,31 @@ class AIProcessor:
         "2. NUNCA calcule preço que não esteja escrito. Se só houver o total e "
         "a quantidade, preencha valor_total e deixe valor_unitario vazio.\n"
         "3. Números em formato brasileiro (1.234,56) viram float (1234.56).\n"
-        "4. Preserve o código do item exatamente como está (PI, NSN, part number).\n"
-        "5. Se a imagem/página estiver ilegível, registre em avisos.\n"
-        "6. Responda APENAS com o objeto JSON, sem markdown e sem preâmbulo."
+        "4. O PI (NÚMERO DE ESTOQUE) é a chave única do item. Copie-o "
+        "exatamente como está, sem reformatar.\n"
+        "5. Quando houver LISTA DE PI abaixo, use SOMENTE esses PI. Item do "
+        "documento que não casar com nenhum: não invente linha, registre em "
+        "avisos_gerais o que foi lido.\n"
+        "6. Classifique cada empresa em tipo_resposta: 'cotacao' (há ao menos "
+        "um preço), 'declinio' (recusa, não fornece, sem interesse, fora de "
+        "linha, sem estoque) ou 'duvida' (só pergunta/pedido de "
+        "esclarecimento). Um mesmo e-mail pode cotar parte e declinar o "
+        "resto: nesse caso é 'cotacao' e o motivo vai em motivo_declinio.\n"
+        "7. Perguntas do fornecedor vão em 'perguntas', nunca viram preço.\n"
+        "8. Se a imagem/página estiver ilegível, registre em avisos.\n"
+        # >>> NOVO: o documento pode ter vindo de OCR local
+        "9. Se o texto vier de OCR e algum número estiver ambíguo (dígito "
+        "borrado, separador decimal duvidoso, PI com caractere trocado), "
+        "reduza 'confianca' do item e descreva a dúvida em avisos. Não "
+        "'conserte' número por conta própria.\n"
+        "10. Responda APENAS com o objeto JSON, sem markdown e sem preâmbulo."
     )
 
     ESQUEMA = """{
   "informacoes_gerais": {"numero_processo":"","modalidade":"","objeto":"",
                          "data_documento":"","valor_estimado_total":null},
-  "empresas": [{"nome":"","cnpj":"","email":"","telefone":"",
+  "empresas": [{"nome":"","cnpj":"","codemp":"","email":"","telefone":"",
+                "tipo_resposta":"cotacao|declinio|duvida","motivo_declinio":"",
                 "validade_proposta":"","prazo_entrega":"","valor_global":null}],
   "itens": [{
      "item": 1, "pi": "", "nsn": "", "codigo": "",
@@ -165,6 +382,7 @@ class AIProcessor:
      "valor_unitario_estimado": null, "valor_total": null,
      "confianca": 90, "avisos": []
   }],
+  "perguntas": [{"empresa":"","pergunta":""}],
   "avisos_gerais": []
 }"""
 
@@ -183,6 +401,8 @@ class AIProcessor:
         self.proxies = getattr(settings, "OPENROUTER_PROXIES", None)
         self.verify = getattr(settings, "OPENROUTER_CA_BUNDLE", True)
         self.pdf_engine_scan = getattr(settings, "OPENROUTER_PDF_ENGINE_SCAN", "native")
+        # >>> NOVO: OCR local antes de recorrer ao motor pago
+        self.ocr_local = getattr(settings, "OCR_LOCAL", True)
 
     # -----------------------------------------------------------------
     # Roteamento da entrada
@@ -196,16 +416,33 @@ class AIProcessor:
 
         # --- PDF: vai inteiro, o file-parser cuida ---------------------
         if ext == ".pdf":
-            engine = "pdf-text" if self._pdf_tem_texto(file_path) else self.pdf_engine_scan
+            caminho, engine, ocerizado = file_path, "pdf-text", False
+
+            if not self._pdf_tem_texto(file_path):
+                # >>> NOVO: tenta o OCR local antes de pagar OCR/visão
+                saida = ocr_pdf(file_path) if self.ocr_local else None
+                if saida and self._pdf_tem_texto(saida):
+                    caminho, ocerizado = saida, True
+                else:
+                    # OCR local ausente, falhou ou rendeu quase nada:
+                    # fluxo antigo, motor pago sobre o arquivo original.
+                    if saida:
+                        shutil.rmtree(os.path.dirname(saida), ignore_errors=True)
+                    engine = self.pdf_engine_scan
+
             blocos = [{
                 "type": "file",
                 "file": {
                     "filename": os.path.basename(file_path),
-                    "file_data": "data:application/pdf;base64," + self._b64(file_path),
+                    "file_data": "data:application/pdf;base64," + self._b64(caminho),
                 },
             }]
+            if ocerizado:
+                # o base64 já está montado; o temporário não serve mais
+                shutil.rmtree(os.path.dirname(caminho), ignore_errors=True)
+
             plugins = [{"id": "file-parser", "pdf": {"engine": engine}}]
-            return blocos, plugins, f"pdf/{engine}"
+            return blocos, plugins, f"pdf/{engine}{'+ocr-local' if ocerizado else ''}"
 
         # --- imagem: direto para o modelo multimodal -------------------
         if ext in EXTENSOES_IMAGEM:
@@ -226,19 +463,40 @@ class AIProcessor:
         with open(file_path, "rb") as f:
             return base64.b64encode(f.read()).decode()
 
+    # >>> NOVO: poppler primeiro. O extractText() da PyPDF2 1.26 subestima
+    # muito o texto, e aqui isso custa caro: PDF digital classificado como
+    # escaneado dispara OCR à toa (ou o motor pago). O pdftotext do
+    # poppler-utils é o mesmo que o Ubuntu já instala com o Evince.
     @staticmethod
-    def _pdf_tem_texto(file_path, minimo_por_pagina=40, amostra=5):
+    def _texto_das_paginas(file_path, amostra=5):
+        if shutil.which("pdftotext"):
+            try:
+                saida = subprocess.run(
+                    ["pdftotext", "-f", "1", "-l", str(amostra), "-q", file_path, "-"],
+                    check=True, timeout=120,
+                    stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                paginas = saida.stdout.decode("utf-8", "ignore").split("\f")
+                if paginas and paginas[-1] == "":
+                    paginas.pop()          # o \f final não é uma página
+                if paginas:
+                    return paginas[:amostra]
+            except (subprocess.SubprocessError, OSError):
+                pass
+
+        paginas, _total = abrir_pdf(file_path)
+        return paginas[:amostra]
+
+    @classmethod
+    def _pdf_tem_texto(cls, file_path, minimo_por_pagina=40, amostra=5):
         """
         Amostra as primeiras páginas. Com camada de texto usa o motor grátis;
-        sem camada, paga OCR/visão. Evita gastar OCR em PDF digital.
+        sem camada, tenta OCR local e, em último caso, paga OCR/visão.
 
-        Atenção: o extractText() da PyPDF2 1.26 é bem pior que o das versões
-        modernas. Ele serve para ESTA decisão (tem texto ou não), mas se você
-        ficar nessa versão, prefira o motor de OCR quando houver dúvida.
+        Usada duas vezes por PDF escaneado: antes do OCR (decide se precisa)
+        e depois (decide se o OCR rendeu o bastante para valer o motor grátis).
         """
         try:
-            paginas, _total = abrir_pdf(file_path)
-            paginas = paginas[:amostra]
+            paginas = cls._texto_das_paginas(file_path, amostra)
             if not paginas:
                 return False
             soma = sum(len(t.strip()) for t in paginas)
@@ -310,6 +568,22 @@ class AIProcessor:
                             f"Assunto: {msg.get('Subject','')}\nData: {msg.get('Date','')}\n"
                             f"Anexos: {', '.join(anexos) or 'nenhum'}\n\n{texto}")
 
+            elif ext == ".xls":
+                import xlrd
+                aba = xlrd.open_workbook(file_path).sheet_by_index(0)
+                partes = [f"\n=== ABA: {aba.name} ==="]
+                for r in range(aba.nrows):
+                    celulas = []
+                    for c in range(aba.ncols):
+                        celula = aba.cell(r, c)
+                        valor = celula.value
+                        if celula.ctype == xlrd.XL_CELL_NUMBER and float(valor).is_integer():
+                            valor = int(valor)          # 5330012345678.0 -> 5330012345678
+                        celulas.append("" if valor in (None, "") else str(valor).strip())
+                    if any(celulas):
+                        partes.append(" | ".join(celulas).rstrip(" |"))
+                conteudo = "\n".join(partes)
+
             else:
                 with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
                     conteudo = f.read()
@@ -331,16 +605,34 @@ class AIProcessor:
     # -----------------------------------------------------------------
     # Chamada à API
     # -----------------------------------------------------------------
-    def montar_payload(self, file_path, context):
-        """Separado da chamada HTTP para permitir teste sem gastar crédito."""
+    def montar_payload(self, file_path, context, base=None, limite_pi=200):
         blocos, plugins, rota = self.montar_conteudo(file_path)
+
+        # >>> NOVO: lista fechada de PI vinda do modelo de proposta
+        lista_pi = ""
+        itens_base = (base or {}).get("itens") or []
+        if itens_base:
+            linhas = [f"{i.get('item')} | {i.get('pi')} | "
+                      f"{(i.get('nome_em_portugues') or '')[:80]} | "
+                      f"{i.get('qtde') or ''} {i.get('uf') or ''}"
+                      for i in itens_base[:limite_pi] if i.get("pi")]
+            lista_pi = ("\nLISTA DE PI DO MODELO DE PROPOSTA "
+                        "(item | PI | nomenclatura | qtde):\n" + "\n".join(linhas))
+            if len(itens_base) > limite_pi:
+                lista_pi += f"\n[... {len(itens_base) - limite_pi} itens não listados]"
+
+        # >>> NOVO: avisa o modelo quando o texto veio de OCR local
+        origem_ocr = ("\nATENÇÃO: este PDF não tinha camada de texto; ela foi criada "
+                      "por OCR local (Tesseract). Trate números com desconfiança, "
+                      "conforme a regra 9.") if rota.endswith("+ocr-local") else ""
 
         blocos.append({"type": "text", "text": (
             f"PROCESSO\n"
             f"- Número: {context.get('numero', 'N/A')}\n"
             f"- Objeto: {context.get('descricao', 'N/A')}\n"
-            f"- Valor estimado: {context.get('valor_estimado', 'N/A')}\n\n"
-            f"ARQUIVO: {os.path.basename(file_path)}\n\n"
+            f"- Valor estimado: {context.get('valor_estimado', 'N/A')}\n"
+            f"{lista_pi}\n\n"
+            f"ARQUIVO: {os.path.basename(file_path)}{origem_ocr}\n\n"
             f"Extraia os dados no schema abaixo.\n\nSCHEMA:\n{self.ESQUEMA}"
         )})
 
@@ -362,9 +654,16 @@ class AIProcessor:
             payload["plugins"] = plugins
         return payload, rota
 
-    def process_file(self, file_path, context):
-        """Rota nova: recebe o CAMINHO do arquivo, não o texto."""
-        payload, rota = self.montar_payload(file_path, context)
+    def process_file(self, file_path, context, base=None):
+        # >>> NOVO: proposta em planilha não gasta IA
+        if Path(file_path).suffix.lower() in (".xls", ".xlsx", ".xlsm"):
+            direto = parse_modelo_proposta(file_path)
+            if direto and direto["itens"]:
+                return {"status": "success", "data": direto,
+                        "uso": {"entrada": 0, "saida": 0, "custo_usd": 0},
+                        "rota": "modelo/deterministico"}
+
+        payload, rota = self.montar_payload(file_path, context, base)
         resultado = self._post(payload)
         resultado["rota"] = rota
         return resultado
@@ -460,7 +759,7 @@ class AIProcessor:
         return {"status": "error", "error": "tentativas esgotadas"}
 
     # -----------------------------------------------------------------
-    def process_directory(self, directory_path, context):
+    def process_directory(self, directory_path, context, base=None):
         resultados = []
         for raiz, _dirs, arquivos in os.walk(directory_path):
             for nome in sorted(arquivos):
@@ -470,7 +769,7 @@ class AIProcessor:
                 if Path(nome).suffix.lower() in (".zip", ".tgz", ".tar", ".gz",
                                                  ".exe", ".dll", ".db"):
                     continue
-                resultado = self.process_file(caminho, context)
+                resultado = self.process_file(caminho, context, base)
                 resultados.append({
                     "filename": nome,
                     "rota": resultado.get("rota", ""),
@@ -479,19 +778,36 @@ class AIProcessor:
         return resultados
 
     # -----------------------------------------------------------------
-    def merge_results(self, results):
+    def merge_results(self, results, base=None):
         merged = {"informacoes_gerais": {}, "empresas": [], "itens": [],
-                  "avisos_gerais": []}
+                  "perguntas": [], "avisos_gerais": []}
         empresas_vistas = {}
-        itens_por_chave = {}
+        itens_por_pi = {}
+        ordem = []
 
         def chave(texto):
             return re.sub(r"[^a-z0-9]", "", str(texto or "").lower())
 
+        # --- 1. linha de base define as linhas do mapa -----------------
+        for item in (base or {}).get("itens") or []:
+            k = chave(item.get("pi"))
+            if not k:
+                merged["avisos_gerais"].append(
+                    f"item {item.get('item')} do modelo sem PI: fora do mapa")
+                continue
+            itens_por_pi[k] = dict(item, empresas=dict(item.get("empresas") or {}))
+            ordem.append(k)
+        tem_base = bool(ordem)
+
+        # --- 2. respostas dos fornecedores -----------------------------
         for r in results:
             dados = (r.get("ai_result") or {}).get("data") or {}
             if not isinstance(dados, dict):
                 continue
+            origem = r.get("filename", "")
+            # >>> NOVO: item lido de OCR local não pode passar como certeza
+            veio_de_ocr = "ocr-local" in (r.get("rota")
+                                          or (r.get("ai_result") or {}).get("rota") or "")
 
             for k, v in (dados.get("informacoes_gerais") or {}).items():
                 if v not in (None, "", []) and not merged["informacoes_gerais"].get(k):
@@ -506,31 +822,48 @@ class AIProcessor:
                     for campo, valor in emp.items():
                         if valor and not empresas_vistas[k].get(campo):
                             empresas_vistas[k][campo] = valor
+                    # cotação prevalece sobre declínio/dúvida do mesmo fornecedor
+                    if emp.get("tipo_resposta") == "cotacao":
+                        empresas_vistas[k]["tipo_resposta"] = "cotacao"
                 else:
                     empresas_vistas[k] = dict(emp, nome=nome)
 
             for item in (dados.get("itens") or []):
-                # chave forte: código/PI/NSN. Só cai na descrição se não houver.
-                k = (chave(item.get("codigo")) or chave(item.get("pi"))
-                     or chave(item.get("nsn")))
-                if not k or len(k) < 4:
-                    k = "desc:" + chave(item.get("nome_em_portugues"))[:60]
+                k = chave(item.get("pi")) or chave(item.get("codigo")) or chave(item.get("nsn"))
+                precos = {n: v for n, v in (item.get("empresas") or {}).items() if n}
 
-                if k in itens_por_chave:
-                    alvo = itens_por_chave[k]
-                    alvo.setdefault("empresas", {}).update(item.get("empresas") or {})
-                    for campo in ("pi", "nsn", "codigo", "nome_em_portugues", "qtde", "uf"):
+                # >>> NOVO: teto de confiança e aviso quando a origem foi OCR local
+                confianca = item.get("confianca", 100)
+                avisos_item = list(item.get("avisos") or [])
+                if veio_de_ocr:
+                    confianca = min(confianca, 70)
+                    avisos_item.append(f"valores lidos por OCR local em {origem}: conferir")
+
+                if k in itens_por_pi:
+                    alvo = itens_por_pi[k]
+                    alvo.setdefault("empresas", {}).update(precos)
+                    for campo in ("nsn", "codigo", "nome_em_portugues", "qtde", "uf"):
                         if not alvo.get(campo) and item.get(campo):
                             alvo[campo] = item[campo]
-                    alvo["confianca"] = min(alvo.get("confianca", 100),
-                                            item.get("confianca", 100))
-                else:
-                    itens_por_chave[k] = dict(item)
+                    alvo["confianca"] = min(alvo.get("confianca", 100), confianca)
+                    alvo["avisos"] = (alvo.get("avisos") or []) + avisos_item
+                elif tem_base:
+                    # PI fora do modelo: não cria linha, só avisa
+                    merged["avisos_gerais"].append(
+                        f"{origem}: PI '{item.get('pi') or '(vazio)'}' "
+                        f"({(item.get('nome_em_portugues') or '')[:60]}) não consta do "
+                        f"modelo de proposta — conferir manualmente")
+                elif k:
+                    itens_por_pi[k] = dict(item, empresas=precos,
+                                           confianca=confianca, avisos=avisos_item)
+                    ordem.append(k)
 
+            for p in (dados.get("perguntas") or []):
+                merged["perguntas"].append(dict(p, arquivo=origem))
             merged["avisos_gerais"].extend(dados.get("avisos_gerais") or [])
 
         merged["empresas"] = list(empresas_vistas.values())
-        merged["itens"] = list(itens_por_chave.values())
+        merged["itens"] = [itens_por_pi[k] for k in ordem]
         for i, item in enumerate(merged["itens"], 1):
             if not item.get("item"):
                 item["item"] = i
