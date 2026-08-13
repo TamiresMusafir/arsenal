@@ -45,6 +45,16 @@ def editar_conta(request):
 
 @login_required
 def preferencias(request):
+    perfil, created = Perfil.objects.get_or_create(
+        usuario=request.user
+    )
+
+    if request.method == "POST":
+        perfil.tema_escuro = "tema_escuro" in request.POST
+        perfil.save()
+
+        return redirect("configuracoes")
+
     return render(request, "preferencias.html")
 
 @login_required
