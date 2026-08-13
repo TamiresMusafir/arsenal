@@ -50,11 +50,7 @@ def preferencias(request):
 @login_required
 def alterar_tema(request):
 
-    print("ENTROU NA VIEW ALTERAR TEMA")
-
     dados = json.loads(request.body)
-
-    print(dados)
 
     perfil, created = Perfil.objects.get_or_create(
         usuario=request.user
