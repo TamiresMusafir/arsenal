@@ -5,6 +5,8 @@ from django.urls import reverse_lazy
 
 
 def login_view(request):
+    erro = False
+
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
@@ -15,7 +17,9 @@ def login_view(request):
             login(request, usuario)
             return redirect("home")
 
-    return render(request, "login.html")
+        erro = True
+
+    return render(request, "login.html", {"erro": erro})
 
 
 class AlterarSenha(auth_views.PasswordChangeView):
