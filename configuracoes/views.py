@@ -1,8 +1,10 @@
 import os
+import json
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from usuarios.models import Perfil
+from django.http import JsonResponse
 
 @login_required
 def configuracoes(request):
@@ -44,3 +46,25 @@ def editar_conta(request):
 @login_required
 def preferencias(request):
     return render(request, "preferencias.html")
+
+@login_required
+def alterar_tema(request):
+
+    print("ENTROU NA VIEW ALTERAR TEMA")
+
+    dados = json.loads(request.body)
+
+    print(dados)
+
+    perfil, created = Perfil.objects.get_or_create(
+        usuario=request.user
+    )
+
+    perfil.tema_escuro = dados["tema_escuro"]
+    perfil.save()
+
+    print(perfil.usuario.username, perfil.tema_escuro)
+
+    return JsonResponse({
+        "status": "ok"
+    })
