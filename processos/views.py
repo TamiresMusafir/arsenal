@@ -1,540 +1,487 @@
-from django.shortcuts import render, redirect, get_object_or_404 
-from django.utils import timezone
-from .models import Processo
-from django.db.models import Q
-from django.core.paginator import Paginator
-from django.http import HttpResponse, FileResponse
-from django.conf import settings
-import re
-import os
-import zipfile
-import tempfile
-import json
-from datetime import datetime
-import openpyxl
-from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
-from openpyxl.utils import get_column_letter
-from .ai_processor import AIProcessor
-from django.db import IntegrityError
-# >>> NOVO: dois imports
-from .services import montar_resumo
-from .persistencia import salvar_dados_ai
-from django.contrib.auth.decorators import login_required
+"""
+processos/views.py
 
-# ==================== VIEWS PRINCIPAIS ====================
+Camada de apresentação. As views coordenam o fluxo e delegam o trabalho:
+
+    pacotes.py      recebimento e extração segura dos arquivos enviados
+    ai_processor.py leitura dos documentos (determinística ou por IA)
+    persistencia.py gravação em banco
+    relatorios.py   geração do .xlsx e do .odt
+    services.py     normalização e montagem dos resumos de tela
+"""
+
+import json
+import logging
+import os
+import tempfile
+from datetime import date, datetime
+from decimal import Decimal, InvalidOperation
+
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
+from django.db import IntegrityError, transaction
+from django.db.models import Q
+from django.http import FileResponse, Http404
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+
+from .ai_processor import AIProcessor, parse_modelo_proposta
+from .models import Processo
+from .pacotes import (
+    EXTENSOES_MODELO,
+    EXTENSOES_RESPOSTA,
+    PacoteInvalido,
+    contar_emails,
+    e_pacote,
+    extrair_pacote,
+    gravar_upload,
+    validar_upload,
+)
+from .persistencia import MODO_BASE, MODO_COMPLETO, salvar_dados_ai
+from .relatorios import (
+    avisos_da_extracao,
+    gerar_planilha_odt,
+    preencher_mapa_comparativo,
+    resumo_extracao,
+)
+from .services import linha_base, montar_resumo
+
+logger = logging.getLogger(__name__)
+
+ITENS_POR_PAGINA = 10
+PROCESSOS_POR_PAGINA = 5
+
+ORDENACOES = {
+    'antigos': 'id',
+    'recentes': '-id',
+    'numero': 'numero',
+    'maior_valor': '-valor_estimado',
+    'menor_valor': 'valor_estimado',
+}
+
+MENSAGEM_ERRO_GENERICA = (
+    'Não foi possível concluir o processamento. O erro foi registrado no log '
+    'do servidor com o número do processo. Tente novamente ou acione o suporte.'
+)
+
+
+# ==================== LISTAGEM ====================
 
 @login_required
 def processos(request):
-    processos = Processo.objects.filter(usuario=request.user)
-    ordem = request.GET.get("ordem")
-    data = request.GET.get("data")
-    busca = request.GET.get("busca")
+    """Lista os processos do usuário autenticado."""
+    consulta = Processo.objects.filter(usuario=request.user)
+
+    busca = request.GET.get('busca')
+    data = request.GET.get('data')
+    ordem = request.GET.get('ordem')
 
     if busca:
-        palavras = busca.split()
-        for palavra in palavras:
-            processos = processos.filter(Q(numero__icontains=palavra) | Q(descricao__icontains=palavra))
+        for palavra in busca.split():
+            consulta = consulta.filter(
+                Q(numero__icontains=palavra) | Q(descricao__icontains=palavra)
+            )
 
     hoje = timezone.now().date()
-    if data == "hoje":
-        processos = processos.filter(data_abertura=hoje)
-    elif data == "mes":
-        processos = processos.filter(data_abertura__month=hoje.month, data_abertura__year=hoje.year)
-    elif data == "ano":
-        processos = processos.filter(data_abertura__year=hoje.year)
+    if data == 'hoje':
+        consulta = consulta.filter(data_abertura=hoje)
+    elif data == 'mes':
+        consulta = consulta.filter(data_abertura__month=hoje.month,
+                                   data_abertura__year=hoje.year)
+    elif data == 'ano':
+        consulta = consulta.filter(data_abertura__year=hoje.year)
+
+    if ordem in ORDENACOES:
+        consulta = consulta.order_by(ORDENACOES[ordem])
+
+    pagina = Paginator(consulta, ITENS_POR_PAGINA).get_page(request.GET.get('page'))
+
+    return render(request, 'processos.html', {
+        'processos': pagina,
+        'busca': busca,
+        'ordem': ordem,
+        'data': data,
+    })
 
-    if ordem == "antigos":
-        processos = processos.order_by("id")
-    elif ordem == "numero":
-        processos = processos.order_by("numero")
-    elif ordem == "recentes":
-        processos = processos.order_by("-id")
-    elif ordem == "maior_valor":
-        processos = processos.order_by("-valor_estimado")
-    elif ordem == "menor_valor":
-        processos = processos.order_by("valor_estimado")
-
-    paginator = Paginator(processos, 10)
-    page = request.GET.get("page")
-    processos = paginator.get_page(page)
-
-    return render(
-        request,
-        "processos.html",
-        {
-            "processos": processos,
-            "busca": busca,
-            "ordem": ordem,
-            "data": data,
-        }
-    )
-
-# ==================== FUNÇÕES DE PROCESSAMENTO ====================
-
-def contar_emails(diretorio):
-    """Conta os .eml/.msg extraídos do pacote (respostas dos fornecedores)."""
-    total = 0
-    for raiz, _, arquivos in os.walk(diretorio):
-        total += sum(1 for nome in arquivos if nome.lower().endswith(('.eml', '.msg')))
-    return total
-
-
-def preencher_mapa_comparativo(processo, dados_ai):
-    """Preenche o modelo Mapa_Comparativo_Base.xlsx com os dados extraídos pela IA"""
-    try:
-        template_path = os.path.join(settings.BASE_DIR, 'static-assets', 'modelos', 'Mapa_Comparativo_Base.xlsx')
-
-        if os.path.exists(template_path):
-            wb = openpyxl.load_workbook(template_path)
-            ws = wb.active
-        else:
-            wb = openpyxl.Workbook()
-            ws = wb.active
-            ws.title = "MAPA COMPARATIVO DO PROCESSO"
-
-        # Estilos
-        header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
-        header_font = Font(bold=True, color="FFFFFF", size=10)
-        border = Border(left=Side(style='thin'), right=Side(style='thin'),
-                        top=Side(style='thin'), bottom=Side(style='thin'))
-        center = Alignment(horizontal='center', vertical='center', wrap_text=True)
-
-        # Cabeçalhos (linha 3 do template)
-        headers = ['ITEM', 'PI', 'NOME EM PORTUGUÊS', 'QTDE', 'UF', 'PAINEL DE PREÇO']
-        empresas = dados_ai.get('empresas', [])
-        for idx, empresa in enumerate(empresas[:20], 1):
-            headers.append(f'EMPRESA{idx}')
-        headers.extend(['VALOR UNITARIO ESTIMADO', 'VALOR TOTAL'])
-
-        # Escreve cabeçalhos
-        for col, header in enumerate(headers, 1):
-            cell = ws.cell(row=3, column=col, value=header)
-            cell.font = header_font
-            cell.fill = header_fill
-            cell.alignment = center
-            cell.border = border
-
-        # Preenche dados
-        itens = dados_ai.get('itens', [])
-        current_row = 4
-
-        for item_idx, item in enumerate(itens, 1):
-            row = current_row + item_idx - 1
-
-            # Colunas A-F: dados básicos
-            ws.cell(row=row, column=1, value=item.get('item', item_idx))
-            ws.cell(row=row, column=2, value=item.get('pi', ''))
-            ws.cell(row=row, column=3, value=item.get('nome_em_portugues', ''))
-            ws.cell(row=row, column=4, value=item.get('qtde', ''))
-            ws.cell(row=row, column=5, value=item.get('uf', ''))
-            ws.cell(row=row, column=6, value=item.get('painel_preco', ''))
-
-            # Colunas G-Z: empresas
-            empresas_data = item.get('empresas', {})
-            for emp_idx in range(1, 21):
-                col = 6 + emp_idx
-                key = f'empresa{emp_idx}'
-                ws.cell(row=row, column=col, value=empresas_data.get(key, ''))
-                ws.cell(row=row, column=col).alignment = center
-
-            # Colunas AA-AB: valores
-            ws.cell(row=row, column=27, value=item.get('valor_unitario_estimado', ''))
-            ws.cell(row=row, column=28, value=item.get('valor_total', ''))
-
-            # Aplica bordas
-            for col in range(1, 29):
-                ws.cell(row=row, column=col).border = border
-
-        # Ajusta largura das colunas
-        for col in range(1, 29):
-            col_letter = get_column_letter(col)
-            if col <= 6 or col >= 27:
-                ws.column_dimensions[col_letter].width = 20
-            else:
-                ws.column_dimensions[col_letter].width = 12
-
-        # Salva
-        filename = f"mapa_comparativo_{processo.numero_slug}.xlsx"   # >>> ALTERADO: usa a property
-        filepath = os.path.join(settings.MEDIA_ROOT, 'processos', 'gerados', filename)
-        os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        wb.save(filepath)
-        return filepath
-
-    except Exception as e:
-        print(f"Erro ao preencher mapa: {e}")
-        raise
-
-
-def gerar_planilha_odt(processo, dados_ai):
-    """Gera arquivo ODT"""
-    try:
-        from odf.opendocument import OpenDocumentText
-        from odf.text import P, H
-
-        doc = OpenDocumentText()
-
-        # Título
-        doc.text.addElement(H(outlinelevel=1, text=f"Mapa Comparativo - Processo {processo.numero}"))
-
-        # Informações
-        doc.text.addElement(H(outlinelevel=2, text="Informações do Processo"))
-        doc.text.addElement(P(text=f"Número: {processo.numero}"))
-        doc.text.addElement(P(text=f"Descrição: {processo.descricao}"))
-        doc.text.addElement(P(text=f"Valor Estimado: R$ {processo.valor_estimado:.2f}"))
-        doc.text.addElement(P(text=f"Data: {processo.data_abertura.strftime('%d/%m/%Y')}"))
-        doc.text.addElement(P(text=""))
-
-        # Empresas
-        empresas = dados_ai.get('empresas', [])
-        if empresas:
-            doc.text.addElement(H(outlinelevel=2, text="Empresas Participantes"))
-            for emp in empresas:
-                doc.text.addElement(P(text=f"- {emp.get('nome', 'N/A')}"))
-                if emp.get('cnpj'):
-                    doc.text.addElement(P(text=f"  CNPJ: {emp.get('cnpj')}"))
-                if emp.get('valor_global'):
-                    doc.text.addElement(P(text=f"  Valor: {emp.get('valor_global')}"))
-                doc.text.addElement(P(text=""))
-
-        # Itens
-        itens = dados_ai.get('itens', [])
-        if itens:
-            doc.text.addElement(H(outlinelevel=2, text="Itens do Processo"))
-            for item in itens:
-                doc.text.addElement(P(text=f"Item {item.get('item', '')}: {item.get('nome_em_portugues', '')}"))
-                doc.text.addElement(P(text=f"  Quantidade: {item.get('qtde', '')} {item.get('uf', '')}"))
-                if item.get('valor_unitario_estimado'):
-                    doc.text.addElement(P(text=f"  Valor Unitário: {item.get('valor_unitario_estimado')}"))
-                if item.get('valor_total'):
-                    doc.text.addElement(P(text=f"  Valor Total: {item.get('valor_total')}"))
-                # Empresas do item
-                empresas_data = item.get('empresas', {})
-                if empresas_data:
-                    doc.text.addElement(P(text="  Cotações:"))
-                    for key, value in empresas_data.items():
-                        if value:
-                            doc.text.addElement(P(text=f"    {key}: {value}"))
-                doc.text.addElement(P(text=""))
-
-        # Salva
-        filename = f"mapa_comparativo_{processo.numero_slug}.odt"   # >>> ALTERADO: usa a property
-        filepath = os.path.join(settings.MEDIA_ROOT, 'processos', 'gerados', filename)
-        os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        doc.save(filepath)
-        return filepath
-
-    except Exception as e:
-        print(f"Erro ao gerar ODT: {e}")
-        raise
-
-
-def processar_arquivo_ia(processo, arquivo):
-    """
-    Recebe um processo e um arquivo.
-    Executa IA, salva JSON, banco e gera XLSX/ODT.
-    """
-
-    contexto = {
-        "numero": processo.numero,
-        "descricao": processo.descricao,
-        "valor_estimado": str(processo.valor_estimado)
-    }
-
-    ai_processor = AIProcessor()
-    emails_recebidos = 0
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-
-        file_path = os.path.join(tmpdir, arquivo.name)
-
-        with open(file_path, "wb+") as f:
-            for chunk in arquivo.chunks():
-                f.write(chunk)
-
-
-        if arquivo.name.lower().endswith(
-            (".zip", ".tgz", ".tar.gz", ".tar")
-        ):
-
-            extract_dir = os.path.join(tmpdir, "extracted")
-            os.makedirs(extract_dir, exist_ok=True)
-
-
-            if file_path.endswith(".zip"):
-
-                with zipfile.ZipFile(file_path, "r") as zip_ref:
-                    zip_ref.extractall(extract_dir)
-
-            else:
-                import tarfile
-
-                mode = (
-                    "r:gz"
-                    if file_path.endswith((".tgz", ".tar.gz"))
-                    else "r"
-                )
-
-                with tarfile.open(file_path, mode) as tar_ref:
-                    tar_ref.extractall(extract_dir)
-
-
-            emails_recebidos = contar_emails(extract_dir)
-
-            results = ai_processor.process_directory(
-                extract_dir,
-                contexto
-            )
-
-            dados_ai = ai_processor.merge_results(results)
-
-
-        else:
-
-            file_data = ai_processor.extract_text_from_file(file_path)
-
-            result = ai_processor.process_with_ai(
-                file_data["content"],
-                contexto
-            )
-
-            dados_ai = result.get("data", {})
-
-
-            if isinstance(dados_ai, str):
-                try:
-                    dados_ai = json.loads(dados_ai)
-
-                except:
-                    dados_ai = {
-                        "conteudo": dados_ai
-                    }
-
-
-    # Salva JSON
-    json_path = os.path.join(
-        settings.MEDIA_ROOT,
-        "processos",
-        "gerados",
-        f"dados_ai_{processo.numero_slug}.json"
-    )
-
-    os.makedirs(
-        os.path.dirname(json_path),
-        exist_ok=True
-    )
-
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(
-            dados_ai,
-            f,
-            ensure_ascii=False,
-            indent=2
-        )
-
-
-    # Salva no banco
-    salvar_dados_ai(
-        processo,
-        dados_ai,
-        emails_recebidos
-    )
-
-
-    # Gera arquivos
-    xlsx_path = preencher_mapa_comparativo(
-        processo,
-        dados_ai
-    )
-
-    if xlsx_path:
-        processo.arquivo_gerado_xlsx = (
-            f"processos/gerados/{os.path.basename(xlsx_path)}"
-        )
-
-
-    odt_path = gerar_planilha_odt(
-        processo,
-        dados_ai
-    )
-
-    if odt_path:
-        processo.arquivo_gerado_odt = (
-            f"processos/gerados/{os.path.basename(odt_path)}"
-        )
-
-
-    processo.status = "concluido"
-    processo.save()
-
-# ==================== VIEWS DE CRIAÇÃO E DOWNLOAD ====================
-
-@login_required
-def novo_processo(request):
-    if request.method == 'POST':
-        numero = request.POST.get("numero")
-        descricao = request.POST.get("descricao")
-        valor_estimado = request.POST.get("valor_estimado")
-        data_abertura = request.POST.get("data_abertura")
-        arquivo = request.FILES.get("file")
-
-        erros = []
-
-        # Validações
-        if not numero or not descricao or not valor_estimado or not data_abertura:
-            erros.append("Todos os campos são obrigatórios!")
-
-        # >>> ALTERADO: sem o "if numero", campo vazio estourava TypeError no re.match
-        if numero and not re.match(r'^[0-9./-]+$', numero):
-            erros.append("Número deve conter apenas números, /, . e -")
-
-        try:
-            valor_estimado = float(valor_estimado)
-            if valor_estimado < 0:
-                erros.append("Valor estimado deve ser maior que zero.")
-        except (TypeError, ValueError):   # >>> ALTERADO: float(None) levanta TypeError, não ValueError
-            erros.append("Valor estimado deve ser um número.")
-
-        if not arquivo:
-            erros.append("É necessário enviar um arquivo!")
-
-        if arquivo and arquivo.size > 50 * 1024 * 1024:
-            erros.append("Arquivo muito grande. Máximo 50MB.")
-
-        if erros:
-            return render(request, "novoprocesso.html", {"erros": erros})
-
-        numero_slug = numero.replace("/", "-")
-
-        try:
-            # Cria o processo
-            processo = Processo.objects.create(
-                usuario=request.user,
-                numero=numero,
-                descricao=descricao,
-                valor_estimado=valor_estimado,
-                data_abertura=data_abertura,
-                status='processando'
-            )
-            processo.arquivo_processo = arquivo
-            processo.save()
-
-            processar_arquivo_ia(processo, arquivo)
-
-            return redirect("processos")
-
-        except IntegrityError:
-            return render(
-                request,
-                "novoprocesso.html",
-                {
-                    "erros": [
-                        "Já existe um processo cadastrado com esse número."
-                    ]
-                }
-            )
-
-        except Exception as e:
-            return render(
-                request,
-                "novoprocesso.html",
-                {
-                    "erros": [
-                        f"Erro ao processar processo: {str(e)}"
-                    ]
-                }
-            )
-
-    return render(request, "novoprocesso.html")
-
-@login_required
-def visualizar_processo(request, numero_slug):
-    numero = numero_slug.replace("_", "/")
-    processo = get_object_or_404(Processo, numero=numero, usuario=request.user)
-
-    return render(request, "verprocesso.html", {"processo": processo})
-
-@login_required
-def editar_processo(request, numero_slug):
-    numero = numero_slug.replace("_", "/")
-    processo = get_object_or_404(Processo, numero=numero, usuario=request.user)
-
-    if request.method == "POST":
-        processo.descricao = request.POST.get("descricao") or processo.descricao
-        processo.valor_estimado = request.POST.get("valor_estimado") or processo.valor_estimado
-        processo.data_abertura = request.POST.get("data_abertura") or processo.data_abertura
-
-        processo.save()
-    
-        novo_arquivo = request.FILES.get("arquivo_processo")
-
-        if novo_arquivo:
-            processo.arquivo_processo = novo_arquivo
-            processo.status = "processando"
-            processo.save()
-
-            processar_arquivo_ia(processo, novo_arquivo)
-
-        return redirect("visualizar_processo", numero_slug=numero_slug)
-
-    return render(request, "editarprocesso.html", {"processo":processo})
-    
 @login_required
 def documentos(request):
-    """Lista os processos com os dados consolidados pela IA."""
-    numero = (request.GET.get("numero") or "").strip()
-    status = (request.GET.get("status") or "").strip()
+    """Lista os processos do usuário com os dados consolidados pela IA."""
+    numero = (request.GET.get('numero') or '').strip()
+    status = (request.GET.get('status') or '').strip()
 
-    consulta = Processo.objects.filter(usuario=request.user)
+    consulta = (Processo.objects
+                .filter(usuario=request.user)
+                .prefetch_related('fornecedores', 'itens__cotacoes__fornecedor'))
 
     if numero:
         consulta = consulta.filter(numero__icontains=numero)
-    if status and status != "todos":
+    if status and status != 'todos':
         consulta = consulta.filter(status__iexact=status)
 
-    paginator = Paginator(consulta, 5)
-    pagina = paginator.get_page(request.GET.get("page"))
+    paginador = Paginator(consulta, PROCESSOS_POR_PAGINA)
+    pagina = paginador.get_page(request.GET.get('page'))
 
-    # mantém os filtros ao trocar de página
     filtros = request.GET.copy()
-    filtros.pop("page", None)
+    filtros.pop('page', None)
 
-    return render(
-        request,
-        "documentos.html",
-        {
-            "resumos": [montar_resumo(processo) for processo in pagina],
-            "pagina": pagina,
-            "filtro_numero": numero,
-            "filtro_status": status or "todos",
-            "status_choices": Processo.STATUS_CHOICES,
-            "querystring": filtros.urlencode(),
-            "total_encontrados": paginator.count,
-        }
-    )
+    return render(request, 'documentos.html', {
+        'resumos': [montar_resumo(processo) for processo in pagina],
+        'pagina': pagina,
+        'filtro_numero': numero,
+        'filtro_status': status or 'todos',
+        'status_choices': Processo.STATUS_CHOICES,
+        'querystring': filtros.urlencode(),
+        'total_encontrados': paginador.count,
+    })
+
 
 @login_required
 def mapas_gerados(request):
-    return render(request, "mapasgerados.html")
+    return render(request, 'mapasgerados.html')
+
+
+# ==================== CRIAÇÃO DO PROCESSO ====================
+
+@login_required
+def novo_processo(request):
+    """Cria ou complementa um processo, em duas etapas ligadas pelo NÚMERO.
+
+    Etapa 1 - campo "modelo": o Modelo de Proposta (.xls/.xlsx) vira a LINHA
+              DE BASE (itens e PI). Lido direto da planilha, sem IA.
+    Etapa 2 - campo "file": pacote de respostas (.tgz/.zip) ou documento
+              avulso. As cotações são casadas com a linha de base pelo PI.
+
+    Os dois campos são opcionais, mas ao menos um precisa vir. Só o modelo
+    deixa o processo 'pendente' aguardando as cotações; os dois juntos rodam
+    as duas etapas na mesma requisição.
+    """
+    if request.method != 'POST':
+        return render(request, 'novoprocesso.html')
+
+    formulario = _ler_formulario(request)
+    erros, dados = _validar_formulario(formulario)
+    if erros:
+        return _responder_com_erro(request, formulario, erros)
+
+    try:
+        processo, erros = _obter_ou_criar_processo(request, formulario, dados)
+    except IntegrityError:
+        logger.warning('Conflito ao gravar o processo %s', formulario['numero'])
+        return _responder_com_erro(request, formulario, [
+            'Não foi possível gravar o processo (número duplicado ou dado '
+            'inconsistente). Confira o número e tente de novo.'
+        ])
+
+    if erros:
+        return _responder_com_erro(request, formulario, erros)
+
+    try:
+        concluido, erros = _processar_arquivos(processo, formulario, dados)
+    except PacoteInvalido as erro:
+        _marcar_erro(processo)
+        return _responder_com_erro(request, formulario, [str(erro)])
+    except Exception:                                       # noqa: BLE001
+        # A mensagem técnica fica no log. Devolver str(exc) à tela expõe
+        # caminho de arquivo, resposta da API e configuração do servidor.
+        logger.exception('Falha ao processar o processo %s', processo.numero)
+        _marcar_erro(processo)
+        return _responder_com_erro(request, formulario, [MENSAGEM_ERRO_GENERICA])
+
+    if erros:
+        return _responder_com_erro(request, formulario, erros)
+
+    logger.info('Processo %s finalizado (concluido=%s)', processo.numero, concluido)
+    return redirect('processos')
+
+
+def _ler_formulario(request):
+    return {
+        'numero': (request.POST.get('numero') or '').strip(),
+        'descricao': (request.POST.get('descricao') or '').strip(),
+        'valor_estimado': (request.POST.get('valor_estimado') or '').strip(),
+        'data_abertura': (request.POST.get('data_abertura') or '').strip(),
+        'modelo': request.FILES.get('modelo'),
+        'arquivo': request.FILES.get('file'),
+    }
+
+
+def _responder_com_erro(request, formulario, erros):
+    """Redesenha o formulário preservando o que o usuário já digitou."""
+    return render(request, 'novoprocesso.html', {
+        'erros': erros,
+        'form_numero': formulario['numero'],
+        'form_descricao': formulario['descricao'],
+        'form_valor_estimado': formulario['valor_estimado'],
+        'form_data_abertura': formulario['data_abertura'],
+    })
+
+
+def _validar_formulario(formulario):
+    """Valida os campos e converte os tipos. Devolve (erros, dados)."""
+    erros = []
+    dados = {}
+
+    obrigatorios = ('numero', 'descricao', 'valor_estimado', 'data_abertura')
+    if not all(formulario[campo] for campo in obrigatorios):
+        erros.append('Todos os campos são obrigatórios!')
+
+    # O formato do número é validado pelo próprio validador do modelo,
+    # em _obter_ou_criar_processo, para não haver duas regras divergentes.
+
+    dados['valor_estimado'] = _converter_valor(formulario['valor_estimado'], erros)
+    dados['data_abertura'] = _converter_data(formulario['data_abertura'], erros)
+
+    if not formulario['modelo'] and not formulario['arquivo']:
+        erros.append('Envie o Modelo de Proposta, o pacote de respostas, ou os dois.')
+
+    erros += validar_upload(formulario['modelo'], 'Modelo de Proposta',
+                            EXTENSOES_MODELO)
+    erros += validar_upload(formulario['arquivo'], 'Arquivo de respostas',
+                            EXTENSOES_RESPOSTA)
+    return erros, dados
+
+
+def _converter_valor(texto, erros):
+    """Dinheiro entra como Decimal: float perde centavo em valor de milhão."""
+    if not texto:
+        return None
+    try:
+        valor = Decimal(texto.replace('.', '').replace(',', '.')
+                        if ',' in texto else texto)
+    except (InvalidOperation, ValueError):
+        erros.append('Valor estimado deve ser um número.')
+        return None
+
+    if valor <= 0:
+        erros.append('Valor estimado deve ser maior que zero.')
+        return None
+    if valor >= Decimal('10') ** 13:
+        erros.append('Valor estimado excede o limite do campo.')
+        return None
+    return valor
+
+
+def _converter_data(texto, erros):
+    if not texto:
+        return None
+    try:
+        return datetime.strptime(texto, '%Y-%m-%d').date()
+    except ValueError:
+        erros.append('Data de abertura inválida. Use o seletor de data.')
+        return None
+
+
+def _obter_ou_criar_processo(request, formulario, dados):
+    """Localiza o processo pelo número ou cria um novo. Devolve (processo, erros)."""
+    numero = formulario['numero']
+    modelo = formulario['modelo']
+
+    processo = Processo.objects.filter(numero=numero).first()
+
+    if processo is not None:
+        erro = _conferir_reaproveitamento(processo, request.user, modelo)
+        if erro:
+            return processo, [erro]
+        processo.status = Processo.STATUS_PROCESSANDO
+    else:
+        if not modelo:
+            return None, [
+                'Processo novo começa pelo Modelo de Proposta: é ele que define '
+                'os itens e os PI da linha de base.'
+            ]
+        processo = Processo(
+            usuario=request.user,
+            numero=numero,
+            descricao=formulario['descricao'],
+            valor_estimado=dados['valor_estimado'],
+            data_abertura=dados['data_abertura'] or date.today(),
+            status=Processo.STATUS_PROCESSANDO,
+        )
+        try:
+            # full_clean aplica o validador de formato do número declarado no
+            # modelo. Sem esta chamada o validador nunca roda fora do admin.
+            processo.full_clean(exclude=['arquivo_processo'])
+        except ValidationError as erro:
+            return None, [
+                mensagem for lista in erro.message_dict.values() for mensagem in lista
+            ]
+
+    processo.arquivo_processo = formulario['arquivo'] or modelo
+    processo.save()
+    return processo, []
+
+
+def _conferir_reaproveitamento(processo, usuario, modelo):
+    """Regras de uso de um número de processo já existente."""
+    if processo.usuario_id not in (None, usuario.id):
+        return 'Esse número pertence a um processo de outro responsável.'
+
+    if modelo and processo.itens.exists() and processo.fornecedores.exists():
+        return ('Esse processo já tem linha de base e respostas processadas. '
+                'Para trocar o Modelo de Proposta, exclua o processo antes.')
+
+    if not modelo and not processo.itens.exists():
+        return ('Esse processo ainda não tem linha de base. Envie primeiro o '
+                'Modelo de Proposta com a coluna NÚMERO DE ESTOQUE (PI).')
+    return None
+
+
+def _marcar_erro(processo):
+    """Evita processo preso em 'processando' quando algo falha no meio."""
+    if processo is not None and processo.pk:
+        processo.status = Processo.STATUS_ERRO
+        processo.save(update_fields=['status'])
+
+
+# ==================== PROCESSAMENTO DOS ARQUIVOS ====================
+
+def _processar_arquivos(processo, formulario, dados):
+    """Executa as duas etapas. Devolve (concluido, erros)."""
+    contexto = {
+        'numero': processo.numero,
+        'descricao': processo.descricao,
+        'valor_estimado': str(dados['valor_estimado']),
+    }
+    processador = AIProcessor()
+
+    with tempfile.TemporaryDirectory() as pasta:
+        if formulario['modelo']:
+            erros = _gravar_linha_base(processo, formulario['modelo'], pasta)
+            if erros:
+                return False, erros
+
+        if not formulario['arquivo']:
+            processo.status = Processo.STATUS_PENDENTE
+            processo.save(update_fields=['status'])
+            return False, []
+
+        resultados, emails_recebidos = _ler_respostas(
+            processo, formulario['arquivo'], pasta, processador, contexto
+        )
+        dados_ai = processador.merge_results(resultados, linha_base(processo))
+
+    _anexar_trilha_de_extracao(dados_ai, resultados)
+    _gravar_json_bruto(processo, dados_ai)
+    salvar_dados_ai(processo, dados_ai, emails_recebidos, modo=MODO_COMPLETO)
+    _gerar_entregaveis(processo, dados_ai)
+
+    processo.status = Processo.STATUS_CONCLUIDO
+    processo.save(update_fields=['status', 'arquivo_gerado_xlsx',
+                                 'arquivo_gerado_odt'])
+    return True, []
+
+
+def _gravar_linha_base(processo, modelo, pasta):
+    """Etapa 1: lê o Modelo de Proposta e grava os itens/PI."""
+    base = parse_modelo_proposta(gravar_upload(modelo, pasta))
+
+    if not base or not any(item.get('pi') for item in base['itens']):
+        with transaction.atomic():
+            # Processo recém-criado sem linha de base só travaria o número.
+            if not processo.itens.exists() and not processo.fornecedores.exists():
+                processo.delete()
+        return ['Não consegui ler o Modelo de Proposta. Confira se é a planilha '
+                'enviada às empresas (com o cabeçalho ITEM / NÚMERO DE ESTOQUE / '
+                'NOMENCLATURA) e se a coluna NÚMERO DE ESTOQUE (PI) está preenchida.']
+
+    salvar_dados_ai(processo, base, modo=MODO_BASE)
+    return []
+
+
+def _ler_respostas(processo, arquivo, pasta, processador, contexto):
+    """Etapa 2: lê o pacote ou o documento avulso. Devolve (resultados, e-mails)."""
+    base = linha_base(processo)
+    caminho = gravar_upload(arquivo, pasta)
+
+    if e_pacote(arquivo.name):
+        destino = os.path.join(pasta, 'extraido')
+        extrair_pacote(caminho, destino)
+        emails_recebidos = contar_emails(destino)
+        resultados = processador.process_directory(destino, contexto, base)
+        return resultados, emails_recebidos
+
+    resultado = processador.process_file(caminho, contexto, base)
+    emails_recebidos = 1 if arquivo.name.lower().endswith(('.eml', '.msg')) else 0
+    return [{'filename': arquivo.name, 'ai_result': resultado}], emails_recebidos
+
+
+def _anexar_trilha_de_extracao(dados_ai, resultados):
+    """Registra de onde veio cada dado e os avisos que dependem da rota."""
+    extracao = resumo_extracao(resultados)
+    dados_ai['extracao'] = extracao
+    dados_ai.setdefault('avisos_gerais', []).extend(avisos_da_extracao(extracao))
+
+
+def _gravar_json_bruto(processo, dados_ai):
+    """Mantém o JSON em disco como registro bruto e auditável da extração."""
+    caminho = os.path.join(settings.MEDIA_ROOT, 'processos', 'gerados',
+                           f'dados_ai_{processo.numero_slug}.json')
+    os.makedirs(os.path.dirname(caminho), exist_ok=True)
+    with open(caminho, 'w', encoding='utf-8') as saida:
+        json.dump(dados_ai, saida, ensure_ascii=False, indent=2)
+
+
+def _gerar_entregaveis(processo, dados_ai):
+    """Gera o mapa e o relatório. A falha de um não impede a gravação do outro."""
+    try:
+        caminho = preencher_mapa_comparativo(processo, dados_ai)
+        processo.arquivo_gerado_xlsx = f'processos/gerados/{os.path.basename(caminho)}'
+    except Exception:                                       # noqa: BLE001
+        logger.exception('Falha ao gerar o XLSX do processo %s', processo.numero)
+
+    try:
+        caminho = gerar_planilha_odt(processo, dados_ai)
+        processo.arquivo_gerado_odt = f'processos/gerados/{os.path.basename(caminho)}'
+    except Exception:                                       # noqa: BLE001
+        logger.exception('Falha ao gerar o ODT do processo %s', processo.numero)
+
+
+# ==================== DOWNLOAD ====================
 
 @login_required
 def download_arquivo(request, tipo, processo_id):
-    try:
-        processo = get_object_or_404(Processo, id=processo_id, usuario=request.user)
-    except Processo.DoesNotExist:
-        return HttpResponse("Processo não encontrado", status=404)
+    """Entrega um arquivo do processo ao responsável por ele.
 
-    caminhos = {
-        'xlsx': os.path.join(settings.MEDIA_ROOT, str(processo.arquivo_gerado_xlsx)) if processo.arquivo_gerado_xlsx else None,
-        'odt': os.path.join(settings.MEDIA_ROOT, str(processo.arquivo_gerado_odt)) if processo.arquivo_gerado_odt else None,
-        'json': os.path.join(settings.MEDIA_ROOT, 'processos', 'gerados', f'dados_ai_{processo.numero_slug}.json'),
-        'original': os.path.join(settings.MEDIA_ROOT, str(processo.arquivo_processo)) if processo.arquivo_processo else None,
+    A conferência de dono é obrigatória: sem ela, trocar o id na URL dá acesso
+    às cotações de qualquer processo do sistema, inclusive de outro setor.
+    """
+    processo = get_object_or_404(Processo, id=processo_id)
+    if processo.usuario_id not in (None, request.user.id) and not request.user.is_staff:
+        logger.warning('Usuário %s tentou baixar o processo %s de outro responsável',
+                        request.user, processo.numero)
+        raise Http404('Processo não encontrado')
+
+    caminho = _caminho_do_arquivo(processo, tipo)
+    if not caminho:
+        raise Http404('Arquivo não disponível para este processo')
+
+    return FileResponse(open(caminho, 'rb'), as_attachment=True,
+                        filename=os.path.basename(caminho))
+
+
+def _caminho_do_arquivo(processo, tipo):
+    """Resolve o caminho e confirma que ele está dentro do MEDIA_ROOT."""
+    relativos = {
+        'xlsx': str(processo.arquivo_gerado_xlsx or ''),
+        'odt': str(processo.arquivo_gerado_odt or ''),
+        'json': os.path.join('processos', 'gerados',
+                            f'dados_ai_{processo.numero_slug}.json'),
+        'original': str(processo.arquivo_processo or ''),
     }
 
-    caminho = caminhos.get(tipo)
-    if caminho and os.path.exists(caminho):
-        return FileResponse(open(caminho, 'rb'),
-                            as_attachment=True,
-                            filename=os.path.basename(caminho))
+    relativo = relativos.get(tipo)
+    if not relativo:
+        return None
 
-    return HttpResponse("Arquivo não disponível para este processo", status=404)
+    raiz = os.path.realpath(settings.MEDIA_ROOT)
+    caminho = os.path.realpath(os.path.join(raiz, relativo))
 
+    # Barreira contra travessia de diretório: o nome do arquivo deriva de
+    # campos gravados no banco, e nenhum deles pode apontar para fora da mídia.
+    if os.path.commonpath([raiz, caminho]) != raiz:
+        logger.error('Caminho fora do MEDIA_ROOT recusado: %s', caminho)
+        return None
+
+    return caminho if os.path.isfile(caminho) else None
