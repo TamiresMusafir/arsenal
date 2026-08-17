@@ -2,11 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 
 def login_view(request):
-    erro = False
-
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
@@ -17,9 +17,7 @@ def login_view(request):
             login(request, usuario)
             return redirect("home")
 
-        erro = True
-
-    return render(request, "login.html", {"erro": erro})
+    return render(request, "login.html")
 
 
 class AlterarSenha(auth_views.PasswordChangeView):
@@ -33,3 +31,20 @@ class AlterarSenha(auth_views.PasswordChangeView):
             field.widget.attrs.update({"class": "form-control"})
 
         return form
+
+
+@require_POST
+def alterar_tema(request):
+    perfil, _ = Perfil.objects.get_or_create(usuario=request.user)
+
+    valor = request.POST.get("tema_escuro")
+    if valor is None:
+        perfil.tema_escuro = not perfil.tema_escuro          # alterna
+    else:
+        perfil.tema_escuro = valor in ("1", "true", "on", "True")
+
+    perfil.save(update_fields=["tema_escuro"])
+
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return JsonResponse({"ok": True, "tema_escuro": perfil.tema_escuro})
+    return redirect("preferencias")
