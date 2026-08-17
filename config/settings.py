@@ -23,7 +23,7 @@ load_dotenv(BASE_DIR/'.env')
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['DJANGO_SECRET_KEy']
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -211,7 +211,6 @@ CORS_ALLOWED_ORIGINS = [
 
 # Para desenvolvimento, você pode permitir todos (cuidado em produção!)
 # CORS_ALLOW_ALL_ORIGINS = True
-O
 # Configurações adicionais de CORS
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
