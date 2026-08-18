@@ -28,11 +28,7 @@ SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    ".app.github.dev",
-]
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -213,10 +209,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://literate-spoon-x69j7gq7g7r2vww7-8000.app.github.dev",
-]
-
 # Para desenvolvimento, você pode permitir todos (cuidado em produção!)
 # CORS_ALLOW_ALL_ORIGINS = True
 # Configurações adicionais de CORS
@@ -246,7 +238,7 @@ CORS_ALLOW_HEADERS = [
 OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY')
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 OPENROUTER_MODEL = os.environ.get(
-    "OPENROUTER_MODEL", "inclusionai/ling-3.0-flash:free"
+    "OPENROUTER_MODEL", "deepinfra/fp8/gemma-4-26b-a4b-it
 )
 OPENROUTER_PDF_ENGINE_SCAN = os.environ.get("OPENROUTER_PDF_ENGINE_SCAN", "native")
 
