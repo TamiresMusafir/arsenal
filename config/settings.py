@@ -23,12 +23,24 @@ load_dotenv(BASE_DIR/'.env')
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-dev-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".app.github.dev",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://localhost:8000",
+    "https://glorious-bassoon-pvgx45q4xp626674-8000.app.github.dev",
+    "https://*.app.github.dev",
+]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Application definition
 
@@ -59,6 +71,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # Deve vir ANTES do CommonMiddleware
     'django.middleware.common.CommonMiddleware',
@@ -208,7 +221,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
 ]
-
+    
 # Para desenvolvimento, você pode permitir todos (cuidado em produção!)
 # CORS_ALLOW_ALL_ORIGINS = True
 # Configurações adicionais de CORS
@@ -238,7 +251,7 @@ CORS_ALLOW_HEADERS = [
 OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY')
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 OPENROUTER_MODEL = os.environ.get(
-    "OPENROUTER_MODEL", "deepinfra/fp8/gemma-4-26b-a4b-it
+    "OPENROUTER_MODEL", "inclusionai/ling-3.0-flash:free"
 )
 OPENROUTER_PDF_ENGINE_SCAN = os.environ.get("OPENROUTER_PDF_ENGINE_SCAN", "native")
 
