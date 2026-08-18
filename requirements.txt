@@ -1,37 +1,68 @@
-# Framework web
-Django==6.1
+# Arsenal - Sistema de Processamento de Documentos de Licitacao
+# Requer Python 3.12 ou superior (exigencia do Django 6.0)
+#
+# Instalacao:
+#   python -m venv .venv
+#   source .venv/bin/activate
+#   pip install -r requirements.txt
 
-# Servidor WSGI para produção / Docker
-gunicorn==23.0.0
 
-# Manipulação e análise de dados
-numpy==2.5.2
-pandas==3.0.5
+# ============================================================
+# NUCLEO
+# ============================================================
+Django>=6.0,<6.1
+python-dotenv>=1.0.0              # config/settings.py: load_dotenv(BASE_DIR/'.env')
 
-# Arquivos Excel / OpenDocument
-openpyxl==3.1.5
-xlrd==2.0.2
-odfpy==1.4.1
 
-# Leitura de arquivos PDF
-pypdf==6.16.1
-PyPDF2==3.0.1
+# ============================================================
+# BANCO DE DADOS - PostgreSQL / Supabase
+# ============================================================
+# O Django tenta importar psycopg (v3) antes de psycopg2.
+# Use psycopg[binary] em maquina de desenvolvimento; em servidor
+# com toolchain de compilacao, prefira psycopg[c] (mais rapido).
+psycopg[binary]>=3.1.12
 
-# Imagens
-Pillow==11.3.0
 
-# Leitura e criação de arquivos DOCX
-python-docx==1.2.0
+# ============================================================
+# API - Django REST Framework
+# ============================================================
+# Origem: INSTALLED_APPS + REST_FRAMEWORK em settings.py
+djangorestframework>=3.15.0
+djangorestframework-simplejwt>=5.3.0    # SIMPLE_JWT, JWTAuthentication
+django-cors-headers>=4.3.0              # corsheaders + CorsMiddleware
+django-filter>=24.1                     # DjangoFilterBackend
+django-guardian>=2.4.0                  # ObjectPermissionBackend
+djoser>=2.2.0                           # endpoints de usuario/senha
 
-# Requisições HTTP / comunicação com APIs
-Requests==2.34.2
 
-# Variáveis de ambiente (.env)
-python-dotenv==1.2.3
-python-decouple==3.8
+# ============================================================
+# LEITURA E GERACAO DE DOCUMENTOS
+# ============================================================
+# Origem: imports em processos/ai_processor.py e processos/relatorios.py
 
-# PostgreSQL
-psycopg2-binary==2.9.10
+openpyxl>=3.1.0        # .xlsx: le o Modelo de Proposta, escreve o Mapa Comparativo
+xlrd>=2.0.1            # .xls antigo (Excel 97-2003) - ai_processor.py:174, :590
+                       # ATENCAO: xlrd 2.x NAO le .xlsx. So .xls. E o uso correto aqui.
+pypdf>=4.0.0           # .pdf - leitor moderno, primeiro na cadeia de fallback
+python-docx>=1.1.0     # .docx - ai_processor.py:554 (from docx import Document)
+odfpy>=1.4.1           # .odt - relatorio final e leitura de anexos ODF
 
-# Configuração da URL do banco de dados
-dj-database-url==2.3.0
+
+# ============================================================
+# INTEGRACAO COM IA
+# ============================================================
+requests>=2.31.0       # chamadas HTTP a OpenRouter (ai_processor.py:721)
+
+
+# ============================================================
+# DEPENDENCIAS DE SISTEMA (nao instalaveis via pip)
+# ============================================================
+# O ai_processor.py chama estes binarios via subprocess e degrada
+# graciosamente se faltarem (shutil.which antes de cada chamada).
+# Sem eles, PDF escaneado vai direto para o motor pago da OpenRouter.
+#
+#   sudo apt install ocrmypdf tesseract-ocr-por poppler-utils
+#
+#   ocrmypdf        -> OCR local, carimba camada de texto no PDF
+#   tesseract-ocr-por -> pacote de idioma portugues do Tesseract
+#   poppler-utils   -> fornece o pdftotext, usado antes do pypdf
