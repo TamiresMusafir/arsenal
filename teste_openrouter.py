@@ -17,7 +17,9 @@ import json
 import os
 import sys
 
-import djangoOPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
+import django
+
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 from django.conf import settings
 
 # --- configura o Django mínimo, sem carregar o projeto inteiro -----------

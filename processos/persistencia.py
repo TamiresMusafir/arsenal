@@ -82,15 +82,15 @@ def salvar_dados_ai(processo, dados_ai, emails_recebidos=0,
     # ==================== FORNECEDORES ====================
 
 def _gravar_fornecedores(processo, dados_ai):
-        """Cria ou atualiza os fornecedores e devolve o índice de lookup.
+    """Cria ou atualiza os fornecedores e devolve o índice de lookup.
 
-        O índice mapeia todas as formas pelas quais uma cotação pode referenciar
-        o fornecedor: nome normalizado, CNPJ normalizado e a chave legada empresaN.
-        """
-        existentes = list(processo.fornecedores.all())
-        por_cnpj = {_chave(f.cnpj): f for f in existentes if f.cnpj}
-        por_nome = {_chave(f.nome): f for f in existentes}
-        indice_lookup = {}
+    O índice mapeia todas as formas pelas quais uma cotação pode referenciar
+    o fornecedor: nome normalizado, CNPJ normalizado e a chave legada empresaN.
+    """
+    existentes = list(processo.fornecedores.all())
+    por_cnpj = {_chave(f.cnpj): f for f in existentes if f.cnpj}
+    por_nome = {_chave(f.nome): f for f in existentes}
+    indice_lookup = {}
 
     for indice, bruto in enumerate(dados_ai.get('empresas') or [], start=1):
         if isinstance(bruto, str):

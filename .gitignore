@@ -1,0 +1,89 @@
+# =========================
+# Python
+# =========================
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables
+.env
+
+# =========================
+# Django
+# =========================
+
+*.log
+#db.sqlite3
+db.sqlite3-journal
+
+# Arquivos gerados pelo Django
+
+staticfiles/
+static_collected/
+
+# =========================
+# Environment / Secrets
+# =========================
+
+.env
+.env.*
+!.env.example
+
+# =========================
+# IDE / Editor
+# =========================
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# Sistema operacional
+# =========================
+
+.DS_Store
+Thumbs.db
+
+# =========================
+# Testes / Coverage
+# =========================
+
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# =========================
+# Jupyter
+# =========================
+
+.ipynb_checkpoints/
+
+# =========================
+# Arquivos temporários
+# =========================
+
+*.tmp
+*.temp
+*.bak
+
+# =========================
+# Arquivos gerados / uploads
+# =========================
+
+media/
+
+# =========================
+# Docker
+# =========================
+
+docker-compose.override.yml
