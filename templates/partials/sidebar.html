@@ -99,10 +99,12 @@
                 Minha conta
               </a>
 
-              <a href="{% url 'logout' %}" class="perfil-menu-item logout-item">
-                <i class="fa-solid fa-right-from-bracket me-2"></i>
-                Sair
-              </a>
+              <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="perfil-menu-item logout-item">
+                   
+                </button>
+              </form>
             </div>
           </div>
         </aside>

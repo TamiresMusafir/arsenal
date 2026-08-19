@@ -1,7 +1,7 @@
 services:
   web:
     build: .
-    container_name: studenthub
+    container_name: arsenal
     ports:
       - "8000:8000"
     env_file:

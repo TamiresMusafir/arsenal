@@ -80,10 +80,13 @@
             <div class="card border-0 shadow-sm p-4 h-100">
               <h4 class="fw-bold mb-3">Sessão</h4>
               <p class="theme-muted small">Encerre sua sessão atual e retorne à tela de login.</p>
-              <a href="{% url 'logout' %}" class="btn btn-outline-danger">
-                <i class="fa-solid fa-right-from-bracket me-2"></i>
-                Sair da conta
-              </a>
+                <form method="post" action="{% url 'logout' %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger">
+                    <i class="fa-solid fa-right-from-bracket me-2"></i>
+                    Sair da conta
+                  </button>
+                </form>
             </div>
           </div>
         </div>
