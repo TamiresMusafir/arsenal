@@ -23,16 +23,13 @@ def configuracoes(request):
     return render(request, "configuracoes.html")
 
 
-def conta(request):
-    return render(request, "conta.html")
-
 @login_required
-def preferencias(request):
-    return render(request, "preferencias.html")
+def conta(request):
+    usuario = request.user
 
-
-def _caminho_banco():
-    return str(settings.DATABASES["default"]["NAME"])
+    return render(request, "conta.html", {
+        "usuario": usuario,
+    })
 
 @login_required
 def editar_conta(request):
@@ -59,7 +56,41 @@ def editar_conta(request):
         "perfil": perfil
     })
 
+@login_required
+def preferencias(request):
+    perfil, created = Perfil.objects.get_or_create(
+        usuario=request.user
+    )
 
+    if request.method == "POST":
+        perfil.tema_escuro = "tema_escuro" in request.POST
+        perfil.save()
+
+        return redirect("configuracoes")
+
+    return render(request, "preferencias.html")
+
+@login_required
+def alterar_tema(request):
+
+    dados = json.loads(request.body)
+
+    perfil, created = Perfil.objects.get_or_create(
+        usuario=request.user
+    )
+
+    perfil.tema_escuro = dados["tema_escuro"]
+    perfil.save()
+
+    print(perfil.usuario.username, perfil.tema_escuro)
+
+    return JsonResponse({
+        "status": "ok"
+    })
+
+
+def _caminho_banco():
+    return str(settings.DATABASES["default"]["NAME"])
 
 def backup_download(request):
     """Gera cópia consistente do db.sqlite3 e devolve como download."""

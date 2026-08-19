@@ -242,6 +242,42 @@ body.menu-open{
   width: 20px;
 }
 
+.perfil-logout-form {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.perfil-logout-form .perfil-menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: .55rem .75rem;
+  border: none;
+  border-radius: 8px;
+
+  background: transparent;
+  color: #dc3545;
+
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+
+  transition: .2s;
+  cursor: pointer;
+}
+
+.perfil-logout-form .perfil-menu-item:hover {
+  background: var(--main-light);
+  color: var(--text-color);
+}
+
+.perfil-logout-form .perfil-menu-item i {
+  width: 20px;
+}
+
 /* ---------- Logout ---------- */
 
 .logout-item{

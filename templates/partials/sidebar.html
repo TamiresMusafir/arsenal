@@ -79,10 +79,11 @@
             <a href="#" id="perfilToggle" class="d-flex align-items-center justify-content-between text-decoration-none">
               <div class="d-flex align-items-center gap-2">
                 {% if perfil.foto %}
-                <img src="{{ perfil.foto.url }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover" />
+                  <img src="{{ perfil.foto.url }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover" />
                 {% else %}
-                <img src="https://placehold.co/40x40" class="rounded-circle" alt="Usuário" />
+                  <img src="https://placehold.co/40x40" class="rounded-circle" alt="Usuário" />
                 {% endif %}
+
                 <div>
                   <strong class="d-block small text-white">
                     {{ request.user.first_name }}<br>
@@ -90,21 +91,25 @@
                   </strong>
                 </div>
               </div>
+
               <i class="fa-solid fa-chevron-right small"></i>
             </a>
 
             <div id="menuPerfil" class="perfil-dropdown">
+
               <a href="{% url 'conta' %}" class="perfil-menu-item">
                 <i class="fa-solid fa-user me-2"></i>
                 Minha conta
               </a>
 
-              <form method="post" action="{% url 'logout' %}">
+              <form method="post" action="{% url 'logout' %}" class="perfil-logout-form">
                 {% csrf_token %}
                 <button type="submit" class="perfil-menu-item logout-item">
-                   
+                  <i class="fa-solid fa-right-from-bracket me-2"></i>
+                  Sair
                 </button>
               </form>
+
             </div>
           </div>
         </aside>
