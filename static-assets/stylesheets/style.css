@@ -203,21 +203,33 @@ body.menu-open{
 
 /* ---------- Dropdown ---------- */
 
-.perfil-dropdown{
-  position: absolute;
-  left: calc(100% + 10px);
-  top: -10px;
-  width: 220px;
-  display: none;
-  padding: .5rem;
-  background: var(--bg-card);
-  border-radius: 10px;
-  border: 1px solid rgba(0,0,0,.08);
-  box-shadow: 0 10px 25px rgba(0,0,0,.25);
-  z-index: 9999;
+.perfil {
+  position: relative;
+  z-index: 10000;
 }
 
-.perfil-dropdown.show{
+.perfil-dropdown {
+  position: absolute;
+
+  left: calc(100% + 10px);
+  bottom: 0;
+
+  width: 220px;
+
+  display: none;
+
+  padding: 0.5rem;
+
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+
+  z-index: 10001;
+}
+
+.perfil-dropdown.show {
   display: block;
 }
 
@@ -287,8 +299,8 @@ body.menu-open{
 
 .logout-item:hover{
 
-  background: rgba(220,53,69,.15);
-  color: #dc3545;
+  background: rgba(220,53,69,.15) !important;
+  color: #dc3545 !important;
 }
 
 /* ---------- CARDS ---------- */
