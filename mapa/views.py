@@ -37,7 +37,7 @@ def processar_upload(request):
             mapa_antigo.delete()
 
         try:
-            mapa = Mapa.objects.create(nome=arquivo.name, arquivo=arquivo)
+            mapa = Mapa.objects.create(arquivo=arquivo)
             arquivo_path = mapa.arquivo.path
             extensao = os.path.splitext(nome_arquivo)[1].lower()
 
