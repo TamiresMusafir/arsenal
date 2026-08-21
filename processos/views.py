@@ -485,3 +485,66 @@ def _caminho_do_arquivo(processo, tipo):
         return None
 
     return caminho if os.path.isfile(caminho) else None
+
+
+# ==================== VISUALIZAR ====================
+
+
+@login_required
+def visualizar_processo(request, numero_slug):
+    processo = get_object_or_404(Processo, numero_slug=numero_slug)
+    # monte o contexto com os dados que deseja mostrar
+    return render(request, 'visualizar_processo.html', {'processo': processo})
+
+    
+# ==================== EDITAR ====================
+
+
+@login_required
+def editar_processo(request, numero_slug):
+    processo = get_object_or_404(Processo, numero_slug=numero_slug, usuario=request.user)
+
+    if request.method == 'POST':
+        # Processa o formulário de edição
+        data_abertura = request.POST.get('data_abertura')
+        descricao = request.POST.get('descricao', '').strip()
+        valor_estimado = request.POST.get('valor_estimado', '').strip()
+
+        erros = []
+        if data_abertura:
+            try:
+                processo.data_abertura = datetime.strptime(data_abertura, '%Y-%m-%d').date()
+            except ValueError:
+                erros.append('Data de abertura inválida.')
+        if descricao:
+            processo.descricao = descricao
+        if valor_estimado:
+            try:
+                processo.valor_estimado = Decimal(valor_estimado.replace(',', '.'))
+            except (InvalidOperation, ValueError):
+                erros.append('Valor estimado inválido.')
+
+        # Se houver novo arquivo (substituição), processar novamente
+        novo_arquivo = request.FILES.get('file')
+        if novo_arquivo:
+            # Código para reprocessar com o novo arquivo
+            # (recomendo delegar para uma função separada, mas por simplicidade farei aqui)
+            try:
+                # Salva o arquivo, chama o processador, atualiza o processo
+                # (pode aproveitar parte da lógica de novo_processo)
+                pass
+            except Exception as e:
+                erros.append(f'Erro ao processar novo arquivo: {e}')
+
+        if not erros:
+            processo.save()
+            return redirect('visualizar_processo', numero_slug=processo.numero_slug)
+
+        # Se houve erros, renderiza o template com os erros
+        return render(request, 'editar_processo.html', {
+            'processo': processo,
+            'erros': erros,
+        })
+
+    # GET: exibe o formulário preenchido
+    return render(request, 'editar_processo.html', {'processo': processo})

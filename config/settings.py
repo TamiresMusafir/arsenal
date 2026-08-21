@@ -251,7 +251,7 @@ CORS_ALLOW_HEADERS = [
 OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY')
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 OPENROUTER_MODEL = os.environ.get(
-    "OPENROUTER_MODEL", "inclusionai/ling-3.0-flash:free"
+    "OPENROUTER_MODEL", "google/gemma-4-26b-a4b-it"
 )
 OPENROUTER_PDF_ENGINE_SCAN = os.environ.get("OPENROUTER_PDF_ENGINE_SCAN", "native")
 

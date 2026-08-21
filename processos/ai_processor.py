@@ -42,7 +42,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 logger = logging.getLogger(__name__)
 
-
+_SEM_PRECO_AINDA = {"", "*", "-", "--"}
 
 # =====================================================================
 # Compatibilidade de PDF entre três gerações da biblioteca
@@ -236,7 +236,8 @@ def parse_modelo_proposta(file_path, limite_descricao=500):
     for linha in grade[linha_cab + 1:]:
         primeiro = cel(linha, "item")
         if re.fullmatch(r"\d{1,4}([.,]0+)?", primeiro):
-            preco = para_float(cel(linha, "preco_unitario"))
+            preco_txt = cel(linha, "preco_unitario")
+            preco = None if _norm_modelo(preco_txt) in _SEM_PRECO_AINDA else para_float(preco_txt)
             atual = {
                 "item": int(float(primeiro.replace(",", "."))),
                 "pi": cel(linha, "pi"),
@@ -409,8 +410,8 @@ class AIProcessor:
         # (conexao, leitura): falha rapido se a rede bloqueia, mas espera
         # o tempo necessario quando o PDF grande esta sendo processado.
         self.timeout = (
-            getattr(settings, "OPENROUTER_CONNECT_TIMEOUT", 15),
-            getattr(settings, "OPENROUTER_TIMEOUT", 300),
+            getattr(settings, "OPENROUTER_CONNECT_TIMEOUT", 300),
+            getattr(settings, "OPENROUTER_TIMEOUT", 3000),
         )
         # Rede corporativa/militar: proxy explicito e CA propria.
         # None faz o requests cair nas variaveis HTTP_PROXY/HTTPS_PROXY.

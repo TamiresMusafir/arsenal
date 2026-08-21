@@ -9,4 +9,8 @@ urlpatterns = [
     path("mapasgerados/", views.mapas_gerados, name="mapas_gerados"),
     path("download/<str:tipo>/<int:processo_id>/",
          views.download_arquivo, name="download_arquivo"),
+
+    # --- ADICIONE ESTAS DUAS LINHAS ---
+    path("<slug:numero_slug>/", views.visualizar_processo, name="visualizar_processo"),
+    path("<slug:numero_slug>/editar/", views.editar_processo, name="editar_processo"),
 ]

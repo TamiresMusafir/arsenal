@@ -190,6 +190,9 @@ def _escrever_cabecalho(aba, empresas, estilos):
 
 
 def _escrever_itens(aba, itens, empresas, estilos):
+    for merged in list(aba.merged_cells.ranges):
+        if merged.min_row >= LINHA_PRIMEIRO_ITEM:
+            aba.unmerge_cells(str(merged))
     for posicao, item in enumerate(itens, start=1):
         linha = LINHA_PRIMEIRO_ITEM + posicao - 1
 
